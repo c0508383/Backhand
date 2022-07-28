@@ -1,7 +1,7 @@
-package louisxiv.backhand.client.renderer;
+package xonin.backhand.client.renderer;
 
-import louisxiv.backhand.BackhandUtilPlayer;
-import louisxiv.backhand.client.ClientEventHandler;
+import xonin.backhand.BackhandUtilPlayer;
+import xonin.backhand.client.ClientEventHandler;
 import mods.battlegear2.api.core.BattlegearUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;

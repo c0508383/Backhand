@@ -1,4 +1,4 @@
-package louisxiv.backhand;
+package xonin.backhand;
 
 import com.google.common.base.Charsets;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -13,7 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.village.MerchantRecipeList;
 import noppes.npcs.LogWriter;
-import louisxiv.backhand.constants.EnumPacketClient;
+import xonin.backhand.constants.EnumPacketClient;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,7 +26,7 @@ public class Server {
         try {
             if(!fillBuffer(buffer, enu, obs))
                 return false;
-            Backhand.Channel.sendTo(new FMLProxyPacket(buffer, "CustomNPCs"), player);
+            Backhand.Channel.sendTo(new FMLProxyPacket(buffer, "Backhand"), player);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -39,7 +39,7 @@ public class Server {
             if(!fillBuffer(buffer, enu, obs))
                 return;
             NetworkRegistry.TargetPoint point = new NetworkRegistry.TargetPoint(entity.dimension, entity.posX, entity.posY, entity.posZ, 60);
-            Backhand.Channel.sendToAllAround(new FMLProxyPacket(buffer,"CustomNPCs"), point);
+            Backhand.Channel.sendToAllAround(new FMLProxyPacket(buffer,"Backhand"), point);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -49,7 +49,7 @@ public class Server {
         try {
             if(!fillBuffer(buffer, enu, obs))
                 return;
-            Backhand.Channel.sendToAll(new FMLProxyPacket(buffer,"CustomNPCs"));
+            Backhand.Channel.sendToAll(new FMLProxyPacket(buffer,"Backhand"));
         } catch (IOException e) {
             e.printStackTrace();
         }

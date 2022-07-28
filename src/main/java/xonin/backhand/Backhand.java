@@ -1,4 +1,4 @@
-package louisxiv.backhand;
+package xonin.backhand;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -14,21 +14,16 @@ import noppes.npcs.config.ConfigProp;
 
 import java.io.File;
 
-@Mod(modid = Backhand.MODID, useMetadata = true, version = Backhand.VERSION, name = "Backhand")
+@Mod(modid = "backhand", name = "Backhand", version = "1.0")
 public class Backhand {
-    public static final String MODID = "backhand";
-    public static final String VERSION = "1.0";
-
-    @Mod.Instance("backhand")
     public static Backhand Instance;
     public static ConfigLoader Config;
 
     public static FMLEventChannel Channel;
     public static FMLEventChannel ChannelPlayer;
 
-    @SidedProxy(clientSide = "louisxiv.backhand.client.ClientProxy",
-                serverSide = "louisxiv.backhand.CommonProxy",
-                modId = "backhand")
+    @SidedProxy(clientSide = "xonin.backhand.client.ClientProxy",
+                serverSide = "xonin.backhand.CommonProxy")
     public static CommonProxy proxy;
 
     @ConfigProp(info="If an extra slot is not made for the offhand, this is the index of where\n" +
@@ -41,8 +36,8 @@ public class Backhand {
 
     @Mod.EventHandler
     public void load(FMLPreInitializationEvent ev) {
-        Channel = NetworkRegistry.INSTANCE.newEventDrivenChannel("CustomNPCs");
-        ChannelPlayer = NetworkRegistry.INSTANCE.newEventDrivenChannel("CustomNPCsPlayer");
+        Channel = NetworkRegistry.INSTANCE.newEventDrivenChannel("Backhand");
+        ChannelPlayer = NetworkRegistry.INSTANCE.newEventDrivenChannel("BackhandPlayer");
 
         MinecraftServer server = MinecraftServer.getServer();
         String dir = "";

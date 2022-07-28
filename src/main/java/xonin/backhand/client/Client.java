@@ -1,11 +1,11 @@
-package louisxiv.backhand.client;
+package xonin.backhand.client;
 
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import louisxiv.backhand.Backhand;
-import louisxiv.backhand.Server;
-import louisxiv.backhand.constants.EnumPacketServer;
+import xonin.backhand.Backhand;
+import xonin.backhand.Server;
+import xonin.backhand.constants.EnumPacketServer;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ public class Client {
         try {
             if(!Server.fillBuffer(buffer, enu, obs))
                 return;
-            Backhand.Channel.sendToServer(new FMLProxyPacket(buffer, "CustomNPCs"));
+            Backhand.Channel.sendToServer(new FMLProxyPacket(buffer, "Backhand"));
         } catch (IOException e) {
             e.printStackTrace();
         }

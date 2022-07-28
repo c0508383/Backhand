@@ -1,7 +1,7 @@
-package louisxiv.backhand.client;
+package xonin.backhand.client;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import louisxiv.backhand.CommonProxy;
+import xonin.backhand.CommonProxy;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
