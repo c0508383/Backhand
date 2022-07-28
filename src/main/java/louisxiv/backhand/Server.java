@@ -1,4 +1,4 @@
-package xonin.backhand;
+package louisxiv.backhand;
 
 import com.google.common.base.Charsets;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -13,7 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.village.MerchantRecipeList;
 import noppes.npcs.LogWriter;
-import xonin.backhand.constants.EnumPacketClient;
+import louisxiv.backhand.constants.EnumPacketClient;
 
 import java.io.IOException;
 import java.util.List;

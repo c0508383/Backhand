@@ -1,10 +1,10 @@
-package xonin.backhand.client;
+package louisxiv.backhand.client;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import louisxiv.backhand.CommonProxy;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import xonin.backhand.CommonProxy;
 
 public class ClientProxy extends CommonProxy {
 

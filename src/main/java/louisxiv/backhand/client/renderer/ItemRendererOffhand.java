@@ -1,5 +1,7 @@
-package xonin.backhand.client.renderer;
+package louisxiv.backhand.client.renderer;
 
+import louisxiv.backhand.BackhandUtilPlayer;
+import louisxiv.backhand.client.ClientEventHandler;
 import mods.battlegear2.api.core.BattlegearUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -7,7 +9,6 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.entity.EntityLivingBase;
@@ -20,11 +21,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.event.RenderPlayerEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import xonin.backhand.BackhandUtilPlayer;
-import xonin.backhand.client.ClientEventHandler;
 
 import static net.minecraftforge.client.IItemRenderer.ItemRenderType.*;
 import static net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D;

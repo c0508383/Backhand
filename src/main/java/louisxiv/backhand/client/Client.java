@@ -1,11 +1,11 @@
-package xonin.backhand.client;
+package louisxiv.backhand.client;
 
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import xonin.backhand.Backhand;
-import xonin.backhand.Server;
-import xonin.backhand.constants.EnumPacketServer;
+import louisxiv.backhand.Backhand;
+import louisxiv.backhand.Server;
+import louisxiv.backhand.constants.EnumPacketServer;
 
 import java.io.IOException;
 

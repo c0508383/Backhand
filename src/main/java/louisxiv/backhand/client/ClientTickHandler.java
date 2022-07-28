@@ -1,4 +1,4 @@
-package xonin.backhand.client;
+package louisxiv.backhand.client;
 
 public class ClientTickHandler {
 }

@@ -1,4 +1,4 @@
-package xonin.backhand;
+package louisxiv.backhand;
 
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;

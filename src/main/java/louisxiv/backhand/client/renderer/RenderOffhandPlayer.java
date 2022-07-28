@@ -1,4 +1,4 @@
-package xonin.backhand.client.renderer;
+package louisxiv.backhand.client.renderer;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;

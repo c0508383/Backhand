@@ -1,4 +1,4 @@
-package xonin.backhand.client;
+package louisxiv.backhand.client;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -14,8 +14,8 @@ import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import xonin.backhand.BackhandUtilPlayer;
-import xonin.backhand.client.renderer.RenderOffhandPlayer;
+import louisxiv.backhand.BackhandUtilPlayer;
+import louisxiv.backhand.client.renderer.RenderOffhandPlayer;
 
 public class ClientEventHandler {
     public static final RenderOffhandPlayer renderOffhandPlayer = new RenderOffhandPlayer();
