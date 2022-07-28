@@ -4,13 +4,11 @@ See https://gist.github.com/TheCurle/fe7ad3ede188cbdd15c235cc75d52d4a for more i
 :compileApiJava UP-TO-DATE
 :processApiResources UP-TO-DATE
 :apiClasses UP-TO-DATE
-:sourceMainJava
-:compileJavaNote: C:\Programming Source\Minecraft Modding\1.7.10\Backhand\build\sources\java\xonin\backhand\Server.java uses unchecked or unsafe operations.
-Note: Recompile with -Xlint:unchecked for details.
-
+:sourceMainJava UP-TO-DATE
+:compileJava UP-TO-DATE
 :processResources UP-TO-DATE
-:classes
+:classes UP-TO-DATE
 
 BUILD SUCCESSFUL
 
-Total time: 0.316 secs
+Total time: 0.146 secs

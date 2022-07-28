@@ -96,7 +96,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
             {
                 itemRenderer.updateEquippedItem();
                 entityRenderer.enableLightmap((double)partialTicks);
-                itemRenderer.renderBGOffhand(partialTicks);
+                itemRenderer.renderOffhandItem(partialTicks);
                 entityRenderer.disableLightmap((double)partialTicks);
             }
 

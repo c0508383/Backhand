@@ -2,20 +2,19 @@ package xonin.backhand.client;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import xonin.backhand.BackhandUtilPlayer;
-import xonin.backhand.client.renderer.ItemRendererOffhand;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 public class ClientEventHandler {
@@ -33,7 +32,7 @@ public class ClientEventHandler {
 
     protected void renderHotbar(GuiIngame gui, int width, int height, float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
-        ItemStack itemstack = BackhandUtilPlayer.getInventoryOffhandItem(mc.thePlayer);
+        ItemStack itemstack = BackhandUtilPlayer.getOffhandItem(mc.thePlayer);
         if (itemstack == null) {
             return;
         }
@@ -64,7 +63,7 @@ public class ClientEventHandler {
 
     protected void renderOffhandInventorySlot(int p_73832_2_, int p_73832_3_, float p_73832_4_) {
         Minecraft mc = Minecraft.getMinecraft();
-        ItemStack itemstack = BackhandUtilPlayer.getInventoryOffhandItem(mc.thePlayer);
+        ItemStack itemstack = BackhandUtilPlayer.getOffhandItem(mc.thePlayer);
 
         if (itemstack != null)
         {
@@ -104,6 +103,14 @@ public class ClientEventHandler {
         GL11.glPushMatrix();
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         renderOffhandPlayer.renderHand(event.partialTicks, event.renderPass);
+        GL11.glPopMatrix();
+    }
+
+    @SubscribeEvent
+    public void render3rdPersonBattlemode(RenderPlayerEvent.Specials.Post event) {
+        GL11.glPushMatrix();
+        ModelBiped biped = (ModelBiped) event.renderer.modelBipedMain;
+        renderOffhandPlayer.itemRenderer.renderOffhandItemIn3rdPerson(event.entityPlayer, biped, event.partialRenderTick);
         GL11.glPopMatrix();
     }
 }

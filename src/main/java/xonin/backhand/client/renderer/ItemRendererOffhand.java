@@ -1,21 +1,22 @@
 package xonin.backhand.client.renderer;
 
+import mods.battlegear2.api.core.BattlegearUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.*;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.MapData;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.MinecraftForgeClient;
@@ -26,6 +27,7 @@ import xonin.backhand.BackhandUtilPlayer;
 import xonin.backhand.client.ClientEventHandler;
 
 import static net.minecraftforge.client.IItemRenderer.ItemRenderType.*;
+import static net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D;
 
 public class ItemRendererOffhand extends ItemRenderer {
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
@@ -243,7 +245,7 @@ public class ItemRendererOffhand extends ItemRenderer {
         p_78439_0_.draw();
     }
 
-    public void renderBGOffhand(float frame) {
+    public void renderOffhandItem(float frame) {
         float progress = this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * frame;
 
         EntityClientPlayerMP player = mc.thePlayer;
@@ -274,7 +276,7 @@ public class ItemRendererOffhand extends ItemRenderer {
         float f6;
         float f7;
 
-        ItemStack offhandItemStack = BackhandUtilPlayer.getInventoryOffhandItem(player);
+        ItemStack offhandItemStack = itemToRender;
         if (offhandItemStack != null)
         {
             int l = offhandItemStack.getItem().getColorFromItemStack(offhandItemStack, 0);
@@ -438,12 +440,98 @@ public class ItemRendererOffhand extends ItemRenderer {
         RenderHelper.disableStandardItemLighting();
     }
 
+    public void renderOffhandItemIn3rdPerson(EntityPlayer par1EntityPlayer, ModelBiped modelBipedMain, float frame) {
+        ItemStack var21 = this.itemToRender;
+        if (var21 != null) {
+            float var7;
+            GL11.glPushMatrix();
+            modelBipedMain.bipedLeftArm.postRender(0.0625F);
+            GL11.glTranslatef(0.0625F, 0.4375F, 0.0625F);
+
+            if (par1EntityPlayer.fishEntity != null) {
+                var21 = new ItemStack(Items.stick);
+            }
+
+            EnumAction var23 = null;
+
+            if (par1EntityPlayer.getItemInUseCount() > 0) {
+                var23 = var21.getItemUseAction();
+            }
+
+            IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(var21, EQUIPPED);
+            boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(EQUIPPED, var21, BLOCK_3D));
+
+            {
+                if (var21.getItem() instanceof ItemBlock && (is3D || RenderBlocks.renderItemIn3d(Block.getBlockFromItem(var21.getItem()).getRenderType()))) {
+                    var7 = 0.5F;
+                    GL11.glTranslatef(0.0F, 0.1875F, -0.3125F);
+                    var7 *= 0.75F;
+                    GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
+                    GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+                    GL11.glScalef(-var7, -var7, var7);
+                } else if (BattlegearUtils.isBow(var21.getItem())) {
+                    var7 = 0.625F;
+                    GL11.glTranslatef(0.0F, 0.125F, 0.3125F);
+                    GL11.glRotatef(-20.0F, 0.0F, 1.0F, 0.0F);
+                    GL11.glScalef(var7, -var7, var7);
+                    GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
+                    GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+                } else if (var21.getItem().isFull3D()) {
+                    var7 = 0.625F;
+
+                    if (var21.getItem().shouldRotateAroundWhenRendering()) {
+                        GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
+                        GL11.glTranslatef(0.0F, -0.125F, 0.0F);
+                    }
+
+                    if (par1EntityPlayer.getItemInUseCount() > 0 && var23 == EnumAction.block) {
+                        GL11.glTranslatef(0.05F, 0.0F, -0.1F);
+                        GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
+                        GL11.glRotatef(-10.0F, 1.0F, 0.0F, 0.0F);
+                        GL11.glRotatef(-60.0F, 0.0F, 0.0F, 1.0F);
+                    }
+
+                    GL11.glTranslatef(0.0F, 0.1875F, 0.0F);
+                    GL11.glScalef(var7, -var7, var7);
+                    GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
+                    GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+                } else {
+                    var7 = 0.375F;
+                    GL11.glTranslatef(0.25F, 0.1875F, -0.1875F);
+                    GL11.glScalef(var7, var7, var7);
+                    GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
+                    GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
+                    GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
+                }
+
+                if (var21.getItem().requiresMultipleRenderPasses()) {
+                    for (int var27 = 0; var27 < var21.getItem().getRenderPasses(var21.getItemDamage()); ++var27) {
+                        applyColorFromItemStack(var21, var27);
+                        RenderManager.instance.itemRenderer.renderItem(par1EntityPlayer, var21, var27);
+                    }
+                } else {
+                    applyColorFromItemStack(var21, 0);
+                    RenderManager.instance.itemRenderer.renderItem(par1EntityPlayer, var21, 0);
+                }
+            }
+            GL11.glPopMatrix();
+        }
+    }
+
+    public void applyColorFromItemStack(ItemStack itemStack, int pass){
+        int col = itemStack.getItem().getColorFromItemStack(itemStack, pass);
+        float r = (float) (col >> 16 & 255) / 255.0F;
+        float g = (float) (col >> 8 & 255) / 255.0F;
+        float b = (float) (col & 255) / 255.0F;
+        GL11.glColor4f(r, g, b, 1.0F);
+    }
+
     public void updateEquippedItem()
     {
         this.prevEquippedProgress = this.equippedProgress;
-        EntityClientPlayerMP entityclientplayermp = this.mc.thePlayer;
-        ItemStack itemstack = entityclientplayermp.inventory.getCurrentItem();
-        boolean flag = this.equippedItemSlot == entityclientplayermp.inventory.currentItem && itemstack == this.itemToRender;
+        EntityClientPlayerMP player = this.mc.thePlayer;
+        ItemStack itemstack = BackhandUtilPlayer.getOffhandItem(player);
+        boolean flag = this.equippedItemSlot == player.inventory.currentItem && itemstack == this.itemToRender;
 
         if (this.itemToRender == null && itemstack == null)
         {
@@ -475,7 +563,7 @@ public class ItemRendererOffhand extends ItemRenderer {
         if (this.equippedProgress < 0.1F)
         {
             this.itemToRender = itemstack;
-            this.equippedItemSlot = entityclientplayermp.inventory.currentItem;
+            this.equippedItemSlot = player.inventory.currentItem;
         }
     }
 

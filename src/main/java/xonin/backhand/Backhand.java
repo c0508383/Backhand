@@ -1,5 +1,6 @@
 package xonin.backhand;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -7,6 +8,7 @@ import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.MinecraftForge;
 import noppes.npcs.config.ConfigLoader;
 import noppes.npcs.config.ConfigProp;
 
@@ -60,6 +62,9 @@ public class Backhand {
 
         proxy.load();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
+
+        MinecraftForge.EVENT_BUS.register(new ServerEventsHandler());
+        FMLCommonHandler.instance().bus().register(new ServerTickHandler());
     }
 
     public static MinecraftServer getServer(){
