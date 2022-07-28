@@ -26,8 +26,8 @@ public class Backhand {
     public static FMLEventChannel Channel;
     public static FMLEventChannel ChannelPlayer;
 
-    @SidedProxy(clientSide = "xonin.backhand.client.ClientProxy",
-                serverSide = "xonin.backhand.CommonProxy",
+    @SidedProxy(clientSide = "louisxiv.backhand.client.ClientProxy",
+                serverSide = "louisxiv.backhand.CommonProxy",
                 modId = "backhand")
     public static CommonProxy proxy;
 
