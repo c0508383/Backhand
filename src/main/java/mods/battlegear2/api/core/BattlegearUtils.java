@@ -459,16 +459,22 @@ public class BattlegearUtils {
         result = ForgeEventFactory.onItemUseFinish(entityPlayer, itemInUse, itemInUseCount, result);
         if (result != itemInUse || (result != null && result.stackSize != previousStackSize)) {
             //Compare with either hands content
-            if (itemInUse == BattlegearUtils.getOffhandItem(entityPlayer)) {
+            if (itemInUse == entityPlayer.getCurrentEquippedItem()) {
                 if (result != null && result.stackSize == 0) {
-                    BattlegearUtils.setPlayerOffhandItem(entityPlayer, null);
+                    setPlayerCurrentItem(entityPlayer, null);
                 } else {
-                    BattlegearUtils.setPlayerOffhandItem(entityPlayer, result);
+                    setPlayerCurrentItem(entityPlayer, result);
+                }
+            } else if (itemInUse == ((InventoryPlayerBattle) entityPlayer.inventory).getOffhandItem()) {
+                if (result != null && result.stackSize == 0) {
+                    setPlayerOffhandItem(entityPlayer, null);
+                } else {
+                    setPlayerOffhandItem(entityPlayer, result);
                 }
             }
         }
         //Reset stuff so that vanilla doesn't do anything
         entityPlayer.clearItemInUse();
-        return result;
+        return null;
     }
 }
