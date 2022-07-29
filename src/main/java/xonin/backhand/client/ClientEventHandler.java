@@ -3,6 +3,7 @@ package xonin.backhand.client;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
+import mods.battlegear2.api.core.IBattlePlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.model.ModelBiped;
@@ -13,6 +14,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
@@ -93,6 +95,7 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void onRenderHand(RenderHandEvent event) {
+        MysteriumPatchesFixesO.onGround2 = 0;
         GL11.glPushMatrix();
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         renderOffhandPlayer.renderHand(event.partialTicks, event.renderPass);
