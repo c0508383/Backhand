@@ -100,7 +100,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void render3rdPersonBattlemode(RenderPlayerEvent.Specials.Post event) {
+    public void render3rdPersonOffhand(RenderPlayerEvent.Specials.Post event) {
         GL11.glPushMatrix();
         ModelBiped biped = (ModelBiped) event.renderer.modelBipedMain;
         renderOffhandPlayer.itemRenderer.renderOffhandItemIn3rdPerson(event.entityPlayer, biped, event.partialRenderTick);
