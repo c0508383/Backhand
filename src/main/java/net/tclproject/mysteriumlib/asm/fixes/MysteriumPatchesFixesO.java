@@ -243,7 +243,7 @@ public class MysteriumPatchesFixesO {
 	            float f8 = MathHelper.sin(onGround2 * (float)Math.PI) * -(b.bipedHead.rotateAngleX - 0.7F) * 0.75F;
 	            b.bipedLeftArm.rotateAngleX = (float)((double)b.bipedLeftArm.rotateAngleX - ((double)f7 * 1.2D + (double)f8));
 	            b.bipedLeftArm.rotateAngleY -= b.bipedBody.rotateAngleY * 2.0F;
-				b.bipedLeftArm.rotateAngleZ = MathHelper.sin(onGround2  * (float)Math.PI) * -0.4F;
+				b.bipedLeftArm.rotateAngleZ = -MathHelper.sin(onGround2  * (float)Math.PI) * -0.4F;
             }
         }
 
