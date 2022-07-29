@@ -40,7 +40,7 @@ public class ClientTickHandler {
     }
 
     @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
+    public void onClientTick(TickEvent.RenderTickEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.thePlayer != null && mc.theWorld != null && !mc.isGamePaused() && event.phase == TickEvent.Phase.END) {
             ClientEventHandler.renderOffhandPlayer.itemRenderer.updateEquippedItem();
