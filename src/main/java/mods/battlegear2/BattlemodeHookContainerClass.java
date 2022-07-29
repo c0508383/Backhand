@@ -113,35 +113,34 @@ public final class BattlemodeHookContainerClass {
                     mainHandItem.stackSize--;
                 }
             }
-            //if (!MysteriumPatchesFixesO.shouldNotOverride) {
-                PlayerInteractEvent.Result blk = event.useBlock;
-                PlayerInteractEvent.Result itm = event.useItem;
-                event.useBlock = PlayerInteractEvent.Result.DENY;
-                MovingObjectPosition mop = getRaytraceBlock(event.entityPlayer);
-                if (Backhand.proxy.isRightClickHeld() && !MysteriumPatchesFixesO.leftclicked) {
-                    event.setCanceled(true);
-                }
-                if (mop != null) {
-                    event.setCanceled(true);
-                    int
-                    i = mop.blockX,
-                    j = mop.blockY,
-                    k = mop.blockZ,
-                    side = mop.sideHit;
-                    float f = (float)mop.hitVec.xCoord - i;
-                    float f1 = (float)mop.hitVec.yCoord - j;
-                    float f2 = (float)mop.hitVec.zCoord - k;
 
-                    if (!event.entityPlayer.isSneaking() && ClientTickHandler.canBlockBeInteractedWith(event.entityPlayer.worldObj, i, j, k)) {
-                        event.setCanceled(false);
-                        event.useBlock = blk;
-                        event.useItem = itm;
-                    }
+            PlayerInteractEvent.Result blk = event.useBlock;
+            PlayerInteractEvent.Result itm = event.useItem;
+            event.useBlock = PlayerInteractEvent.Result.DENY;
+            MovingObjectPosition mop = getRaytraceBlock(event.entityPlayer);
+            if (Backhand.proxy.isRightClickHeld() && !MysteriumPatchesFixesO.leftclicked) {
+                event.setCanceled(true);
+            }
+            if (mop != null) {
+                event.setCanceled(true);
+                int
+                i = mop.blockX,
+                j = mop.blockY,
+                k = mop.blockZ,
+                side = mop.sideHit;
+                float f = (float)mop.hitVec.xCoord - i;
+                float f1 = (float)mop.hitVec.yCoord - j;
+                float f2 = (float)mop.hitVec.zCoord - k;
+
+                if (!event.entityPlayer.isSneaking() && ClientTickHandler.canBlockBeInteractedWith(event.entityPlayer.worldObj, i, j, k)) {
+                    event.setCanceled(false);
+                    event.useBlock = blk;
+                    event.useItem = itm;
                 }
-                if (event.entityPlayer.worldObj.isRemote && !BattlegearUtils.usagePriorAttack(offhandItem)) {
-                    sendOffSwingEventNoCheck(mainHandItem, offhandItem);
-                }
-            //}
+            }
+            if (event.entityPlayer.worldObj.isRemote && !BattlegearUtils.usagePriorAttack(offhandItem)) {
+                sendOffSwingEventNoCheck(mainHandItem, offhandItem);
+            }
         }
     }
 
@@ -305,10 +304,6 @@ public final class BattlemodeHookContainerClass {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public void onOffhandSwing(PlayerEventChild.OffhandSwingEvent event){
-        if(MysteriumPatchesFixesO.shouldNotOverride){
-            event.setCanceled(true);
-            event.setCancelParentEvent(false);
-        }
     }
     
     public boolean interactWithNoEvent(EntityPlayer pl, Entity p_70998_1_)
@@ -367,26 +362,24 @@ public final class BattlemodeHookContainerClass {
         if(!BattlegearUtils.usagePriorAttack(offhandItem)){
             ItemStack mainHandItem = event.entityPlayer.getCurrentEquippedItem();
             PlayerEventChild.OffhandAttackEvent offAttackEvent = new PlayerEventChild.OffhandAttackEvent(event, mainHandItem, offhandItem);
-            //if (!MysteriumPatchesFixesO.shouldNotOverride) {
-                if(!MinecraftForge.EVENT_BUS.post(offAttackEvent)){
-                    if (interactWith) {
-                        interactWith = false;
-                        return;
-                    } else {
-                        event.setCanceled(true);
-                    }
-                    if (offAttackEvent.swingOffhand){
-                        if (event.entityPlayer.worldObj.isRemote) sendOffSwingEvent(event, mainHandItem, offhandItem);
-                    }
-                    if (offAttackEvent.shouldAttack)
-                    {
-                        ((IBattlePlayer) event.entityPlayer).attackTargetEntityWithCurrentOffItem(event.target);
-                    }
-                    if (offAttackEvent.cancelParent) {
-                        event.setCanceled(true);
-                    }
+            if(!MinecraftForge.EVENT_BUS.post(offAttackEvent)){
+                if (interactWith) {
+                    interactWith = false;
+                    return;
+                } else {
+                    event.setCanceled(true);
                 }
-            //}
+                if (offAttackEvent.swingOffhand){
+                    if (event.entityPlayer.worldObj.isRemote) sendOffSwingEvent(event, mainHandItem, offhandItem);
+                }
+                if (offAttackEvent.shouldAttack)
+                {
+                    ((IBattlePlayer) event.entityPlayer).attackTargetEntityWithCurrentOffItem(event.target);
+                }
+                if (offAttackEvent.cancelParent) {
+                    event.setCanceled(true);
+                }
+            }
         }
     }
 

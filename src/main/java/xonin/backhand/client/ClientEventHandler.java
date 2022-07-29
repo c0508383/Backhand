@@ -18,7 +18,7 @@ import org.lwjgl.opengl.GL12;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 public class ClientEventHandler {
-    public static final RenderOffhandPlayer renderOffhandPlayer = new RenderOffhandPlayer();
+    public RenderOffhandPlayer renderOffhandPlayer = new RenderOffhandPlayer();
     public static boolean cancelone = false;
     public static int delay;
 
@@ -103,6 +103,8 @@ public class ClientEventHandler {
     public void render3rdPersonOffhand(RenderPlayerEvent.Specials.Post event) {
         GL11.glPushMatrix();
         ModelBiped biped = (ModelBiped) event.renderer.modelBipedMain;
+        renderOffhandPlayer.itemRenderer.updateEquippedItem();
+        renderOffhandPlayer.updateFovModifierHand();
         renderOffhandPlayer.itemRenderer.renderOffhandItemIn3rdPerson(event.entityPlayer, biped, event.partialRenderTick);
         GL11.glPopMatrix();
     }

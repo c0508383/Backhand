@@ -51,12 +51,8 @@ import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import xonin.backhand.client.ClientEventHandler;
 
 public class MysteriumPatchesFixesO {
-
-	/**Whether we should override the default action of the item in hand*/
-	public static boolean shouldNotOverride;
 	/**Whether we have just overriden the minecraft method that gets called on right click to substitute the offhand item*/
 	public static boolean leftclicked;
-    private static boolean consecutiveCancel;
 
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
 	public static boolean isPlayer(EntityPlayer p) {
@@ -67,13 +63,11 @@ public class MysteriumPatchesFixesO {
 	@SideOnly(Side.CLIENT)
 	public static boolean func_147116_af(Minecraft mc) {
 		if (Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() == null || (mc.objectMouseOver.typeOfHit == MovingObjectType.BLOCK && Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() != null && !(Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem().getItem() instanceof ItemMonsterPlacer)) || !BattlegearUtils.usagePriorAttack(Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem())) {
-			shouldNotOverride = true;
 			return false;
 		}
 		KeyBinding keyCode = Minecraft.getMinecraft().gameSettings.keyBindUseItem;
 		KeyBinding.setKeyBindState(keyCode.getKeyCode(), true);
 		KeyBinding.onTick(keyCode.getKeyCode());
-		shouldNotOverride = true;
 		leftclicked = true;
 		return true;
 	}

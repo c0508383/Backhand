@@ -20,8 +20,6 @@ import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 import xonin.backhand.Backhand;
 
-import xonin.backhand.client.ClientEventHandler;
-
 public class ClientTickHandler {
 
     @SubscribeEvent
@@ -39,15 +37,6 @@ public class ClientTickHandler {
         }
     }
 
-    @SubscribeEvent
-    public void onClientTick(TickEvent.RenderTickEvent event) {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.thePlayer != null && mc.theWorld != null && !mc.isGamePaused() && event.phase == TickEvent.Phase.END) {
-            ClientEventHandler.renderOffhandPlayer.itemRenderer.updateEquippedItem();
-            ClientEventHandler.renderOffhandPlayer.updateFovModifierHand();
-        }
-    }
-
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void clientHelper(TickEvent.PlayerTickEvent event) {
@@ -58,7 +47,7 @@ public class ClientTickHandler {
             return;
         }
 
-        if (/*!MysteriumPatchesFixesO.shouldNotOverride && */event.player.worldObj.isRemote && Backhand.proxy.getLeftClickCounter() <= 0) {
+        if (event.player.worldObj.isRemote && Backhand.proxy.getLeftClickCounter() <= 0) {
             if (event.player.capabilities.allowEdit) {
                 if (Backhand.proxy.isRightClickHeld()) { // if it's a block and we should try break it
                     MovingObjectPosition mop = BattlemodeHookContainerClass.getRaytraceBlock(event.player);
