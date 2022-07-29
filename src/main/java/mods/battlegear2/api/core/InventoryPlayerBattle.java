@@ -104,11 +104,6 @@ public class InventoryPlayerBattle extends InventoryPlayer {
         }
     }
 
-    public int getSizeInventory()
-    {
-        return this.mainInventory.length + 5;
-    }
-
     public void setInventorySlotContents(int slot, ItemStack itemStack) {
         if (slot == InventoryPlayerBattle.OFFHAND_ITEM_INDEX) {
             this.setOffhandItem(itemStack);
