@@ -92,15 +92,6 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.thePlayer != null && mc.theWorld != null && !mc.isGamePaused() && event.phase == TickEvent.Phase.END) {
-            renderOffhandPlayer.itemRenderer.updateEquippedItem();
-            renderOffhandPlayer.updateFovModifierHand();
-        }
-    }
-
-    @SubscribeEvent
     public void onRenderHand(RenderHandEvent event) {
         GL11.glPushMatrix();
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);

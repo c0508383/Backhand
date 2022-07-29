@@ -459,58 +459,56 @@ public class ItemRendererOffhand extends ItemRenderer {
             IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(offhandItem, EQUIPPED);
             boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(EQUIPPED, offhandItem, BLOCK_3D));
 
-            {
-                if (offhandItem.getItem() instanceof ItemBlock && (is3D || RenderBlocks.renderItemIn3d(Block.getBlockFromItem(offhandItem.getItem()).getRenderType()))) {
-                    var7 = 0.5F;
-                    GL11.glTranslatef(0.0F, 0.1875F, -0.3125F);
-                    var7 *= 0.75F;
-                    GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
-                    GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-                    GL11.glScalef(-var7, -var7, var7);
-                } else if (BattlegearUtils.isBow(offhandItem.getItem())) {
-                    var7 = 0.625F;
-                    GL11.glTranslatef(0.0F, 0.125F, 0.3125F);
-                    GL11.glRotatef(-20.0F, 0.0F, 1.0F, 0.0F);
-                    GL11.glScalef(var7, -var7, var7);
-                    GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
-                    GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-                } else if (offhandItem.getItem().isFull3D()) {
-                    var7 = 0.625F;
+            if (offhandItem.getItem() instanceof ItemBlock && (is3D || RenderBlocks.renderItemIn3d(Block.getBlockFromItem(offhandItem.getItem()).getRenderType()))) {
+                var7 = 0.5F;
+                GL11.glTranslatef(0.0F, 0.1875F, -0.3125F);
+                var7 *= 0.75F;
+                GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+                GL11.glScalef(-var7, -var7, var7);
+            } else if (BattlegearUtils.isBow(offhandItem.getItem())) {
+                var7 = 0.625F;
+                GL11.glTranslatef(0.0F, 0.125F, 0.3125F);
+                GL11.glRotatef(-20.0F, 0.0F, 1.0F, 0.0F);
+                GL11.glScalef(var7, -var7, var7);
+                GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+            } else if (offhandItem.getItem().isFull3D()) {
+                var7 = 0.625F;
 
-                    if (offhandItem.getItem().shouldRotateAroundWhenRendering()) {
-                        GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
-                        GL11.glTranslatef(0.0F, -0.125F, 0.0F);
-                    }
-
-                    if (player.getItemInUseCount() > 0 && player.getItemInUse() == offhandItem && var23 == EnumAction.block) {
-                        GL11.glTranslatef(0.05F, 0.0F, -0.1F);
-                        GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
-                        GL11.glRotatef(-10.0F, 1.0F, 0.0F, 0.0F);
-                        GL11.glRotatef(-60.0F, 0.0F, 0.0F, 1.0F);
-                    }
-
-                    GL11.glTranslatef(0.0F, 0.1875F, 0.0F);
-                    GL11.glScalef(var7, -var7, var7);
-                    GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
-                    GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-                } else {
-                    var7 = 0.375F;
-                    GL11.glTranslatef(0.25F, 0.1875F, -0.1875F);
-                    GL11.glScalef(var7, var7, var7);
-                    GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
-                    GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
-                    GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
+                if (offhandItem.getItem().shouldRotateAroundWhenRendering()) {
+                    GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
+                    GL11.glTranslatef(0.0F, -0.125F, 0.0F);
                 }
 
-                if (offhandItem.getItem().requiresMultipleRenderPasses()) {
-                    for (int var27 = 0; var27 < offhandItem.getItem().getRenderPasses(offhandItem.getItemDamage()); ++var27) {
-                        applyColorFromItemStack(offhandItem, var27);
-                        RenderManager.instance.itemRenderer.renderItem(player, offhandItem, var27);
-                    }
-                } else {
-                    applyColorFromItemStack(offhandItem, 0);
-                    RenderManager.instance.itemRenderer.renderItem(player, offhandItem, 0);
+                if (player.getItemInUseCount() > 0 && player.getItemInUse() == offhandItem && var23 == EnumAction.block) {
+                    GL11.glTranslatef(0.05F, 0.0F, -0.1F);
+                    GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(-10.0F, 1.0F, 0.0F, 0.0F);
+                    GL11.glRotatef(-60.0F, 0.0F, 0.0F, 1.0F);
                 }
+
+                GL11.glTranslatef(0.0F, 0.1875F, 0.0F);
+                GL11.glScalef(var7, -var7, var7);
+                GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+            } else {
+                var7 = 0.375F;
+                GL11.glTranslatef(0.25F, 0.1875F, -0.1875F);
+                GL11.glScalef(var7, var7, var7);
+                GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
+                GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
+            }
+
+            if (offhandItem.getItem().requiresMultipleRenderPasses()) {
+                for (int var27 = 0; var27 < offhandItem.getItem().getRenderPasses(offhandItem.getItemDamage()); ++var27) {
+                    applyColorFromItemStack(offhandItem, var27);
+                    RenderManager.instance.itemRenderer.renderItem(player, offhandItem, var27);
+                }
+            } else {
+                applyColorFromItemStack(offhandItem, 0);
+                RenderManager.instance.itemRenderer.renderItem(player, offhandItem, 0);
             }
             GL11.glPopMatrix();
         }

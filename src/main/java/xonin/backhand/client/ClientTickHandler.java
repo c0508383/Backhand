@@ -1,6 +1,5 @@
 package xonin.backhand.client;
 
-import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -9,22 +8,19 @@ import cpw.mods.fml.relauncher.SideOnly;
 import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.api.core.BattlegearTranslator;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import mods.battlegear2.packet.OffhandSwapPacket;
-import mods.battlegear2.packet.OverrideSyncServer;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import xonin.backhand.Backhand;
+
+import xonin.backhand.client.ClientEventHandler;
 
 public class ClientTickHandler {
 
@@ -40,6 +36,15 @@ public class ClientTickHandler {
             );
             ((InventoryPlayerBattle) player.inventory).setOffhandItem(player.getCurrentEquippedItem());
             BattlegearUtils.setPlayerCurrentItem(player, offhandItem);
+        }
+    }
+
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.thePlayer != null && mc.theWorld != null && !mc.isGamePaused() && event.phase == TickEvent.Phase.END) {
+            ClientEventHandler.renderOffhandPlayer.itemRenderer.updateEquippedItem();
+            ClientEventHandler.renderOffhandPlayer.updateFovModifierHand();
         }
     }
 
