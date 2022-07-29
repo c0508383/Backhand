@@ -6,7 +6,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.MinecraftForge;
 
 /**
  * User: nerd-boy
@@ -105,6 +104,27 @@ public class InventoryPlayerBattle extends InventoryPlayer {
         }
     }
 
+    public int getSizeInventory()
+    {
+        return this.mainInventory.length + 5;
+    }
+
+    public void setInventorySlotContents(int slot, ItemStack itemStack) {
+        if (slot == InventoryPlayerBattle.OFFHAND_ITEM_INDEX) {
+            this.setOffhandItem(itemStack);
+        } else {
+            super.setInventorySlotContents(slot,itemStack);
+        }
+    }
+
+    public ItemStack getStackInSlotOnClosing(int slot) {
+        if (slot == InventoryPlayerBattle.OFFHAND_ITEM_INDEX) {
+            return this.getOffhandItem();
+        } else {
+            return super.getStackInSlotOnClosing(slot);
+        }
+    }
+
     /**
      * Writes the inventory out as a list of compound tags. This is where the slot indices are used (+100 for armor, +150
      * for battle slots).
@@ -179,6 +199,13 @@ public class InventoryPlayerBattle extends InventoryPlayer {
             hasChanged = true;
             this.offhandItem = ItemStack.copyItemStack(par1InventoryPlayer.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX));
         }
+    }
+
+    public void dropAllItems()
+    {
+        super.dropAllItems();
+        this.player.func_146097_a(offhandItem, true, false);
+        this.offhandItem = null;
     }
 
     /**
