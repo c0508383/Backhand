@@ -28,7 +28,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import xonin.backhand.BackhandUtilPlayer;
 
 /**
  * Store commonly used method, mostly for the {@link EntityPlayer} {@link ItemStack}s management
@@ -52,6 +51,18 @@ public class BattlegearUtils {
      * The generic attack damage key for {@link ItemStack#getAttributeModifiers()}
      */
     private static String genericAttack = SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName();
+
+    public static void setPlayerCurrentItem(EntityPlayer player, ItemStack stack) {
+        (player.inventory).setInventorySlotContents(player.inventory.currentItem, stack);
+    }
+
+    public static void setPlayerOffhandItem(EntityPlayer player, ItemStack stack) {
+        ((InventoryPlayerBattle)player.inventory).setOffhandItem(stack);
+    }
+
+    public static ItemStack getOffhandItem(EntityPlayer player) {
+        return ((InventoryPlayerBattle)player.inventory).getOffhandItem();
+    }
 
     /**
      * Defines a generic weapon
@@ -97,33 +108,32 @@ public class BattlegearUtils {
     }
 
     /**
+     * Patch in EntityPlayer#onUpdate() to support hotswap of itemInUse
+     * @param entityPlayer
+     * @param itemInUse
+     * @return
+     */
+    public static ItemStack getCurrentItemOnUpdate(EntityPlayer entityPlayer, ItemStack itemInUse) {
+        ItemStack itemStack = ((InventoryPlayerBattle) entityPlayer.inventory).getOffhandItem();
+        if (itemInUse == itemStack) {
+            return itemStack;
+        }
+        return entityPlayer.getCurrentEquippedItem();
+    }
+
+    /**
      * Defines a item which "use" (effect on right click) should have priority over its "attack" (effect on left click)
      * @param itemStack the item which will be "used", instead of attacking
      * @return true if such item prefer being "used"
      */
     public static boolean usagePriorAttack(ItemStack itemStack){
-        /*
-        boolean result = false;
-        if(itemStack == null) return false;
-        if(itemStack.getItem() instanceof IUsableItem)
-            if (reverseactionconfirmed) {
-                return !(((IUsableItem) itemStack.getItem()).isUsedOverAttack(itemStack));
-            } else {
-                return ((IUsableItem) itemStack.getItem()).isUsedOverAttack(itemStack);
-            }
-        else if(itemStack.getItemUseAction()==EnumAction.drink || itemStack.getItemUseAction()==EnumAction.eat)
-            if (reverseactionconfirmed) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        result = !(itemStack.getItem() instanceof ItemSword) && (checkForRightClickFunction(itemStack) || isCommonlyUsable(itemStack.getItem()));
-        if (reverseactionconfirmed) return !(!(itemStack.getItem() instanceof ItemSword) && (checkForRightClickFunction(itemStack) || isCommonlyUsable(itemStack.getItem())));
-        return result;
-
-         */
-        return false;
+        if (itemStack == null) {
+            return false;
+        }
+        if(itemStack.getItemUseAction() == EnumAction.drink || itemStack.getItemUseAction() == EnumAction.eat || itemStack.getItemUseAction() == EnumAction.bow) {
+            return true;
+        }
+        return !(itemStack.getItem() instanceof ItemSword) && (checkForRightClickFunction(itemStack) || isCommonlyUsable(itemStack.getItem()));
     }
 
     /**
@@ -147,11 +157,6 @@ public class BattlegearUtils {
 
     public static boolean isItemBlock(Item item) {
         return item instanceof ItemBlock || item instanceof ItemDoor || item instanceof ItemSign || item instanceof ItemReed || item instanceof ItemSeedFood || item instanceof ItemRedstone || item instanceof ItemBucket || item instanceof ItemSkull;
-    }
-
-    @Deprecated//See method below
-    public static boolean checkForRightClickFunction(Item item, ItemStack stack){
-        return checkForRightClickFunction(stack);
     }
 
     @SuppressWarnings("unchecked")
@@ -271,22 +276,22 @@ public class BattlegearUtils {
      */
     public static void attackTargetEntityWithCurrentOffItem(EntityPlayer player, Entity par1Entity){
         final ItemStack oldItem = player.getCurrentEquippedItem();
-        final ItemStack offhandItem = BackhandUtilPlayer.getOffhandItem(player);
-        BackhandUtilPlayer.setPlayerCurrentItem(player,offhandItem);
+        final ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+        BattlegearUtils.setPlayerCurrentItem(player,offhandItem);
         ItemStack stack = player.getCurrentEquippedItem();
 
         refreshAttributes(player.getAttributeMap(), oldItem, stack);
         if (MinecraftForge.EVENT_BUS.post(new AttackEntityEvent(player, par1Entity)))
         {
             refreshAttributes(player.getAttributeMap(), player.getCurrentEquippedItem(), oldItem);
-            BackhandUtilPlayer.setPlayerCurrentItem(player,oldItem);
+            BattlegearUtils.setPlayerCurrentItem(player,oldItem);
             return;
         }
         stack = player.getCurrentEquippedItem();
         if (stack != null && stack.getItem().onLeftClickEntity(stack, player, par1Entity))
         {
             refreshAttributes(player.getAttributeMap(), player.getCurrentEquippedItem(), oldItem);
-            BackhandUtilPlayer.setPlayerCurrentItem(player,oldItem);
+            BattlegearUtils.setPlayerCurrentItem(player,oldItem);
             return;
         }
         if (par1Entity.canAttackWithItem())
@@ -411,7 +416,7 @@ public class BattlegearUtils {
             }
         }
         refreshAttributes(player.getAttributeMap(), player.getCurrentEquippedItem(), oldItem);
-        BackhandUtilPlayer.setPlayerCurrentItem(player,oldItem);
+        BattlegearUtils.setPlayerCurrentItem(player,oldItem);
     }
 
     /**
@@ -454,11 +459,11 @@ public class BattlegearUtils {
         result = ForgeEventFactory.onItemUseFinish(entityPlayer, itemInUse, itemInUseCount, result);
         if (result != itemInUse || (result != null && result.stackSize != previousStackSize)) {
             //Compare with either hands content
-            if (itemInUse == BackhandUtilPlayer.getOffhandItem(entityPlayer)) {
+            if (itemInUse == BattlegearUtils.getOffhandItem(entityPlayer)) {
                 if (result != null && result.stackSize == 0) {
-                    BackhandUtilPlayer.setOffhandItem(entityPlayer, null);
+                    BattlegearUtils.setPlayerOffhandItem(entityPlayer, null);
                 } else {
-                    BackhandUtilPlayer.setOffhandItem(entityPlayer, result);
+                    BattlegearUtils.setPlayerOffhandItem(entityPlayer, result);
                 }
             }
         }

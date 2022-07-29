@@ -1,6 +1,6 @@
 package xonin.backhand.client.renderer;
 
-import xonin.backhand.BackhandUtilPlayer;
+import mods.battlegear2.api.core.IBattlePlayer;
 import xonin.backhand.client.ClientEventHandler;
 import mods.battlegear2.api.core.BattlegearUtils;
 import net.minecraft.block.Block;
@@ -315,8 +315,8 @@ public class ItemRendererOffhand extends ItemRenderer {
                         GL11.glRotatef(var12 * 3.0F, 0.0F, 0.0F, 1.0F);
                     }
                 } else {
-                    //var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
-                    var20 = player.getSwingProgress(frame);
+                    var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
+                    //var20 = player.getSwingProgress(frame);
                     var21 = MathHelper.sin(var20 * (float) Math.PI);
                     var10 = MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI);
                     //Flip the (x direction)
@@ -329,8 +329,8 @@ public class ItemRendererOffhand extends ItemRenderer {
                 GL11.glRotatef(-45.0F, 0.0F, 1.0F, 0.0F);
 
                 GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-                //var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
-                var20 = player.getSwingProgress(frame);
+                var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
+                //var20 = player.getSwingProgress(frame);
 
                 var21 = MathHelper.sin(var20 * var20 * (float) Math.PI);
                 var10 = MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI);
@@ -407,8 +407,8 @@ public class ItemRendererOffhand extends ItemRenderer {
 
             GL11.glScalef(-1.0F, 1.0F, 1.0F);
 
-            //var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
-            var20 = player.getSwingProgress(frame);
+            var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
+            //var20 = player.getSwingProgress(frame);
             var21 = MathHelper.sin(var20 * (float) Math.PI);
             var10 = MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI);
             GL11.glTranslatef(-var10 * 0.3F, MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI * 2.0F) * 0.4F, -var21 * 0.4F);
@@ -528,13 +528,8 @@ public class ItemRendererOffhand extends ItemRenderer {
     {
         this.prevEquippedProgress = this.equippedProgress;
         EntityClientPlayerMP player = this.mc.thePlayer;
-        ItemStack itemstack = BackhandUtilPlayer.getOffhandItem(player);
-        boolean flag = this.equippedItemSlot == player.inventory.currentItem && itemstack == this.itemToRender;
-
-        if (this.itemToRender == null && itemstack == null)
-        {
-            flag = true;
-        }
+        ItemStack itemstack = BattlegearUtils.getOffhandItem(player);
+        boolean flag = itemstack == this.itemToRender;
 
         if (itemstack != null && this.itemToRender != null && itemstack != this.itemToRender && itemstack.getItem() == this.itemToRender.getItem() && itemstack.getItemDamage() == this.itemToRender.getItemDamage())
         {
