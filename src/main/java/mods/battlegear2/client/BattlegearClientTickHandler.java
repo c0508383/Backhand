@@ -167,28 +167,27 @@ public final class BattlegearClientTickHandler {
             }
         }
         Backhand.packetHandler.sendPacketToServer(new OffhandPlaceBlockPacket(i, j, k, l, offhand, f, f1, f2).generatePacket());
-        if (flag){
+        if (flag) {
             return true;
-        }
-        else if (offhand == null){
-            return false;
-        }
-        else{
+        } else {
             if (controller.isInCreativeMode()){
                 i1 = offhand.getItemDamage();
                 int j1 = offhand.stackSize;
                 boolean flag1 = offhand.tryPlaceItemIntoWorld(player, worldObj, i, j, k, l, f, f1, f2);
                 offhand.setItemDamage(i1);
                 offhand.stackSize = j1;
+                if (flag1) {
+                    BattlemodeHookContainerClass.sendOffSwingEventNoCheck(player, offhand, player.getCurrentEquippedItem());
+                }
                 return flag1;
-            }
-            else{
+            } else {
                 if (!offhand.tryPlaceItemIntoWorld(player, worldObj, i, j, k, l, f, f1, f2)){
                     return false;
                 }
                 if (offhand.stackSize <= 0){
                     ForgeEventFactory.onPlayerDestroyItem(player, offhand);
                 }
+                BattlemodeHookContainerClass.sendOffSwingEventNoCheck(player,offhand,player.getCurrentEquippedItem());
                 return true;
             }
         }

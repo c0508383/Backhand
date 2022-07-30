@@ -116,10 +116,7 @@ public final class BattlemodeHookContainerClass {
             }
             if (mop != null) {
                 event.setCanceled(true);
-                int
-                i = mop.blockX,
-                j = mop.blockY,
-                k = mop.blockZ,
+                int i = mop.blockX, j = mop.blockY, k = mop.blockZ,
                 side = mop.sideHit;
                 float f = (float)mop.hitVec.xCoord - i;
                 float f1 = (float)mop.hitVec.yCoord - j;
