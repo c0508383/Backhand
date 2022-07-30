@@ -19,7 +19,7 @@ import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 
-@Mod(modid = "backhand", name = "Backhand", version = "1.0")
+@Mod(modid = "backhand", name = "Backhand", version = "1.0.0")
 public class Backhand {
     public static Backhand Instance;
 
