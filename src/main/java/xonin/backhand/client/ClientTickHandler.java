@@ -41,6 +41,10 @@ public class ClientTickHandler {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void clientHelper(TickEvent.PlayerTickEvent event) {
+        if (!Backhand.OffhandBreakBlocks) {
+            return;
+        }
+
         if (!Backhand.EmptyOffhand && BattlegearUtils.getOffhandItem(event.player) == null) {
             return;
         }

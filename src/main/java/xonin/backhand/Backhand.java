@@ -33,6 +33,7 @@ public class Backhand {
 
     public static boolean OffhandAttack = false;
     public static boolean EmptyOffhand = false;
+    public static boolean OffhandBreakBlocks = false;
     public static Item[] offhandBlacklist;
     public static boolean RenderEmptyOffhandAtRest = true;
 

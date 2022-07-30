@@ -29,6 +29,10 @@ public class BattlegearConfig {
         Backhand.EmptyOffhand = config.get(category, "Allow empty offhand",Backhand.EmptyOffhand, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
+        sb.append("Determines whether you can break blocks with the offhand or not.");
+        Backhand.OffhandBreakBlocks = config.get(category, "Offhand breaks blocks",Backhand.OffhandBreakBlocks, sb.toString()).getBoolean();
+
+        sb = new StringBuilder();
         sb.append("These items will be unable to be swapped into the offhand.\n");
         sb.append("Formatting of an item should be: modid:itemname\n");
         sb.append("These should all be placed on separate lines between the provided \'<\' and \'>\'.");
