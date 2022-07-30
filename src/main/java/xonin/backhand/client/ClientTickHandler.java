@@ -37,6 +37,10 @@ public class ClientTickHandler {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void clientHelper(TickEvent.PlayerTickEvent event) {
+        if (!Backhand.proxy.isRightClickHeld()) {
+            Backhand.proxy.setRightClickCounter(0);
+        }
+
         ItemStack mainHandItem = event.player.getCurrentEquippedItem();
         ItemStack offhandItem = ((InventoryPlayerBattle) event.player.inventory).getOffhandItem();
 

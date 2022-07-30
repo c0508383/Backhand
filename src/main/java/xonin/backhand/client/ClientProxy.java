@@ -15,6 +15,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy extends CommonProxy {
     public static final KeyBinding swapOffhand = new KeyBinding("Swap Offhand", Keyboard.KEY_F, "key.categories.gameplay");
+    public static int rightClickCounter = 0;
 
     public void load() {
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
@@ -49,6 +50,16 @@ public class ClientProxy extends CommonProxy {
     @Override
     public boolean isLeftClickHeld() {
         return Minecraft.getMinecraft().gameSettings.keyBindAttack.getIsKeyPressed();
+    }
+
+    @Override
+    public int getRightClickCounter() {
+        return rightClickCounter;
+    }
+
+    @Override
+    public void setRightClickCounter(int i) {
+        rightClickCounter = i;
     }
 
     @Override

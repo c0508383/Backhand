@@ -35,7 +35,6 @@ import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import xonin.backhand.Backhand;
 
 public final class BattlemodeHookContainerClass {
@@ -101,6 +100,14 @@ public final class BattlemodeHookContainerClass {
                 return;
             }
 
+            if (Backhand.proxy.isRightClickHeld()) {
+                Backhand.proxy.setRightClickCounter(Backhand.proxy.getRightClickCounter()+1);
+                if (Backhand.proxy.getRightClickCounter() > 1) {
+                    event.setCanceled(true);
+                    return;
+                }
+            }
+
             if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && mainHandItem != null && mainHandItem.getItem() instanceof ItemMonsterPlacer) {
                 if (event.world.isRemote && !event.entityPlayer.capabilities.isCreativeMode) {
                     mainHandItem.stackSize--;
@@ -111,9 +118,6 @@ public final class BattlemodeHookContainerClass {
             PlayerInteractEvent.Result itm = event.useItem;
             event.useBlock = PlayerInteractEvent.Result.DENY;
             MovingObjectPosition mop = getRaytraceBlock(event.entityPlayer);
-            if (Backhand.proxy.isRightClickHeld()) {
-                event.setCanceled(true);
-            }
             if (mop != null) {
                 event.setCanceled(true);
                 int i = mop.blockX, j = mop.blockY, k = mop.blockZ,

@@ -40,6 +40,12 @@ public class CommonProxy implements IGuiHandler {
         return false;
     }
 
+    public int getRightClickCounter() {
+        return 0;
+    }
+
+    public void setRightClickCounter(int i) {}
+
     // Should not be called on the server anyway
     public int getLeftClickCounter() {
         return 0;
