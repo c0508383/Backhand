@@ -78,6 +78,9 @@ public class Backhand {
     }
 
     public static boolean isOffhandBlacklisted(ItemStack stack) {
+        if (stack == null)
+            return false;
+
         for (Item item : offhandBlacklist) {
             if (stack.getItem() == item) {
                 return true;
