@@ -30,9 +30,16 @@ public class Backhand {
     public static CommonProxy proxy;
     public static BattlegearPacketHandler packetHandler;
 
-    @ConfigProp(info="If an extra slot is not made for the offhand, this is the index of where\n" +
-                     "the offhand item should go in your inventory.")
-    public static int OffhandInventorySlot = 9;
+    @ConfigProp(info="Determines whether you can attack with the offhand, or if it's just used \n" +
+                     "for using items like in Vanilla MC.")
+    public static boolean OffhandPunch = false;
+
+    @ConfigProp(info="If set to false, disables offhand actions and rendering if there is no offhand item.")
+    public static boolean EmptyOffhand = false;
+
+    @ConfigProp(info="Client sided! If set to false, an empty offhand will only be rendered \n" +
+            "when the player is punching with the offhand.")
+    public static boolean RenderEmptyOffhandAtRest = true;
 
     public Backhand() {
         Instance = this;
@@ -53,11 +60,6 @@ public class Backhand {
 
         Config = new ConfigLoader(this.getClass(), new File(dir, "config"), "Backhand");
         Config.loadConfig();
-
-        if (OffhandInventorySlot < 0)
-            OffhandInventorySlot = 0;
-        if (OffhandInventorySlot > 39)
-            OffhandInventorySlot = 39;
 
         proxy.load();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);

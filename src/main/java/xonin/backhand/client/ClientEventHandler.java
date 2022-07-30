@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -17,6 +18,7 @@ import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import xonin.backhand.Backhand;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 public class ClientEventHandler {
@@ -95,6 +97,14 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void onRenderHand(RenderHandEvent event) {
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        if (!Backhand.EmptyOffhand && BattlegearUtils.getOffhandItem(player) == null) {
+            return;
+        }
+        if (!Backhand.RenderEmptyOffhandAtRest && ((IBattlePlayer)player).getOffSwingProgress(event.partialTicks) == 0) {
+            return;
+        }
+
         MysteriumPatchesFixesO.onGround2 = 0;
         GL11.glPushMatrix();
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -104,6 +114,10 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void render3rdPersonOffhand(RenderPlayerEvent.Specials.Post event) {
+        if (!Backhand.EmptyOffhand && BattlegearUtils.getOffhandItem(event.entityPlayer) == null) {
+            return;
+        }
+
         GL11.glPushMatrix();
         ModelBiped biped = (ModelBiped) event.renderer.modelBipedMain;
         renderOffhandPlayer.itemRenderer.updateEquippedItem();

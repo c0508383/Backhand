@@ -57,6 +57,13 @@ public final class BattlemodeHookContainerClass {
             if (!(((EntityPlayer) event.entity).inventory instanceof InventoryPlayerBattle)) {
                 throw new RuntimeException("Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
             }
+            ItemStack offhandItem = BattlegearUtils.getOffhandItem((EntityPlayer) event.entity);
+            if (!Backhand.EmptyOffhand && offhandItem != null) {
+                BattlegearUtils.setPlayerOffhandItem((EntityPlayer) event.entity,null);
+                if (!((EntityPlayer) event.entity).inventory.addItemStackToInventory(offhandItem)) {
+                    event.entity.entityDropItem(offhandItem,0);
+                }
+            }
             if(event.entity instanceof EntityPlayerMP){
             	Backhand.packetHandler.sendPacketToPlayer(
                         new BattlegearSyncItemPacket((EntityPlayer) event.entity).generatePacket(),
@@ -91,6 +98,10 @@ public final class BattlemodeHookContainerClass {
     public void playerInteract(PlayerInteractEvent event) {
         if(isFake(event.entityPlayer))
             return;
+
+        if (!Backhand.EmptyOffhand && BattlegearUtils.getOffhandItem(event.entityPlayer) == null) {
+            return;
+        }
 
         if(event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR || event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {//Right click
             ItemStack mainHandItem = event.entityPlayer.getCurrentEquippedItem();
@@ -132,7 +143,7 @@ public final class BattlemodeHookContainerClass {
                     event.useItem = itm;
                 }
             }
-            if (event.entityPlayer.worldObj.isRemote && !BattlegearUtils.usagePriorAttack(offhandItem)) {
+            if (event.entityPlayer.worldObj.isRemote && !BattlegearUtils.usagePriorAttack(offhandItem) && Backhand.OffhandPunch) {
                 BattlemodeHookContainerClass.sendOffSwingEventNoCheck(event.entityPlayer, mainHandItem, offhandItem);
             }
         }

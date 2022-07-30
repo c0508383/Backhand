@@ -37,6 +37,10 @@ public class ClientTickHandler {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void clientHelper(TickEvent.PlayerTickEvent event) {
+        if (!Backhand.EmptyOffhand && BattlegearUtils.getOffhandItem(event.player) == null) {
+            return;
+        }
+
         if (!Backhand.proxy.isRightClickHeld()) {
             Backhand.proxy.setRightClickCounter(0);
         }
