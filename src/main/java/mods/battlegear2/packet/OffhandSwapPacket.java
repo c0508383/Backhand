@@ -5,7 +5,9 @@ import io.netty.buffer.ByteBuf;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import xonin.backhand.Backhand;
 
 public class OffhandSwapPacket extends AbstractMBPacket {
     public static final String packetName = "MB2|Swap";
@@ -40,11 +42,12 @@ public class OffhandSwapPacket extends AbstractMBPacket {
     public void process(ByteBuf inputStream, EntityPlayer player) {
         this.user = ByteBufUtils.readUTF8String(inputStream);
         this.player = player.worldObj.getPlayerEntityByName(user);
-        if(this.player!=null) {
+        if (this.player != null) {
             ItemStack currentItem = ByteBufUtils.readItemStack(inputStream);
             ItemStack offhandItem = ByteBufUtils.readItemStack(inputStream);
-            BattlegearUtils.setPlayerCurrentItem(player,currentItem);
-            BattlegearUtils.setPlayerOffhandItem(player,offhandItem);
+            BattlegearUtils.setPlayerCurrentItem(this.player,currentItem);
+            BattlegearUtils.setPlayerOffhandItem(this.player,offhandItem);
+            Backhand.packetHandler.sendPacketToAll(new BattlegearSyncItemPacket(this.player).generatePacket());
         }
     }
 }
