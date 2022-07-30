@@ -6,17 +6,14 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mods.battlegear2.BattlemodeHookContainerClass;
-import mods.battlegear2.api.core.BattlegearTranslator;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
+import mods.battlegear2.client.BattlegearClientTickHandler;
 import mods.battlegear2.packet.OffhandSwapPacket;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 import xonin.backhand.Backhand;
 
@@ -53,14 +50,14 @@ public class ClientTickHandler {
                     MovingObjectPosition mop = BattlemodeHookContainerClass.getRaytraceBlock(event.player);
                     if (offhandItem != null && BattlemodeHookContainerClass.isItemBlock(offhandItem.getItem())) {
                         if (!BattlegearUtils.usagePriorAttack(offhandItem) && mop != null) {
-                            BattlemodeHookContainerClass.tryBreakBlockOffhand(mop, offhandItem, mainHandItem, event);
+                            BattlegearClientTickHandler.tryBreakBlockOffhand(mop, offhandItem, mainHandItem, event);
                             Backhand.proxy.setLeftClickCounter(10);
                         } else {
                             Minecraft.getMinecraft().playerController.resetBlockRemoving();
                         }
                     } else {
-                        if (mop != null && !BattlegearUtils.usagePriorAttack(offhandItem) && !canBlockBeInteractedWith(Minecraft.getMinecraft().theWorld, mop.blockX, mop.blockY, mop.blockZ)) {
-                            BattlemodeHookContainerClass.tryBreakBlockOffhand(mop, offhandItem, mainHandItem, event);
+                        if (mop != null && !BattlegearUtils.usagePriorAttack(offhandItem) && !BattlemodeHookContainerClass.canBlockBeInteractedWith(Minecraft.getMinecraft().theWorld, mop.blockX, mop.blockY, mop.blockZ)) {
+                            BattlegearClientTickHandler.tryBreakBlockOffhand(mop, offhandItem, mainHandItem, event);
                             Backhand.proxy.setLeftClickCounter(10);
                         } else {
                             Minecraft.getMinecraft().playerController.resetBlockRemoving();
@@ -70,46 +67,6 @@ public class ClientTickHandler {
                     Minecraft.getMinecraft().playerController.resetBlockRemoving();
                 }
             }
-        }
-    }
-
-    private static String[] activatedBlockMethodNames = {
-            BattlegearTranslator.getMapedMethodName("Block", "func_149727_a", "onBlockActivated"),
-            BattlegearTranslator.getMapedMethodName("Block", "func_149699_a", "onBlockClicked")};
-    private static Class[][] activatedBlockMethodParams = {
-            new Class[]{World.class, int.class, int.class, int.class, EntityPlayer.class, int.class, float.class, float.class, float.class},
-            new Class[]{World.class, int.class, int.class, int.class, EntityPlayer.class}};
-    @SuppressWarnings("unchecked")
-    public static boolean canBlockBeInteractedWith(World worldObj, int x, int y, int z) {
-        if (worldObj == null) return false;
-        Block block = worldObj.getBlock(x, y, z);
-        if (block == null) return false;
-        if (block.getClass().equals(Block.class)) return false;
-        try {
-            Class c = block.getClass();
-            while (!(c.equals(Block.class))) {
-                try {
-                    try {
-                        c.getDeclaredMethod(activatedBlockMethodNames[0], activatedBlockMethodParams[0]);
-                        return true;
-                    } catch (NoSuchMethodException ignored) {
-                    }
-
-                    try {
-                        c.getDeclaredMethod(activatedBlockMethodNames[1], activatedBlockMethodParams[1]);
-                        return true;
-                    } catch (NoSuchMethodException ignored) {
-                    }
-                } catch (NoClassDefFoundError ignored) {
-
-                }
-
-                c = c.getSuperclass();
-            }
-
-            return false;
-        } catch (NullPointerException e) {
-            return true;
         }
     }
 }

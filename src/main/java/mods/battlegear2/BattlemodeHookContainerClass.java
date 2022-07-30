@@ -5,10 +5,10 @@ import java.util.List;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mods.battlegear2.api.PlayerEventChild;
+import mods.battlegear2.api.core.BattlegearTranslator;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
@@ -16,10 +16,6 @@ import mods.battlegear2.packet.BattlegearSyncItemPacket;
 import mods.battlegear2.packet.OffhandPlaceBlockPacket;
 import mods.battlegear2.utils.EnumBGAnimations;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -27,11 +23,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.*;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -42,8 +37,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import xonin.backhand.Backhand;
-import xonin.backhand.client.ClientEventHandler;
-import xonin.backhand.client.ClientTickHandler;
 
 public final class BattlemodeHookContainerClass {
 
@@ -132,15 +125,55 @@ public final class BattlemodeHookContainerClass {
                 float f1 = (float)mop.hitVec.yCoord - j;
                 float f2 = (float)mop.hitVec.zCoord - k;
 
-                if (!event.entityPlayer.isSneaking() && ClientTickHandler.canBlockBeInteractedWith(event.entityPlayer.worldObj, i, j, k)) {
+                if (!event.entityPlayer.isSneaking() && canBlockBeInteractedWith(event.entityPlayer.worldObj, i, j, k)) {
                     event.setCanceled(false);
                     event.useBlock = blk;
                     event.useItem = itm;
                 }
             }
             if (event.entityPlayer.worldObj.isRemote && !BattlegearUtils.usagePriorAttack(offhandItem)) {
-                sendOffSwingEventNoCheck(mainHandItem, offhandItem);
+                BattlemodeHookContainerClass.sendOffSwingEventNoCheck(event.entityPlayer, mainHandItem, offhandItem);
             }
+        }
+    }
+
+    private static String[] activatedBlockMethodNames = {
+            BattlegearTranslator.getMapedMethodName("Block", "func_149727_a", "onBlockActivated"),
+            BattlegearTranslator.getMapedMethodName("Block", "func_149699_a", "onBlockClicked")};
+    private static Class[][] activatedBlockMethodParams = {
+            new Class[]{World.class, int.class, int.class, int.class, EntityPlayer.class, int.class, float.class, float.class, float.class},
+            new Class[]{World.class, int.class, int.class, int.class, EntityPlayer.class}};
+    @SuppressWarnings("unchecked")
+    public static boolean canBlockBeInteractedWith(World worldObj, int x, int y, int z) {
+        if (worldObj == null) return false;
+        Block block = worldObj.getBlock(x, y, z);
+        if (block == null) return false;
+        if (block.getClass().equals(Block.class)) return false;
+        try {
+            Class c = block.getClass();
+            while (!(c.equals(Block.class))) {
+                try {
+                    try {
+                        c.getDeclaredMethod(activatedBlockMethodNames[0], activatedBlockMethodParams[0]);
+                        return true;
+                    } catch (NoSuchMethodException ignored) {
+                    }
+
+                    try {
+                        c.getDeclaredMethod(activatedBlockMethodNames[1], activatedBlockMethodParams[1]);
+                        return true;
+                    } catch (NoSuchMethodException ignored) {
+                    }
+                } catch (NoClassDefFoundError ignored) {
+
+                }
+
+                c = c.getSuperclass();
+            }
+
+            return false;
+        } catch (NullPointerException e) {
+            return true;
         }
     }
 
@@ -151,101 +184,6 @@ public final class BattlemodeHookContainerClass {
     public static boolean isItemBlock(Item item) {
     	return item instanceof ItemBlock || item instanceof ItemDoor || item instanceof ItemSign || item instanceof ItemReed || item instanceof ItemSeedFood || item instanceof ItemRedstone || item instanceof ItemBucket || item instanceof ItemSkull;
     }
-    
-    @SideOnly(Side.CLIENT)
-    public static void tryBreakBlockOffhand(MovingObjectPosition objectMouseOver, ItemStack offhandItem, ItemStack mainHandItem, PlayerTickEvent event) {
-    	Minecraft mcInstance = Minecraft.getMinecraft();
-        int i = objectMouseOver.blockX;
-        int j = objectMouseOver.blockY;
-        int k = objectMouseOver.blockZ;
-        if (mcInstance.thePlayer.capabilities.isCreativeMode) 
-        {
-        	if (ClientEventHandler.delay <= 0) {
-            	mcInstance.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(0, i, j, k, objectMouseOver.sideHit));
-            	PlayerControllerMP.clickBlockCreative(mcInstance, mcInstance.playerController, i, j, k, objectMouseOver.sideHit);
-            	if (!(event.player.worldObj.isRemote && !(BattlegearUtils.usagePriorAttack(offhandItem)))) {
-            		sendOffSwingEventNoCheck(mainHandItem, offhandItem); // force offhand swing anyway because we broke a block
-                }
-            	ClientEventHandler.delay = 24;
-        	}
-        	return;
-        }
-        if (mcInstance.theWorld.getBlock(i, j, k).getMaterial() != Material.air)
-        {
-        	if (mcInstance.playerController.blockHitDelay > 0)
-            {
-                --mcInstance.playerController.blockHitDelay;
-            }
-            else
-            {
-            	mcInstance.playerController.isHittingBlock = true;
-                mcInstance.playerController.currentBlockX = i;
-                mcInstance.playerController.currentBlockY = j;
-                mcInstance.playerController.currentblockZ = k;
-
-            	if ((!ItemStack.areItemStacksEqual(((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffhandItem(), mcInstance.thePlayer.inventory.getStackInSlot(mcInstance.thePlayer.inventory.currentItem))) && (((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffhandItem() != null))
-            	{
-            		if (mcInstance.gameSettings.heldItemTooltips) {
-            			mcInstance.gameSettings.heldItemTooltips = false;
-            			changedHeldItemTooltips = true;   			
-            		}
-            		
-            		//prevOffhandOffset = ((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffsetToInactiveHand();
-                    //mcInstance.thePlayer.inventory.currentItem += ((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffsetToInactiveHand();
-            		mcInstance.playerController.currentItemHittingBlock = ((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffhandItem();
-                    mcInstance.playerController.syncCurrentPlayItem();
-            	}
-
-                
-                Block block = mcInstance.theWorld.getBlock(i, j, k);
-                if (block.getMaterial() == Material.air)
-                {
-                    mcInstance.playerController.isHittingBlock = false;
-                    return;
-                }
-                MysteriumPatchesFixesO.countToCancel = 5;
-                mcInstance.playerController.curBlockDamageMP += block.getPlayerRelativeBlockHardness(mcInstance.thePlayer, mcInstance.thePlayer.worldObj, i, j, k);
-
-                if (mcInstance.playerController.stepSoundTickCounter % 4.0F == 0.0F)
-                {
-                	mcInstance.getSoundHandler().playSound(new PositionedSoundRecord(new ResourceLocation(block.stepSound.getStepResourcePath()), (block.stepSound.getVolume() + 1.0F) / 8.0F, block.stepSound.getPitch() * 0.5F, (float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F));
-                }
-
-                ++mcInstance.playerController.stepSoundTickCounter;
-
-                if (mcInstance.playerController.curBlockDamageMP >= 1.0F)
-                {
-                    
-                    ItemStack itemstack = mcInstance.thePlayer.getCurrentEquippedItem();
-
-                    if (itemstack != null)
-                    {
-                    	itemstack.func_150999_a(mcInstance.theWorld, block, i, j, k, mcInstance.thePlayer);
-
-                        if (itemstack.stackSize == 0)
-                        {
-                        	mcInstance.thePlayer.destroyCurrentEquippedItem();
-                        }
-                    }
-                    mcInstance.playerController.isHittingBlock = false;
-                    mcInstance.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(2, i, j, k, objectMouseOver.sideHit));
-                    mcInstance.playerController.onPlayerDestroyBlock(i, j, k, objectMouseOver.sideHit);
-                    mcInstance.playerController.curBlockDamageMP = 0.0F;
-                    mcInstance.playerController.stepSoundTickCounter = 0.0F;
-                    mcInstance.playerController.blockHitDelay = 5;
-                }
-                mcInstance.theWorld.destroyBlockInWorldPartially(mcInstance.thePlayer.getEntityId(), mcInstance.playerController.currentBlockX, mcInstance.playerController.currentBlockY, mcInstance.playerController.currentblockZ, (int)(mcInstance.playerController.curBlockDamageMP * 10.0F) - 1);
-            }
-
-            if (mcInstance.thePlayer.isCurrentToolAdventureModeExempt(i, j, k))
-            {
-            	mcInstance.effectRenderer.addBlockHitEffects(i, j, k, objectMouseOver);
-            }
-            if (!(event.player.worldObj.isRemote && !(BattlegearUtils.usagePriorAttack(offhandItem)))) {
-            	sendOffSwingEventNoCheck(mainHandItem, offhandItem); // force offhand swing anyway because we broke a block
-            }
-        }
-	}
 
 	/**
      * Attempts to right-click-use an item by the given EntityPlayer
@@ -296,9 +234,9 @@ public final class BattlemodeHookContainerClass {
     }
 
     @SideOnly(Side.CLIENT)
-    public static void sendOffSwingEventNoCheck(ItemStack mainHandItem, ItemStack offhandItem){
-        ((IBattlePlayer) Minecraft.getMinecraft().thePlayer).swingOffItem();
-        Backhand.proxy.sendAnimationPacket(EnumBGAnimations.OffHandSwing, Minecraft.getMinecraft().thePlayer);
+    public static void sendOffSwingEventNoCheck(EntityPlayer player, ItemStack mainHandItem, ItemStack offhandItem){
+        ((IBattlePlayer) player).swingOffItem();
+        Backhand.proxy.sendAnimationPacket(EnumBGAnimations.OffHandSwing, player);
     }
 
     @SideOnly(Side.CLIENT)
