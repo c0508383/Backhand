@@ -1,5 +1,6 @@
 package xonin.backhand.client;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import mods.battlegear2.client.BattlegearClientTickHandler;
 import mods.battlegear2.packet.BattlegearAnimationPacket;
@@ -22,6 +23,8 @@ public class ClientProxy extends CommonProxy {
         FMLCommonHandler.instance().bus().register(new ClientTickHandler());
 
         FMLCommonHandler.instance().bus().register(new BattlegearClientTickHandler());
+
+        ClientRegistry.registerKeyBinding(swapOffhand);
     }
 
     @Override
