@@ -25,11 +25,11 @@ public class ClientTickHandler {
         EntityClientPlayerMP player = mc.thePlayer;
 
         if (ClientProxy.swapOffhand.getIsKeyPressed() && Keyboard.isKeyDown(Keyboard.getEventKey())) {
-            if (Backhand.isOffhandBlacklisted(player.getCurrentEquippedItem())) {
+            ItemStack offhandItem = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
+            if (Backhand.isOffhandBlacklisted(player.getCurrentEquippedItem()) || Backhand.isOffhandBlacklisted(offhandItem)) {
                 return;
             }
 
-            ItemStack offhandItem = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
             player.sendQueue.addToSendQueue(
                 new OffhandSwapPacket(player.getCurrentEquippedItem(), offhandItem, player).generatePacket()
             );
