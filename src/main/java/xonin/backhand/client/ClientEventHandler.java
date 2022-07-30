@@ -101,7 +101,8 @@ public class ClientEventHandler {
         if (!Backhand.EmptyOffhand && BattlegearUtils.getOffhandItem(player) == null) {
             return;
         }
-        if (!Backhand.RenderEmptyOffhandAtRest && ((IBattlePlayer)player).getOffSwingProgress(event.partialTicks) == 0) {
+        ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+        if (offhandItem == null && !Backhand.RenderEmptyOffhandAtRest && ((IBattlePlayer)player).getOffSwingProgress(event.partialTicks) == 0) {
             return;
         }
 
