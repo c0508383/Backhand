@@ -68,7 +68,6 @@ public class MysteriumPatchesFixesO {
 		KeyBinding keyCode = Minecraft.getMinecraft().gameSettings.keyBindUseItem;
 		KeyBinding.setKeyBindState(keyCode.getKeyCode(), true);
 		KeyBinding.onTick(keyCode.getKeyCode());
-		leftclicked = true;
 		return true;
 	}
 
@@ -124,29 +123,6 @@ public class MysteriumPatchesFixesO {
 			return true;
 		}
 		return false;
-    }
-
-	/**Whether the offhand can use it's item right now. Prevents the other animation from playing when we're actually using the item not hitting with it*/
-	private static boolean noAltHandUse;
-	
-	/**Whether we're rendering the item in the main hand right now*/
-	public static boolean renderingItem2;
-
-	@Fix
-	@SideOnly(Side.CLIENT)
-	public static void renderEquippedItems(RenderPlayer p, AbstractClientPlayer p_77029_1_, float p_77029_2_)
-    {
-		if (!MysteriumPatchesFixesO.leftclicked) noAltHandUse = true;
-    }
-
-	@Fix(returnSetting=EnumReturnSetting.ALWAYS)
-	public static EnumAction getItemUseAction(ItemStack itmst)
-    {
-		if (noAltHandUse) {
-			noAltHandUse = false;
-			return EnumAction.none;
-		}
-		else return itmst.getItem().getItemUseAction(itmst);
     }
 
 	public static float onGround2;

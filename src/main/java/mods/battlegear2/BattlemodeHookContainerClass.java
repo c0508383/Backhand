@@ -111,7 +111,7 @@ public final class BattlemodeHookContainerClass {
             PlayerInteractEvent.Result itm = event.useItem;
             event.useBlock = PlayerInteractEvent.Result.DENY;
             MovingObjectPosition mop = getRaytraceBlock(event.entityPlayer);
-            if (Backhand.proxy.isRightClickHeld() && !MysteriumPatchesFixesO.leftclicked) {
+            if (Backhand.proxy.isRightClickHeld()) {
                 event.setCanceled(true);
             }
             if (mop != null) {
