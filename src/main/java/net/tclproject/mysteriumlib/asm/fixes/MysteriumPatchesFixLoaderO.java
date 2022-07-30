@@ -1,12 +1,6 @@
 package net.tclproject.mysteriumlib.asm.fixes;
 
-import mods.battlegear2.coremod.transformers.EntityAIControlledByPlayerTransformer;
-import mods.battlegear2.coremod.transformers.EntityOtherPlayerMPTransformer;
-import mods.battlegear2.coremod.transformers.EntityPlayerTransformer;
-import mods.battlegear2.coremod.transformers.ItemInWorldTransformer;
-import mods.battlegear2.coremod.transformers.MinecraftTransformer;
-import mods.battlegear2.coremod.transformers.PlayerControllerMPTransformer;
-import mods.battlegear2.coremod.transformers.TransformerBase;
+import mods.battlegear2.coremod.transformers.*;
 import net.tclproject.mysteriumlib.asm.common.CustomClassTransformer;
 import net.tclproject.mysteriumlib.asm.common.CustomLoadingPlugin;
 import net.tclproject.mysteriumlib.asm.common.FirstClassTransformer;
@@ -19,7 +13,8 @@ public class MysteriumPatchesFixLoaderO extends CustomLoadingPlugin {
 		new MinecraftTransformer(),
 		new ItemInWorldTransformer(),
 		new EntityAIControlledByPlayerTransformer(),
-		new EntityOtherPlayerMPTransformer()
+		new EntityOtherPlayerMPTransformer(),
+		new NetClientHandlerTransformer()
     };
 	
     // Turns on MysteriumASM Lib. You can do this in only one of your Fix Loaders.

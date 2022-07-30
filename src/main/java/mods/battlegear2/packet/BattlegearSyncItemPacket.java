@@ -42,8 +42,8 @@ public final class BattlegearSyncItemPacket extends AbstractMBPacket {
             int slot = inputStream.readInt();
             ItemStack currentItem = ByteBufUtils.readItemStack(inputStream);
             ItemStack offhandItem = ByteBufUtils.readItemStack(inputStream);
-
-            this.player.inventory.currentItem = slot;
+            if(InventoryPlayerBattle.isValidSwitch(slot))
+                this.player.inventory.currentItem = slot;
             BattlegearUtils.setPlayerCurrentItem(this.player, currentItem);
             BattlegearUtils.setPlayerOffhandItem(this.player, offhandItem);
             if(!player.worldObj.isRemote){//Using data sent only by client

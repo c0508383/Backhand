@@ -1,6 +1,5 @@
 package xonin.backhand;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -10,7 +9,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import xonin.backhand.client.ClientEventHandler;
-import xonin.backhand.client.ClientTickHandler;
 
 public class ServerEventsHandler {
 

@@ -20,6 +20,7 @@ public class InventoryPlayerBattle extends InventoryPlayer {
     public static int OFFSET = 150;
 
     public static final int OFFHAND_ITEM_INDEX = 40;
+    public static final int OFFHAND_HOTBAR_SLOT = 9;
     public ItemStack offhandItem;
 
     public InventoryPlayerBattle(EntityPlayer entityPlayer) {
@@ -64,7 +65,16 @@ public class InventoryPlayerBattle extends InventoryPlayer {
 
     public ItemStack getCurrentItem()
     {
-        return this.currentItem < 9 && this.currentItem >= 0 ? this.mainInventory[this.currentItem] : this.currentItem == 9 ? getOffhandItem() : null;
+        return this.currentItem < 9 && this.currentItem >= 0 ? this.mainInventory[this.currentItem] : this.currentItem == InventoryPlayerBattle.OFFHAND_HOTBAR_SLOT ? getOffhandItem() : null;
+    }
+
+    /**
+     * Patch used for "set current slot" vanilla packets
+     * @param id the value to test for currentItem setting
+     * @return true if it is possible for currentItem to be set with this value
+     */
+    public static boolean isValidSwitch(int id) {
+        return (id >= 0 && id < getHotbarSize()) || id == OFFHAND_HOTBAR_SLOT;
     }
 
     public ItemStack decrStackSize(int slot, int amount)

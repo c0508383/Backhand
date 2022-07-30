@@ -192,6 +192,8 @@ public final class BattlegearClientTickHandler {
         int i = objectMouseOver.blockX;
         int j = objectMouseOver.blockY;
         int k = objectMouseOver.blockZ;
+        int prevHeldItem = event.player.inventory.currentItem;
+
         if (mcInstance.thePlayer.capabilities.isCreativeMode)
         {
             if (ClientEventHandler.delay <= 0) {
@@ -217,15 +219,14 @@ public final class BattlegearClientTickHandler {
                 mcInstance.playerController.currentBlockY = j;
                 mcInstance.playerController.currentblockZ = k;
 
-                if ((!ItemStack.areItemStacksEqual(((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffhandItem(), mcInstance.thePlayer.inventory.getStackInSlot(mcInstance.thePlayer.inventory.currentItem))) && (((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffhandItem() != null))
+                if (offhandItem != null)
                 {
                     if (mcInstance.gameSettings.heldItemTooltips) {
                         mcInstance.gameSettings.heldItemTooltips = false;
                         BattlemodeHookContainerClass.changedHeldItemTooltips = true;
                     }
 
-                    //prevOffhandOffset = ((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffsetToInactiveHand();
-                    //mcInstance.thePlayer.inventory.currentItem += ((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffsetToInactiveHand();
+                    mcInstance.thePlayer.inventory.currentItem = InventoryPlayerBattle.OFFHAND_HOTBAR_SLOT;
                     mcInstance.playerController.currentItemHittingBlock = ((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffhandItem();
                     mcInstance.playerController.syncCurrentPlayItem();
                 }
@@ -275,10 +276,10 @@ public final class BattlegearClientTickHandler {
             {
                 mcInstance.effectRenderer.addBlockHitEffects(i, j, k, objectMouseOver);
             }
-            if (!(event.player.worldObj.isRemote && !(BattlegearUtils.usagePriorAttack(offhandItem)))) {
-                BattlemodeHookContainerClass.sendOffSwingEventNoCheck(event.player, mainHandItem, offhandItem); // force offhand swing anyway because we broke a block
-            }
+            BattlemodeHookContainerClass.sendOffSwingEventNoCheck(event.player, mainHandItem, offhandItem); // force offhand swing anyway because we broke a block
         }
+        event.player.inventory.currentItem = prevHeldItem;
+        mcInstance.playerController.syncCurrentPlayItem();
     }
 
     public static float getPartialTick(){
