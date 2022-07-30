@@ -9,9 +9,13 @@ import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.packet.BattlegearPacketHandler;
+import mods.battlegear2.utils.BattlegearConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import noppes.npcs.config.ConfigLoader;
 import noppes.npcs.config.ConfigProp;
 
@@ -20,7 +24,6 @@ import java.io.File;
 @Mod(modid = "backhand", name = "Backhand", version = "1.0")
 public class Backhand {
     public static Backhand Instance;
-    public static ConfigLoader Config;
 
     public static FMLEventChannel Channel;
     public static FMLEventChannel ChannelPlayer;
@@ -30,15 +33,9 @@ public class Backhand {
     public static CommonProxy proxy;
     public static BattlegearPacketHandler packetHandler;
 
-    @ConfigProp(info="Determines whether you can attack with the offhand, or if it's just used \n" +
-                     "for using items like in Vanilla MC.")
-    public static boolean OffhandPunch = false;
-
-    @ConfigProp(info="If set to false, disables offhand actions and rendering if there is no offhand item.")
+    public static boolean OffhandAttack = false;
     public static boolean EmptyOffhand = false;
-
-    @ConfigProp(info="Client sided! If set to false, an empty offhand will only be rendered \n" +
-            "when the player is punching with the offhand.")
+    public static Item[] offhandBlacklist;
     public static boolean RenderEmptyOffhandAtRest = true;
 
     public Backhand() {
@@ -46,7 +43,7 @@ public class Backhand {
     }
 
     @Mod.EventHandler
-    public void load(FMLPreInitializationEvent ev) {
+    public void load(FMLPreInitializationEvent event) {
         Channel = NetworkRegistry.INSTANCE.newEventDrivenChannel("Backhand");
         ChannelPlayer = NetworkRegistry.INSTANCE.newEventDrivenChannel("BackhandPlayer");
 
@@ -58,8 +55,7 @@ public class Backhand {
             dir = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
         }
 
-        Config = new ConfigLoader(this.getClass(), new File(dir, "config"), "Backhand");
-        Config.loadConfig();
+        BattlegearConfig.getConfig(new Configuration(event.getSuggestedConfigurationFile()));
 
         proxy.load();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
@@ -79,5 +75,14 @@ public class Backhand {
 
     public static MinecraftServer getServer(){
         return MinecraftServer.getServer();
+    }
+
+    public static boolean isOffhandBlacklisted(ItemStack stack) {
+        for (Item item : offhandBlacklist) {
+            if (stack.getItem() == item) {
+                return true;
+            }
+        }
+        return false;
     }
 }
