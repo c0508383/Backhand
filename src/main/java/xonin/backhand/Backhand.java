@@ -16,8 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import noppes.npcs.config.ConfigLoader;
-import noppes.npcs.config.ConfigProp;
 
 import java.io.File;
 

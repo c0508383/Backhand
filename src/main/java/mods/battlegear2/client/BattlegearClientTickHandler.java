@@ -41,17 +41,10 @@ import xonin.backhand.client.ClientEventHandler;
 import xonin.backhand.client.ClientTickHandler;
 
 public final class BattlegearClientTickHandler {
-	public static final int FLASH_MAX = 30;
-    // TODO: Add special action to some items, maybe?
-    //public final KeyBinding special;
     public final Minecraft mc = Minecraft.getMinecraft();
 
-    public float blockBar = 1;
     public float partialTick;
-    public boolean wasBlocking = false;
     public int previousBattlemode = 0;
-    public int flashTimer;
-    public boolean specialDone = false, drawDone = false, inBattle = false;
     public static final BattlegearClientTickHandler INSTANCE = new BattlegearClientTickHandler();
 
     public BattlegearClientTickHandler() {
@@ -61,10 +54,6 @@ public final class BattlegearClientTickHandler {
     @SideOnly(Side.CLIENT)
     public void onPlayerTick(TickEvent.PlayerTickEvent event){
         if(event.player == mc.thePlayer) {
-        	if (!MysteriumPatchesFixesO.hotSwapped && ((InventoryPlayerBattle)event.player.inventory).currentItem > 153) {
-        		//event.player.inventory.currentItem = previousBattlemode;
-                mc.playerController.syncCurrentPlayItem();
-        	}
             if (event.phase == TickEvent.Phase.START) {
                 tickStart(mc.thePlayer);
             }
@@ -84,6 +73,10 @@ public final class BattlegearClientTickHandler {
     @SideOnly(Side.CLIENT)
     public void tryCheckUseItem(ItemStack offhandItem, EntityPlayer player){
         ItemStack mainHandItem = player.getCurrentEquippedItem();
+        if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || offhandItem == null)) {
+            return;
+        }
+
         if (mainHandItem != null && BattlegearUtils.checkForRightClickFunction(mainHandItem)) {
             return;
         }
