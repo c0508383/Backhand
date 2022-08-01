@@ -18,6 +18,7 @@ import org.lwjgl.input.Keyboard;
 import xonin.backhand.Backhand;
 
 public class ClientTickHandler {
+    public static int delay;
 
     @SubscribeEvent
     public void onKeyInputEvent(InputEvent.KeyInputEvent event) {
@@ -41,6 +42,10 @@ public class ClientTickHandler {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void clientHelper(TickEvent.PlayerTickEvent event) {
+        if (ClientTickHandler.delay > 0) {
+            ClientTickHandler.delay--;
+        }
+
         if (!Backhand.OffhandBreakBlocks) {
             return;
         }

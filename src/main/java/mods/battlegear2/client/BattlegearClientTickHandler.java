@@ -5,10 +5,6 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.ResourceLocation;
 import xonin.backhand.Backhand;
-import org.lwjgl.input.Keyboard;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -21,12 +17,7 @@ import mods.battlegear2.api.core.InventoryPlayerBattle;
 import mods.battlegear2.packet.OffhandPlaceBlockPacket;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -37,7 +28,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
-import xonin.backhand.client.ClientEventHandler;
+import xonin.backhand.client.ClientTickHandler;
 
 public final class BattlegearClientTickHandler {
     public final Minecraft mc = Minecraft.getMinecraft();
@@ -191,13 +182,13 @@ public final class BattlegearClientTickHandler {
 
         if (mcInstance.thePlayer.capabilities.isCreativeMode)
         {
-            if (ClientEventHandler.delay <= 0) {
+            if (ClientTickHandler.delay <= 0) {
                 mcInstance.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(0, i, j, k, objectMouseOver.sideHit));
                 PlayerControllerMP.clickBlockCreative(mcInstance, mcInstance.playerController, i, j, k, objectMouseOver.sideHit);
-                if (!(event.player.worldObj.isRemote && !(BattlegearUtils.usagePriorAttack(offhandItem)))) {
+                if (!(BattlegearUtils.usagePriorAttack(offhandItem))) {
                     BattlemodeHookContainerClass.sendOffSwingEventNoCheck(event.player, mainHandItem, offhandItem); // force offhand swing anyway because we broke a block
                 }
-                ClientEventHandler.delay = 24;
+                ClientTickHandler.delay = 24;
             }
             return;
         }

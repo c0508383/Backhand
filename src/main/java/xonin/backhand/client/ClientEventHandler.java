@@ -30,7 +30,6 @@ public class ClientEventHandler {
     public static RenderOffhandPlayer renderOffhandPlayer = new RenderOffhandPlayer();
     public static EntityPlayer renderingPlayer;
     public static boolean cancelone = false;
-    public static int delay;
 
     @SubscribeEvent
     public void renderHotbarOverlay(RenderGameOverlayEvent event) {

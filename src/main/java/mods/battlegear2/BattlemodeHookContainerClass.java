@@ -114,7 +114,6 @@ public final class BattlemodeHookContainerClass {
             if (Backhand.proxy.isRightClickHeld()) {
                 Backhand.proxy.setRightClickCounter(Backhand.proxy.getRightClickCounter()+1);
                 if (Backhand.proxy.getRightClickCounter() > 1) {
-                    event.setCanceled(true);
                     return;
                 }
             }
@@ -125,25 +124,23 @@ public final class BattlemodeHookContainerClass {
                 }
             }
 
+            boolean swingHand = true;
             PlayerInteractEvent.Result blk = event.useBlock;
             PlayerInteractEvent.Result itm = event.useItem;
             event.useBlock = PlayerInteractEvent.Result.DENY;
             MovingObjectPosition mop = getRaytraceBlock(event.entityPlayer);
             if (mop != null) {
                 event.setCanceled(true);
-                int i = mop.blockX, j = mop.blockY, k = mop.blockZ,
-                side = mop.sideHit;
-                float f = (float)mop.hitVec.xCoord - i;
-                float f1 = (float)mop.hitVec.yCoord - j;
-                float f2 = (float)mop.hitVec.zCoord - k;
+                int i = mop.blockX, j = mop.blockY, k = mop.blockZ;
 
                 if (!event.entityPlayer.isSneaking() && canBlockBeInteractedWith(event.entityPlayer.worldObj, i, j, k)) {
                     event.setCanceled(false);
                     event.useBlock = blk;
                     event.useItem = itm;
+                    swingHand = false;
                 }
             }
-            if (event.entityPlayer.worldObj.isRemote && !BattlegearUtils.usagePriorAttack(offhandItem) && Backhand.OffhandAttack) {
+            if (event.entityPlayer.worldObj.isRemote && !BattlegearUtils.usagePriorAttack(offhandItem) && Backhand.OffhandAttack && swingHand) {
                 BattlemodeHookContainerClass.sendOffSwingEventNoCheck(event.entityPlayer, mainHandItem, offhandItem);
             }
         }
