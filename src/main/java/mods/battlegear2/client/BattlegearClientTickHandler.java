@@ -97,7 +97,17 @@ public final class BattlegearClientTickHandler {
                     if(mc.playerController.interactWithEntitySendPacket(player, mouseOver.entityHit))
                         flag = false;
                 }
-                else if (mouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+
+                if (flag)
+                {
+                    offhandItem = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
+                    PlayerEventChild.UseOffhandItemEvent useItemEvent = new PlayerEventChild.UseOffhandItemEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, 0, 0, 0, -1, player.worldObj), offhandItem);
+                    if (offhandItem != null && !MinecraftForge.EVENT_BUS.post(useItemEvent)) {
+                        BattlemodeHookContainerClass.tryUseItem(player, offhandItem, Side.CLIENT);
+                    }
+                }
+
+                if (offhandItem != null && mouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
                 {
                     int j = mouseOver.blockX;
                     int k = mouseOver.blockY;
@@ -109,27 +119,13 @@ public final class BattlegearClientTickHandler {
                         if (player.capabilities.allowEdit || !BattlemodeHookContainerClass.isItemBlock(offhandItem.getItem())) {
                             if (!MinecraftForge.EVENT_BUS.post(useItemEvent) && onPlayerPlaceBlock(mc.playerController, player, offhandItem, j, k, l, i1, mouseOver.hitVec)) {
                                 ((IBattlePlayer) player).swingOffItem();
-                                flag = false;
                             }
                         }
                         if (offhandItem.stackSize == 0)
                         {
                             BattlegearUtils.setPlayerOffhandItem(player, null);
                         }
-                        else if (offhandItem.stackSize != size || mc.playerController.isInCreativeMode())
-                        {
-                            ClientEventHandler.renderOffhandPlayer.itemRenderer.resetEquippedProgress();
-                        }
                     }
-                }
-            }
-            if (flag)
-            {
-                offhandItem = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
-                PlayerEventChild.UseOffhandItemEvent useItemEvent = new PlayerEventChild.UseOffhandItemEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, 0, 0, 0, -1, player.worldObj), offhandItem);
-                if (offhandItem != null && !MinecraftForge.EVENT_BUS.post(useItemEvent) && BattlemodeHookContainerClass.tryUseItem(player, offhandItem, Side.CLIENT))
-                {
-                    ClientEventHandler.renderOffhandPlayer.itemRenderer.resetEquippedProgress();
                 }
             }
             ticksBeforeUse = 4;
