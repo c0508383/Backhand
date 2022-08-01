@@ -38,7 +38,6 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import xonin.backhand.client.ClientEventHandler;
-import xonin.backhand.client.ClientTickHandler;
 
 public final class BattlegearClientTickHandler {
     public final Minecraft mc = Minecraft.getMinecraft();
@@ -63,8 +62,8 @@ public final class BattlegearClientTickHandler {
     @SideOnly(Side.CLIENT)
     public void tickStart(EntityPlayer player) {
         ItemStack offhand = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
-        if(offhand != null){
-            if(mc.gameSettings.keyBindUseItem.getIsKeyPressed() && mc.rightClickDelayTimer == 4 && !player.isUsingItem()){
+        if (offhand != null) {
+            if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
                 tryCheckUseItem(offhand, player);
             }
         }
@@ -74,10 +73,6 @@ public final class BattlegearClientTickHandler {
     public void tryCheckUseItem(ItemStack offhandItem, EntityPlayer player){
         ItemStack mainHandItem = player.getCurrentEquippedItem();
         if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || offhandItem == null)) {
-            return;
-        }
-
-        if (mainHandItem != null && BattlegearUtils.checkForRightClickFunction(mainHandItem)) {
             return;
         }
 
@@ -110,17 +105,13 @@ public final class BattlegearClientTickHandler {
                                 flag = false;
                             }
                         }
-                        if (offhandItem == null)
-                        {
-                            return;
-                        }
                         if (offhandItem.stackSize == 0)
                         {
                             BattlegearUtils.setPlayerOffhandItem(player, null);
                         }
                         else if (offhandItem.stackSize != size || mc.playerController.isInCreativeMode())
                         {
-                            //ClientEventHandler.renderOffhandPlayer.itemRenderer.resetEquippedProgress();
+                            ClientEventHandler.renderOffhandPlayer.itemRenderer.resetEquippedProgress();
                         }
                     }
                 }
@@ -131,7 +122,7 @@ public final class BattlegearClientTickHandler {
                 PlayerEventChild.UseOffhandItemEvent useItemEvent = new PlayerEventChild.UseOffhandItemEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, 0, 0, 0, -1, player.worldObj), offhandItem);
                 if (offhandItem != null && !MinecraftForge.EVENT_BUS.post(useItemEvent) && BattlemodeHookContainerClass.tryUseItem(player, offhandItem, Side.CLIENT))
                 {
-                    //ClientEventHandler.renderOffhandPlayer.itemRenderer.resetEquippedProgress();
+                    ClientEventHandler.renderOffhandPlayer.itemRenderer.resetEquippedProgress();
                 }
             }
         }

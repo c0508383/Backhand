@@ -1,19 +1,24 @@
 package xonin.backhand.client;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.IBattlePlayer;
+import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.opengl.GL11;
@@ -22,7 +27,8 @@ import xonin.backhand.Backhand;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 public class ClientEventHandler {
-    public RenderOffhandPlayer renderOffhandPlayer = new RenderOffhandPlayer();
+    public static RenderOffhandPlayer renderOffhandPlayer = new RenderOffhandPlayer();
+    public static EntityPlayer renderingPlayer;
     public static boolean cancelone = false;
     public static int delay;
 
@@ -98,6 +104,7 @@ public class ClientEventHandler {
     @SubscribeEvent
     public void onRenderHand(RenderHandEvent event) {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        renderingPlayer = player;
         if (!Backhand.EmptyOffhand && BattlegearUtils.getOffhandItem(player) == null) {
             return;
         }
@@ -111,6 +118,41 @@ public class ClientEventHandler {
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         renderOffhandPlayer.renderHand(event.partialTicks, event.renderPass);
         GL11.glPopMatrix();
+    }
+
+    /**
+     * Bend the models when the item in left hand is used
+     * And stop the right hand inappropriate bending
+     */
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void renderPlayerLeftItemUsage(RenderLivingEvent.Pre event){
+        if(event.entity instanceof EntityPlayer) {
+            EntityPlayer entityPlayer = (EntityPlayer) event.entity;
+            renderingPlayer = entityPlayer;
+            ItemStack offhand = ((InventoryPlayerBattle) entityPlayer.inventory).getOffhandItem();
+            if (offhand != null && event.renderer instanceof RenderPlayer) {
+                RenderPlayer renderer = ((RenderPlayer) event.renderer);
+                renderer.modelArmorChestplate.heldItemLeft = renderer.modelArmor.heldItemLeft = renderer.modelBipedMain.heldItemLeft = 1;
+                if (entityPlayer.getItemInUseCount() > 0 && entityPlayer.getItemInUse() == offhand) {
+                    EnumAction enumaction = offhand.getItemUseAction();
+                    if (enumaction == EnumAction.block) {
+                        renderer.modelArmorChestplate.heldItemLeft = renderer.modelArmor.heldItemLeft = renderer.modelBipedMain.heldItemLeft = 3;
+                    } else if (enumaction == EnumAction.bow) {
+                        renderer.modelArmorChestplate.aimedBow = renderer.modelArmor.aimedBow = renderer.modelBipedMain.aimedBow = true;
+                    }
+                    ItemStack mainhand = entityPlayer.inventory.getCurrentItem();
+                    renderer.modelArmorChestplate.heldItemRight = renderer.modelArmor.heldItemRight = renderer.modelBipedMain.heldItemRight = mainhand != null ? 1 : 0;
+                }
+            }
+        }
+    }
+
+    /**
+     * Reset models to default values
+     */
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void resetPlayerLeftHand(RenderPlayerEvent.Post event){
+        event.renderer.modelArmorChestplate.heldItemLeft = event.renderer.modelArmor.heldItemLeft = event.renderer.modelBipedMain.heldItemLeft = 0;
     }
 
     @SubscribeEvent

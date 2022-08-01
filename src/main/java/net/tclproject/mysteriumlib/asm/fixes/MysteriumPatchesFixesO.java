@@ -1,20 +1,17 @@
 package net.tclproject.mysteriumlib.asm.fixes;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mods.battlegear2.BattlemodeHookContainerClass;
-import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.particle.EffectRenderer;
-import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -53,16 +50,29 @@ import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import xonin.backhand.client.ClientEventHandler;
 
 public class MysteriumPatchesFixesO {
+    /**Dirty hack to prevent random resetting of block removal (why does this even happen?!) when breaking blocks with the offhand.*/
+    public static int countToCancel = 0;
+    /**If we have hotswapped the breaking item with the one in offhand and should hotswap it back when called next*/
+    public static boolean hotSwapped = false;
+
+    public static boolean renderingOffhandUse = false;
 
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
 	public static boolean isPlayer(EntityPlayer p) {
 		return false;
 	}
 
-    /**Dirty hack to prevent random resetting of block removal (why does this even happen?!) when breaking blocks with the offhand.*/
-    public static int countToCancel = 0;
-    /**If we have hotswapped the breaking item with the one in offhand and should hotswap it back when called next*/
-    public static boolean hotSwapped = false;
+    @Fix(returnSetting=EnumReturnSetting.ALWAYS)
+    public static EnumAction getItemUseAction(ItemStack itemStack)
+    {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            EntityPlayer player = ClientEventHandler.renderingPlayer;
+            if (itemStack == player.getCurrentEquippedItem() && player.getItemInUse() != player.getCurrentEquippedItem()) {
+                return EnumAction.none;
+            }
+        }
+        return itemStack.getItem().getItemUseAction(itemStack);
+    }
 
     @SideOnly(Side.CLIENT)
     @Fix(returnSetting=EnumReturnSetting.ON_TRUE)
@@ -80,7 +90,7 @@ public class MysteriumPatchesFixesO {
             return false;
         }
     }
-	
+
 	@Fix(returnSetting=EnumReturnSetting.ON_TRUE)
 	@SideOnly(Side.CLIENT)
 	public static boolean clickBlock(PlayerControllerMP mp, int p_78743_1_, int p_78743_2_, int p_78743_3_, int p_78743_4_)
