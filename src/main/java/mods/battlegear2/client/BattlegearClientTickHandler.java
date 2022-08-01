@@ -44,6 +44,7 @@ public final class BattlegearClientTickHandler {
 
     public float partialTick;
     public int previousBattlemode = 0;
+    public static float ticksBeforeUse = 0;
     public static final BattlegearClientTickHandler INSTANCE = new BattlegearClientTickHandler();
 
     public BattlegearClientTickHandler() {
@@ -54,6 +55,8 @@ public final class BattlegearClientTickHandler {
     public void onPlayerTick(TickEvent.PlayerTickEvent event){
         if(event.player == mc.thePlayer) {
             if (event.phase == TickEvent.Phase.START) {
+                if (ticksBeforeUse > 0)
+                    ticksBeforeUse--;
                 tickStart(mc.thePlayer);
             }
         }
@@ -64,7 +67,11 @@ public final class BattlegearClientTickHandler {
         ItemStack offhand = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
         if (offhand != null) {
             if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
-                tryCheckUseItem(offhand, player);
+                if (ticksBeforeUse == 0) {
+                    tryCheckUseItem(offhand, player);
+                }
+            } else {
+                ticksBeforeUse = 0;
             }
         }
     }
@@ -125,6 +132,7 @@ public final class BattlegearClientTickHandler {
                     ClientEventHandler.renderOffhandPlayer.itemRenderer.resetEquippedProgress();
                 }
             }
+            ticksBeforeUse = 4;
         }
     }
 
