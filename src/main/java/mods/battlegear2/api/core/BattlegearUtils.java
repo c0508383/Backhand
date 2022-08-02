@@ -194,6 +194,36 @@ public class BattlegearUtils {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public static boolean checkForRightClickFunctionNoAction(ItemStack stack) {
+        try {
+            Class c = stack.getItem().getClass();
+            while (!(c.equals(Item.class) || c.equals(ItemTool.class) || c.equals(ItemSword.class))) {
+                try {
+                    try {
+                        c.getDeclaredMethod(itemBlackListMethodNames[0], itemBlackListMethodParams[0]);
+                        return true;
+                    } catch (NoSuchMethodException ignored) {
+                    }
+
+                    try {
+                        c.getDeclaredMethod(itemBlackListMethodNames[1], itemBlackListMethodParams[1]);
+                        return true;
+                    } catch (NoSuchMethodException ignored) {
+                    }
+                } catch (NoClassDefFoundError ignored) {
+
+                }
+
+                c = c.getSuperclass();
+            }
+
+            return false;
+        } catch (NullPointerException e) {
+            return true;
+        }
+    }
+
     /**
      * Reads a {@link ItemStack} from the InputStream
      */

@@ -68,7 +68,8 @@ public class MysteriumPatchesFixesO {
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             EntityPlayer player = ClientEventHandler.renderingPlayer;
             ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
-            if (offhandItemUsed != null && offhandItemUsed != itemStack && offhandItem != null && itemStack != offhandItem) {
+            if (offhandItemUsed != null && offhandItemUsed != itemStack
+                    && offhandItem != null && BattlegearUtils.checkForRightClickFunctionNoAction(offhandItem) && itemStack != offhandItem) {
                 return EnumAction.none;
             }
         }
