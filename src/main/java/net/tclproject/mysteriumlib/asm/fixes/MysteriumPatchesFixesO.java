@@ -260,18 +260,6 @@ public class MysteriumPatchesFixesO {
             b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
         }
     }
-
-	@SideOnly(Side.CLIENT)
-	@Fix(insertOnExit = true, returnSetting = EnumReturnSetting.ALWAYS)
-    public static IIcon getItemIcon(EntityPlayer p, ItemStack p_70620_1_, int p_70620_2_, @ReturnedValue IIcon returnValue) 
-	{
-		if (returnValue == Items.bow.getItemIconForUseDuration(2) || returnValue == Items.bow.getItemIconForUseDuration(1) || returnValue == Items.bow.getItemIconForUseDuration(0)) {
-			if (p.getItemInUse().getItem() != Items.bow) {
-				return p_70620_1_.getItem().getIcon(p_70620_1_, p_70620_2_, p, p.getItemInUse(), p.getItemInUseCount());
-			}
-		}
-		return returnValue;
-	}
 	
 	@Fix(returnSetting=EnumReturnSetting.ON_TRUE)
 	public static boolean processPlayerDigging(NetHandlerPlayServer serv, C07PacketPlayerDigging p_147345_1_)
