@@ -190,7 +190,7 @@ public final class BattlegearClientTickHandler {
                     PlayerControllerMP.clickBlockCreative(mcInstance, mcInstance.playerController, i, j, k, objectMouseOver.sideHit);
                     BattlemodeHookContainerClass.sendOffSwingEventNoCheck(event.player, mainHandItem, offhandItem); // force offhand swing anyway because we broke a block
                 }
-                ClientTickHandler.delay = 10;
+                ClientTickHandler.delay = 20;
             }
             return;
         }
