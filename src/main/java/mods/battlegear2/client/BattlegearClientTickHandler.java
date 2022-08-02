@@ -84,6 +84,7 @@ public final class BattlegearClientTickHandler {
 
     @SideOnly(Side.CLIENT)
     public void tryCheckUseItem(ItemStack offhandItem, EntityPlayer player){
+        MysteriumPatchesFixesO.offhandItemUsed = null;
         ItemStack mainHandItem = player.getCurrentEquippedItem();
         if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || offhandItem == null)) {
             return;
