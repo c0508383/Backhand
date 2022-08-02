@@ -1,11 +1,14 @@
 package mods.battlegear2.api.core;
 
+import mods.battlegear2.packet.BattlegearSyncItemPacket;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import xonin.backhand.Backhand;
 
 /**
  * User: nerd-boy
@@ -37,6 +40,33 @@ public class InventoryPlayerBattle extends InventoryPlayer {
         }
 
         return amount + super.clearInventory(item,metadata);
+    }
+
+    public boolean addItemStackToInventory(final ItemStack itemStack)
+    {
+        if (!Backhand.isOffhandBlacklisted(itemStack)) {
+            if (offhandItem == null && getFirstEmptyStack() == -1) {
+                offhandItem = itemStack;
+                itemStack.stackSize = 0;
+                Backhand.packetHandler.sendPacketToPlayer(new BattlegearSyncItemPacket(player).generatePacket(), (EntityPlayerMP) player);
+                return true;
+            }
+
+            if (offhandItem != null && offhandItem.getItem() == itemStack.getItem() && offhandItem.isStackable() && offhandItem.stackSize < offhandItem.getMaxStackSize() && offhandItem.stackSize < this.getInventoryStackLimit() && (!offhandItem.getHasSubtypes() || offhandItem.getItemDamage() == itemStack.getItemDamage()) && ItemStack.areItemStackTagsEqual(offhandItem, itemStack)) {
+                if (offhandItem.stackSize + itemStack.stackSize > offhandItem.getMaxStackSize()) {
+                    itemStack.stackSize -= offhandItem.stackSize;
+                    offhandItem.stackSize = offhandItem.getMaxStackSize();
+                    Backhand.packetHandler.sendPacketToPlayer(new BattlegearSyncItemPacket(player).generatePacket(), (EntityPlayerMP) player);
+                    return super.addItemStackToInventory(itemStack);
+                } else {
+                    offhandItem.stackSize += itemStack.stackSize;
+                    itemStack.stackSize = 0;
+                    Backhand.packetHandler.sendPacketToPlayer(new BattlegearSyncItemPacket(player).generatePacket(), (EntityPlayerMP) player);
+                    return true;
+                }
+            }
+        }
+        return super.addItemStackToInventory(itemStack);
     }
 
     public boolean consumeInventoryItem(Item item)
