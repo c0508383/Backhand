@@ -250,6 +250,7 @@ public class ItemRendererOffhand extends ItemRenderer {
             GL11.glPushMatrix();
             modelBipedMain.bipedLeftArm.postRender(0.0625F);
             GL11.glTranslatef(0.0625F, 0.4375F, 0.0625F);
+            thirdPersonRenderModCompatibility(player,modelBipedMain,frame,offhandItem);
 
             if (player.fishEntity != null) {
                 offhandItem = new ItemStack(Items.stick);
@@ -317,6 +318,19 @@ public class ItemRendererOffhand extends ItemRenderer {
             }
             GL11.glPopMatrix();
         }
+    }
+
+    public void thirdPersonRenderModCompatibility(EntityPlayer player, ModelBiped modelBiped, float frame, ItemStack offhandItem) {
+        try {
+            Class<?> CNPCShield = Class.forName("noppes.npcs.items.ItemShield");
+            if (CNPCShield.isInstance(offhandItem.getItem())) {
+                if (player.getItemInUse() != offhandItem) {
+                    GL11.glTranslatef(0.36F, 0.0F, 0.0F);
+                } else {
+                    GL11.glTranslatef(0.0F, 0.07F, 0.0F);
+                }
+            }
+        } catch (Exception ignored) {}
     }
 
     public void applyColorFromItemStack(ItemStack itemStack, int pass){
