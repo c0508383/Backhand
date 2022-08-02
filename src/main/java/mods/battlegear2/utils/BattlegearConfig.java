@@ -33,6 +33,10 @@ public class BattlegearConfig {
         Backhand.OffhandBreakBlocks = config.get(category, "Offhand breaks blocks",Backhand.OffhandBreakBlocks, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
+        sb.append("If enabled, arrows in the offhand will be used first when shooting a bow. Compatible with Et-Futurum's tipped arrows!");
+        Backhand.UseOffhandArrows = config.get(category, "Use offhand arrows",Backhand.UseOffhandArrows, sb.toString()).getBoolean();
+
+        sb = new StringBuilder();
         sb.append("These items will be unable to be swapped into the offhand.\n");
         sb.append("Formatting of an item should be: modid:itemname\n");
         sb.append("These should all be placed on separate lines between the provided \'<\' and \'>\'.");
