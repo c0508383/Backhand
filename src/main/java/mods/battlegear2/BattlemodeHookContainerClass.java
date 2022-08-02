@@ -111,7 +111,7 @@ public final class BattlemodeHookContainerClass {
                 return;
             }
 
-            if (Backhand.proxy.isRightClickHeld()) {
+            if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && Backhand.proxy.isRightClickHeld()) {
                 Backhand.proxy.setRightClickCounter(Backhand.proxy.getRightClickCounter()+1);
                 if (Backhand.proxy.getRightClickCounter() > 1) {
                     return;

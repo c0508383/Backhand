@@ -51,18 +51,24 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public boolean isLeftClickHeld() {
-        return Minecraft.getMinecraft().gameSettings.keyBindAttack.getIsKeyPressed();
-    }
-
-    @Override
     public int getRightClickCounter() {
         return rightClickCounter;
     }
 
     @Override
+    public int getRightClickDelay() {
+        return ClientTickHandler.delay;
+    }
+
+    @Override
     public void setRightClickCounter(int i) {
         rightClickCounter = i;
+    }
+
+
+    @Override
+    public boolean isLeftClickHeld() {
+        return Minecraft.getMinecraft().gameSettings.keyBindAttack.getIsKeyPressed();
     }
 
     @Override

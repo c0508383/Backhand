@@ -2,6 +2,7 @@ package mods.battlegear2.client;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.ResourceLocation;
 import xonin.backhand.Backhand;
@@ -183,12 +184,13 @@ public final class BattlegearClientTickHandler {
         if (mcInstance.thePlayer.capabilities.isCreativeMode)
         {
             if (ClientTickHandler.delay <= 0) {
-                mcInstance.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(0, i, j, k, objectMouseOver.sideHit));
-                PlayerControllerMP.clickBlockCreative(mcInstance, mcInstance.playerController, i, j, k, objectMouseOver.sideHit);
-                if (!(BattlegearUtils.usagePriorAttack(offhandItem))) {
+                mcInstance.effectRenderer.addBlockHitEffects(i, j, k, objectMouseOver);
+                mcInstance.effectRenderer.addBlockHitEffects(i, j, k, objectMouseOver);
+                if (!(BattlegearUtils.usagePriorAttack(offhandItem)) && (offhandItem == null || !(offhandItem.getItem() instanceof ItemSword))) {
+                    PlayerControllerMP.clickBlockCreative(mcInstance, mcInstance.playerController, i, j, k, objectMouseOver.sideHit);
                     BattlemodeHookContainerClass.sendOffSwingEventNoCheck(event.player, mainHandItem, offhandItem); // force offhand swing anyway because we broke a block
                 }
-                ClientTickHandler.delay = 24;
+                ClientTickHandler.delay = 10;
             }
             return;
         }

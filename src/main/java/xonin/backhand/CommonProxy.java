@@ -46,6 +46,15 @@ public class CommonProxy implements IGuiHandler {
 
     public void setRightClickCounter(int i) {}
 
+    public int getRightClickDelay() {
+        return 0;
+    }
+
+    // Should not be called on the server anyway
+    public boolean isLeftClickHeld() {
+        return false;
+    }
+
     // Should not be called on the server anyway
     public int getLeftClickCounter() {
         return 0;
@@ -53,9 +62,4 @@ public class CommonProxy implements IGuiHandler {
 
     // Should not be called on the server anyway
     public void setLeftClickCounter(int i) {}
-
-    // Should not be called on the server anyway
-    public boolean isLeftClickHeld() {
-        return false;
-    }
 }
