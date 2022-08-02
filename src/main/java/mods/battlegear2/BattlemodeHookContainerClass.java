@@ -35,6 +35,7 @@ import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import xonin.backhand.Backhand;
 
 public final class BattlemodeHookContainerClass {
@@ -204,27 +205,28 @@ public final class BattlemodeHookContainerClass {
         }
         final int i = itemStack.stackSize;
         final int j = itemStack.getItemDamage();
-        ItemStack itemstack1 = itemStack.useItemRightClick(entityPlayer.getEntityWorld(), entityPlayer);
+        ItemStack itemStackResult = itemStack.useItemRightClick(entityPlayer.getEntityWorld(), entityPlayer);
 
-        if (itemstack1 == itemStack && (itemstack1 == null || itemstack1.stackSize == i && (side.isServer()?(itemstack1.getMaxItemUseDuration() <= 0 && itemstack1.getItemDamage() == j):true)))
+        if (itemStackResult == itemStack && (itemStackResult == null || itemStackResult.stackSize == i && (side.isServer()?(itemStackResult.getMaxItemUseDuration() <= 0 && itemStackResult.getItemDamage() == j):true)))
         {
             return false;
         }
         else
         {
-            BattlegearUtils.setPlayerOffhandItem(entityPlayer, itemstack1);
+            MysteriumPatchesFixesO.offhandItemUsed = itemStackResult;
+            BattlegearUtils.setPlayerOffhandItem(entityPlayer, itemStackResult);
             if (side.isServer() && (entityPlayer).capabilities.isCreativeMode)
             {
-                itemstack1.stackSize = i;
-                if (itemstack1.isItemStackDamageable())
+                itemStackResult.stackSize = i;
+                if (itemStackResult.isItemStackDamageable())
                 {
-                    itemstack1.setItemDamage(j);
+                    itemStackResult.setItemDamage(j);
                 }
             }
-            if (itemstack1.stackSize <= 0)
+            if (itemStackResult.stackSize <= 0)
             {
                 BattlegearUtils.setPlayerOffhandItem(entityPlayer, null);
-                ForgeEventFactory.onPlayerDestroyItem(entityPlayer, itemstack1);
+                ForgeEventFactory.onPlayerDestroyItem(entityPlayer, itemStackResult);
             }
             if (side.isServer() && !entityPlayer.isUsingItem())
             {

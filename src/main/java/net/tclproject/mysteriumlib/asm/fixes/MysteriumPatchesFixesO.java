@@ -4,6 +4,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mods.battlegear2.BattlemodeHookContainerClass;
+import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.block.material.Material;
@@ -38,7 +39,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -55,6 +55,8 @@ public class MysteriumPatchesFixesO {
     /**If we have hotswapped the breaking item with the one in offhand and should hotswap it back when called next*/
     public static boolean hotSwapped = false;
 
+    public static ItemStack offhandItemUsed;
+
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
 	public static boolean isPlayer(EntityPlayer p) {
 		return false;
@@ -65,7 +67,8 @@ public class MysteriumPatchesFixesO {
     {
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             EntityPlayer player = ClientEventHandler.renderingPlayer;
-            if (itemStack == player.getCurrentEquippedItem() && player.getItemInUse() != player.getCurrentEquippedItem()) {
+            ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+            if (offhandItemUsed != null && offhandItemUsed != itemStack && offhandItem != null && itemStack != offhandItem) {
                 return EnumAction.none;
             }
         }
