@@ -1,7 +1,10 @@
 package mods.battlegear2.client;
 
+import mods.battlegear2.packet.OffhandAttackPacket;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.ResourceLocation;
@@ -62,9 +65,20 @@ public final class BattlegearClientTickHandler {
                 if (ticksBeforeUse == 0) {
                     tryCheckUseItem(offhand, player);
                 }
+                tryAttackEntity(offhand, player);
             } else {
                 ticksBeforeUse = 0;
             }
+        }
+    }
+
+    public void tryAttackEntity(ItemStack offhand, EntityPlayer player) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            Entity target = mc.objectMouseOver.entityHit;
+            ((EntityClientPlayerMP) player).sendQueue.addToSendQueue(
+                new OffhandAttackPacket(player,target).generatePacket()
+            );
         }
     }
 

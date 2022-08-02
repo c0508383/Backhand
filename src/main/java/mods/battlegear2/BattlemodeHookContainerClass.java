@@ -321,10 +321,10 @@ public final class BattlemodeHookContainerClass {
                 if (offAttackEvent.swingOffhand){
                     if (event.entityPlayer.worldObj.isRemote) sendOffSwingEvent(event, mainHandItem, offhandItem);
                 }
-                if (offAttackEvent.shouldAttack)
+                /*if (offAttackEvent.shouldAttack)
                 {
                     ((IBattlePlayer) event.entityPlayer).attackTargetEntityWithCurrentOffItem(event.target);
-                }
+                }*/
                 if (offAttackEvent.cancelParent) {
                     event.setCanceled(true);
                 }

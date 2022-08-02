@@ -24,6 +24,7 @@ public final class BattlegearPacketHandler {
         map.put(BattlegearAnimationPacket.packetName, new BattlegearAnimationPacket());
         map.put(OffhandPlaceBlockPacket.packetName, new OffhandPlaceBlockPacket());
         map.put(OffhandSwapPacket.packetName, new OffhandSwapPacket());
+        map.put(OffhandAttackPacket.packetName, new OffhandAttackPacket());
     }
     
     public void register(){
