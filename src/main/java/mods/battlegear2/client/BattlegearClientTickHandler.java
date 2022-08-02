@@ -70,6 +70,9 @@ public final class BattlegearClientTickHandler {
                 ticksBeforeUse = 0;
             }
         }
+        if (player.getItemInUse() == null) {
+            MysteriumPatchesFixesO.offhandItemUsed = null;
+        }
     }
 
     public void tryAttackEntity(ItemStack offhand, EntityPlayer player) {
@@ -84,7 +87,6 @@ public final class BattlegearClientTickHandler {
 
     @SideOnly(Side.CLIENT)
     public void tryCheckUseItem(ItemStack offhandItem, EntityPlayer player){
-        MysteriumPatchesFixesO.offhandItemUsed = null;
         ItemStack mainHandItem = player.getCurrentEquippedItem();
         if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || offhandItem == null)) {
             return;

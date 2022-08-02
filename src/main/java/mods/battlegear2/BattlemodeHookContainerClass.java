@@ -206,6 +206,7 @@ public final class BattlemodeHookContainerClass {
         final int i = itemStack.stackSize;
         final int j = itemStack.getItemDamage();
         ItemStack itemStackResult = itemStack.useItemRightClick(entityPlayer.getEntityWorld(), entityPlayer);
+        MysteriumPatchesFixesO.offhandItemUsed = itemStackResult;
 
         if (itemStackResult == itemStack && (itemStackResult == null || itemStackResult.stackSize == i && (side.isServer()?(itemStackResult.getMaxItemUseDuration() <= 0 && itemStackResult.getItemDamage() == j):true)))
         {
@@ -213,7 +214,6 @@ public final class BattlemodeHookContainerClass {
         }
         else
         {
-            MysteriumPatchesFixesO.offhandItemUsed = itemStackResult;
             BattlegearUtils.setPlayerOffhandItem(entityPlayer, itemStackResult);
             if (side.isServer() && (entityPlayer).capabilities.isCreativeMode)
             {

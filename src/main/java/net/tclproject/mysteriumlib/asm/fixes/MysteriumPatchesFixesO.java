@@ -53,15 +53,17 @@ public class MysteriumPatchesFixesO {
 		return false;
 	}
 
-    @Fix(returnSetting=EnumReturnSetting.ALWAYS)
-    public static EnumAction getItemUseAction(ItemStack itemStack)
+    @Fix(insertOnExit = true, returnSetting=EnumReturnSetting.ALWAYS)
+    public static EnumAction getItemUseAction(ItemStack itemStack, @ReturnedValue EnumAction returnedAction)
     {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            EntityPlayer player = ClientEventHandler.renderingPlayer;
-            ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
-            if (offhandItemUsed != null && offhandItemUsed != itemStack
-                    && offhandItem != null && BattlegearUtils.checkForRightClickFunctionNoAction(offhandItem) && itemStack != offhandItem) {
-                return EnumAction.none;
+        if (returnedAction != EnumAction.none) {
+            if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+                EntityPlayer player = ClientEventHandler.renderingPlayer;
+                ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+                if (offhandItemUsed != null && offhandItemUsed != itemStack
+                        && offhandItem != null && BattlegearUtils.checkForRightClickFunctionNoAction(offhandItem) && itemStack != offhandItem) {
+                    return EnumAction.none;
+                }
             }
         }
         return itemStack.getItem().getItemUseAction(itemStack);
