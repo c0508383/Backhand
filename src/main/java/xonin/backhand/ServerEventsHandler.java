@@ -43,7 +43,7 @@ public class ServerEventsHandler {
                 }
             } catch (Exception ignored) {}
 
-            if (Items.arrow.getClass().isInstance(offhandItem.getItem())) {
+            if (Items.arrow == offhandItem.getItem()) {
                 overrideWithOffhand = true;
             }
 
@@ -70,7 +70,7 @@ public class ServerEventsHandler {
                 }
             } catch (Exception ignored) {}
 
-            if (Items.arrow.getClass().isInstance(offhandItem.getItem())) {
+            if (Items.arrow == offhandItem.getItem()) {
                 overrideWithOffhand = true;
             }
 
