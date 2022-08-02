@@ -379,8 +379,7 @@ public class MysteriumPatchesFixesO {
         m.tryHarvestBlock(p_73082_1_, p_73082_2_, p_73082_3_);
     }
 
-	
-
+	/*
 	@Fix(returnSetting = EnumReturnSetting.ALWAYS)
 	public static void attackTargetEntityWithCurrentItem(EntityPlayer plr, Entity p_71059_1_)
     {
@@ -517,6 +516,7 @@ public class MysteriumPatchesFixesO {
             }
         }
     }
+    */
 
 	@Fix(returnSetting=EnumReturnSetting.ON_TRUE)
 	public static boolean onPlayerStoppedUsing(ItemBow bow, ItemStack p_77615_1_, World p_77615_2_, EntityPlayer p_77615_3_, int p_77615_4_)
