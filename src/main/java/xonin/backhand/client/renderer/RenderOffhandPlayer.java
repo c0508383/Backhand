@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
@@ -107,7 +108,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
             {
                 itemRenderer.updateEquippedItem();
                 entityRenderer.enableLightmap((double)partialTicks);
-                renderOffhandItem(partialTicks);
+                this.renderOffhandItem(partialTicks);
                 entityRenderer.disableLightmap((double)partialTicks);
             }
 
@@ -380,6 +381,10 @@ public class RenderOffhandPlayer extends RenderPlayer {
 
                 if (offhandItem.getItem().shouldRotateAroundWhenRendering()) {
                     GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+                }
+                if (offhandItem.getItem() != null && offhandItem.getItem().getUnlocalizedName() != null && offhandItem.getItem().getUnlocalizedName().toLowerCase().endsWith("arrow")) {
+                    GL11.glTranslatef(-0.2F,0.0F,0.0F);
+                    GL11.glRotatef(-90,1,0,1);
                 }
                 itemRenderer.renderItem(player, offhandItem, 0);
                 if (offhandItem.getItem().requiresMultipleRenderPasses()) {
