@@ -299,38 +299,6 @@ public final class BattlemodeHookContainerClass {
             return true;
         }
     }
-    
-    public static boolean interactWith = false;
-
-    @SubscribeEvent
-    public void playerInteractEntity(EntityInteractEvent event) {
-        if(isFake(event.entityPlayer))
-            return;
-        interactWith = interactWithNoEvent(event.entityPlayer, event.target);
-        ItemStack offhandItem = ((InventoryPlayerBattle)event.entityPlayer.inventory).getOffhandItem();
-        if(!BattlegearUtils.usagePriorAttack(offhandItem)){
-            ItemStack mainHandItem = event.entityPlayer.getCurrentEquippedItem();
-            PlayerEventChild.OffhandAttackEvent offAttackEvent = new PlayerEventChild.OffhandAttackEvent(event, mainHandItem, offhandItem);
-            if(!MinecraftForge.EVENT_BUS.post(offAttackEvent)){
-                if (interactWith) {
-                    interactWith = false;
-                    return;
-                } else {
-                    event.setCanceled(true);
-                }
-                if (offAttackEvent.swingOffhand){
-                    if (event.entityPlayer.worldObj.isRemote) sendOffSwingEvent(event, mainHandItem, offhandItem);
-                }
-                /*if (offAttackEvent.shouldAttack)
-                {
-                    ((IBattlePlayer) event.entityPlayer).attackTargetEntityWithCurrentOffItem(event.target);
-                }*/
-                if (offAttackEvent.cancelParent) {
-                    event.setCanceled(true);
-                }
-            }
-        }
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onOffhandAttack(PlayerEventChild.OffhandAttackEvent event){
