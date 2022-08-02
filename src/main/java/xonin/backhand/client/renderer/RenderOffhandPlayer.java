@@ -279,6 +279,8 @@ public class RenderOffhandPlayer extends RenderPlayer {
                     EnumAction action = offhandItem.getItemUseAction();
 
                     if (action == EnumAction.eat || action == EnumAction.drink) {
+                        GL11.glTranslatef(-0.7F * var7, -0.65F * var7 - (1.0F - progress) * 0.6F, -0.9F * var7);
+
                         var21 = (float) player.getItemInUseCount() - frame + 1.0F;
                         var10 = 1.0F - var21 / (float) offhandItem.getMaxItemUseDuration();
                         var11 = 1.0F - var10;
@@ -286,15 +288,29 @@ public class RenderOffhandPlayer extends RenderPlayer {
                         var11 = var11 * var11 * var11;
                         var11 = var11 * var11 * var11;
                         var12 = 1.0F - var11;
-                        GL11.glTranslatef(0.0F, MathHelper.abs(MathHelper.cos(var21 / 4.0F * (float) Math.PI) * 0.1F) * (float) ((double) var10 > 0.2D ? 1 : 0), 0.0F);
-                        GL11.glTranslatef(var12 * 0.1F, -var12 * 0.1F, 0.0F);
-                        GL11.glRotatef(var12 * 2.0F, 0.0F, 1.0F, 0.0F);
-                        GL11.glRotatef(var12 * 5.0F, 1.0F, 0.0F, 0.0F);
-                        GL11.glRotatef(var12 * 3.0F, 0.0F, 0.0F, 1.0F);
+                        GL11.glTranslatef(0.0F, MathHelper.abs(MathHelper.cos(1.0F + (var21 / 4.0F * (float) Math.PI)) * 0.1F) * (float) ((double) var10 > 0.15D ? 1 : 0), 0.0F);
+                        GL11.glTranslatef(var12 * 0.7F, -var12 * 0.025F, 0.0F);
+                        GL11.glRotatef(-var12 * 65.0F, 0.0F, 1.0F, 0.0F);
+                        GL11.glRotatef(var12 * 30.0F, 1.0F, 0.0F, 0.0F);
+                        GL11.glRotatef(-var12 * 20.0F, 0.0F, 0.0F, 1.0F);
+                        var11 = 0.4F;
+                        GL11.glScalef(var11, var11, var11);
+                        itemRenderer.renderItem(player, offhandItem, 0);
+                        if (offhandItem.getItem().requiresMultipleRenderPasses()) {
+                            for (int x = 1; x < offhandItem.getItem().getRenderPasses(offhandItem.getItemDamage()); x++) {
+                                int k1 = offhandItem.getItem().getColorFromItemStack(offhandItem, x);
+                                float f10 = (float)(k1 >> 16 & 255) / 255.0F;
+                                float f11 = (float)(k1 >> 8 & 255) / 255.0F;
+                                float f12 = (float)(k1 & 255) / 255.0F;
+                                GL11.glColor4f(f10, f11, f12, 1.0F);
+                                itemRenderer.renderItem(player, offhandItem, x, EQUIPPED_FIRST_PERSON);
+                            }
+                        }
+                        GL11.glPopMatrix();
+                        return;
                     }
                 } else {
                     var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
-                    //var20 = player.getSwingProgress(frame);
                     var21 = MathHelper.sin(var20 * (float) Math.PI);
                     var10 = MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI);
                     //Flip the (x direction)
@@ -308,7 +324,6 @@ public class RenderOffhandPlayer extends RenderPlayer {
 
                 GL11.glEnable(GL12.GL_RESCALE_NORMAL);
                 var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
-                //var20 = player.getSwingProgress(frame);
 
                 var21 = MathHelper.sin(var20 * var20 * (float) Math.PI);
                 var10 = MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI);
