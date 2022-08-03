@@ -316,11 +316,11 @@ public class ItemRendererOffhand extends ItemRenderer {
             if (offhandItem.getItem().requiresMultipleRenderPasses()) {
                 for (int var27 = 0; var27 < offhandItem.getItem().getRenderPasses(offhandItem.getItemDamage()); ++var27) {
                     applyColorFromItemStack(offhandItem, var27);
-                    RenderManager.instance.itemRenderer.renderItem(player, offhandItem, var27);
+                    this.renderItem(player, offhandItem, var27);
                 }
             } else {
                 applyColorFromItemStack(offhandItem, 0);
-                RenderManager.instance.itemRenderer.renderItem(player, offhandItem, 0);
+                this.renderItem(player, offhandItem, 0);
             }
             GL11.glPopMatrix();
         }
