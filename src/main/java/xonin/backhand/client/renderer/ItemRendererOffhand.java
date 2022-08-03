@@ -91,7 +91,8 @@ public class ItemRendererOffhand extends ItemRenderer {
             IIcon iicon = p_78443_1_.getItemIcon(p_78443_2_, p_78443_3_);
 
             if (p_78443_1_ instanceof EntityPlayer && ((EntityPlayer)p_78443_1_).getItemInUse() != null
-                    && !(((EntityPlayer)p_78443_1_).getItemInUse().getItem() instanceof ItemBow)) {
+                    && !(((EntityPlayer)p_78443_1_).getItemInUse().getItem() instanceof ItemBow)
+                    && p_78443_2_.getItem() instanceof ItemBow) {
                 iicon = p_78443_2_.getItem().getIcon(p_78443_2_, 0, ((EntityPlayer)p_78443_1_), ((EntityPlayer)p_78443_1_).getItemInUse(), 0);
             }
 

@@ -222,7 +222,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
         }
     }
 
-    public static void renderOffhandItem(float frame) {
+    public void renderOffhandItem(float frame) {
         Minecraft mc = Minecraft.getMinecraft();
         float progress = itemRenderer.prevEquippedProgress + (itemRenderer.equippedProgress - itemRenderer.prevEquippedProgress) * frame;
 
@@ -436,7 +436,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
         RenderHelper.disableStandardItemLighting();
     }
 
-    public static void renderFirstPersonLeftArm(EntityPlayer player) {
+    public void renderFirstPersonLeftArm(EntityPlayer player) {
         Render render = RenderManager.instance.getEntityRenderObject(player);
         RenderPlayer renderplayer = (RenderPlayer)render;
 

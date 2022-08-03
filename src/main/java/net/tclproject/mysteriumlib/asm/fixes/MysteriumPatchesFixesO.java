@@ -137,7 +137,7 @@ public class MysteriumPatchesFixesO {
         }
 
         MysteriumPatchesFixesO.onGround2 = 0;
-        ClientEventHandler.renderOffhandPlayer.renderHand(p_78440_1_,ClientEventHandler.renderPass);
+        ClientEventHandler.renderOffhandPlayer.renderOffhandItem(p_78440_1_);
     }
 	
 	@Fix
