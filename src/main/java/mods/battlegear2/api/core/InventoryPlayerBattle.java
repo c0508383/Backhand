@@ -4,11 +4,13 @@ import mods.battlegear2.packet.BattlegearSyncItemPacket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import xonin.backhand.Backhand;
+import xonin.backhand.ServerEventsHandler;
 
 /**
  * User: nerd-boy
@@ -135,6 +137,10 @@ public class InventoryPlayerBattle extends InventoryPlayer {
     }
 
     public ItemStack getStackInSlot(int slot) {
+        if (ServerEventsHandler.arrowHotSwapped && this.getOffhandItem().getItem() == Items.arrow) {
+            return this.getOffhandItem();
+        }
+
         if (slot < InventoryPlayerBattle.OFFHAND_ITEM_INDEX) {
             return super.getStackInSlot(slot);
         } else if (slot == InventoryPlayerBattle.OFFHAND_ITEM_INDEX) {

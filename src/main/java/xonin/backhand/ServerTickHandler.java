@@ -5,6 +5,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
 public class ServerTickHandler {
@@ -27,8 +28,10 @@ public class ServerTickHandler {
         if (ServerEventsHandler.arrowHotSwapped) {
             final ItemStack oldItem = event.player.getCurrentEquippedItem();
             final ItemStack offhandItem = BattlegearUtils.getOffhandItem(event.player);
-            BattlegearUtils.setPlayerCurrentItem(event.player, offhandItem);
-            BattlegearUtils.setPlayerOffhandItem(event.player, oldItem);
+            if (offhandItem.getItem() != Items.arrow) {
+                BattlegearUtils.setPlayerCurrentItem(event.player, offhandItem);
+                BattlegearUtils.setPlayerOffhandItem(event.player, oldItem);
+            }
             ServerEventsHandler.arrowHotSwapped = false;
         }
     }

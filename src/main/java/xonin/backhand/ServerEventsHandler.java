@@ -76,9 +76,11 @@ public class ServerEventsHandler {
 
             if (overrideWithOffhand) {
                 arrowHotSwapped = true;
-                final ItemStack oldItem = event.entityPlayer.getCurrentEquippedItem();
-                BattlegearUtils.setPlayerCurrentItem(event.entityPlayer,offhandItem);
-                BattlegearUtils.setPlayerOffhandItem(event.entityPlayer,oldItem);
+                if (offhandItem.getItem() != Items.arrow) {
+                    final ItemStack oldItem = event.entityPlayer.getCurrentEquippedItem();
+                    BattlegearUtils.setPlayerCurrentItem(event.entityPlayer, offhandItem);
+                    BattlegearUtils.setPlayerOffhandItem(event.entityPlayer, oldItem);
+                }
             }
         }
     }
