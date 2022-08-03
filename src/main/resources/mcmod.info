@@ -1,0 +1,16 @@
+[
+{
+  "modid": "backhand",
+  "name": "Backhand",
+  "description": "A backport of the vanilla Minecraft offhand for 1.7.10.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://modrinth.com/mod/backhand",
+  "updateUrl": "",
+  "authorList": ["LouisXIV"],
+  "credits": "Huge thanks to the authors of TheOffhandMod and M&B:Battlegear2, this is all possible thanks to their open source repositories!",
+  "logoFile": "backhand_logo.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
