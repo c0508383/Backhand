@@ -21,20 +21,24 @@ public class BattlegearConfig {
          * GENERAL CONFIGS
          *============================================================================================================*/
         sb = new StringBuilder();
-        sb.append("If set to false, an empty offhand will only be rendered when the player is punching with the offhand.");
+        sb.append("If set to false, an empty offhand will only be rendered when the player is punching with the offhand. False in vanilla.");
         Backhand.OffhandAttack = config.get(category, "Attack with offhand",Backhand.OffhandAttack, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
-        sb.append("If set to false, disables offhand actions and rendering if there is no offhand item.");
+        sb.append("If set to false, disables offhand actions and rendering if there is no offhand item. False in vanilla.");
         Backhand.EmptyOffhand = config.get(category, "Allow empty offhand",Backhand.EmptyOffhand, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
-        sb.append("Determines whether you can break blocks with the offhand or not.");
+        sb.append("Determines whether you can break blocks with the offhand or not. False in vanilla.");
         Backhand.OffhandBreakBlocks = config.get(category, "Offhand breaks blocks",Backhand.OffhandBreakBlocks, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
-        sb.append("If enabled, arrows in the offhand will be used first when shooting a bow. Compatible with Et-Futurum's tipped arrows!");
+        sb.append("If enabled, arrows in the offhand will be used first when shooting a bow. Compatible with Et-Futurum's tipped arrows! True in vanilla.");
         Backhand.UseOffhandArrows = config.get(category, "Use offhand arrows",Backhand.UseOffhandArrows, sb.toString()).getBoolean();
+
+        sb = new StringBuilder();
+        sb.append("If enabled, bows can be used in the offhand. True in vanilla.");
+        Backhand.UseOffhandBow = config.get(category, "Use offhand bow",Backhand.UseOffhandBow, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
         sb.append("These items will be unable to be swapped into the offhand.\n");

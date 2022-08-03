@@ -5,6 +5,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.ResourceLocation;
@@ -87,6 +88,10 @@ public final class BattlegearClientTickHandler {
 
     @SideOnly(Side.CLIENT)
     public void tryCheckUseItem(ItemStack offhandItem, EntityPlayer player){
+        if (offhandItem.getItem() instanceof ItemBow && !Backhand.UseOffhandBow) {
+            return;
+        }
+
         ItemStack mainHandItem = player.getCurrentEquippedItem();
         if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || offhandItem == null)) {
             return;
