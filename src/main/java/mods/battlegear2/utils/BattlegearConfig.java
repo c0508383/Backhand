@@ -11,6 +11,7 @@ import java.util.Arrays;
 public class BattlegearConfig {
     private static Configuration file;
 	public static String[] blacklistedItems = new String[0];
+    private static String[] comments = new String[1];
 
 	public static void getConfig(Configuration config) {
         file = config;
@@ -63,8 +64,18 @@ public class BattlegearConfig {
         config.addCustomCategoryComment(category, "This category is client side, you don't have to sync its values with server in multiplayer.");
         sb = new StringBuilder();
         sb.append("If set to false, an empty offhand will only be rendered when the player is punching with the offhand.");
-        Backhand.RenderEmptyOffhandAtRest = config.get(category, "Render empty offhand at rest",Backhand.RenderEmptyOffhandAtRest, sb.toString()).getBoolean();
+        comments[0] = sb.toString();
+        Backhand.RenderEmptyOffhandAtRest = config.get(category, "Render empty offhand at rest",Backhand.RenderEmptyOffhandAtRest, comments[0]).getBoolean();
 
         file.save();
+    }
+
+    public static void refreshConfig(){
+        try{
+            file.get("Rendering", "Render empty offhand at rest", new String[0], comments[0]).set(Backhand.RenderEmptyOffhandAtRest);
+            file.save();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

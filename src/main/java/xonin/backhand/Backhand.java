@@ -19,7 +19,7 @@ import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 
-@Mod(modid = "backhand", name = "Backhand", version = "1.0.1")
+@Mod(modid = "backhand", name = "Backhand", version = "$version", guiFactory = "xonin.backhand.client.gui.BackhandGuiFactory")
 public class Backhand {
     public static Backhand Instance;
 
@@ -37,7 +37,7 @@ public class Backhand {
     public static boolean UseOffhandArrows = true;
     public static boolean UseOffhandBow = true;
     public static Item[] offhandBlacklist;
-    public static boolean RenderEmptyOffhandAtRest = true;
+    public static boolean RenderEmptyOffhandAtRest = false;
 
     public Backhand() {
         Instance = this;
