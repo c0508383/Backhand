@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -38,6 +39,7 @@ import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
+import xonin.backhand.Backhand;
 import xonin.backhand.client.ClientEventHandler;
 
 public class MysteriumPatchesFixesO {
@@ -119,6 +121,24 @@ public class MysteriumPatchesFixesO {
     }
 
 	public static float onGround2;
+
+    @Fix
+    @SideOnly(Side.CLIENT)
+    public static void renderItemInFirstPerson(ItemRenderer i, float p_78440_1_)
+    {
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        ClientEventHandler.renderingPlayer = player;
+        ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+        if (!Backhand.EmptyOffhand && offhandItem == null) {
+            return;
+        }
+        if (offhandItem == null && !Backhand.RenderEmptyOffhandAtRest && ((IBattlePlayer)player).getOffSwingProgress(p_78440_1_) == 0) {
+            return;
+        }
+
+        MysteriumPatchesFixesO.onGround2 = 0;
+        ClientEventHandler.renderOffhandPlayer.renderHand(p_78440_1_,ClientEventHandler.renderPass);
+    }
 	
 	@Fix
 	@SideOnly(Side.CLIENT)

@@ -31,16 +31,11 @@ public final class BattlegearLoadingPlugin implements IFMLLoadingPlugin {
     public static final String[] transformers = 
     		new String[]{
 		        EntityPlayerTransformer,
-		        ModelBipedTransformer,
 		        NetClientHandlerTransformer,
-		        NetServerHandlerTransformer,
 		        PlayerControllerMPTransformer,
-		        ItemRendererTransformer,
-		        MinecraftTransformer,
-		        ItemStackTransformer,
 		        ItemInWorldTransformer,
 		        EntityAIControlledTransformer,
-		        EntityOtherPlayerMPTransformer,
+		        EntityOtherPlayerMPTransformer
    			};
 
     @Override

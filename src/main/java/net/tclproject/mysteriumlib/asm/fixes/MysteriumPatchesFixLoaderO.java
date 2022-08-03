@@ -10,7 +10,6 @@ public class MysteriumPatchesFixLoaderO extends CustomLoadingPlugin {
 	TransformerBase[] bt_transformers = {
 		new EntityPlayerTransformer(),
 		new PlayerControllerMPTransformer(),
-		new MinecraftTransformer(),
 		new ItemInWorldTransformer(),
 		new EntityAIControlledByPlayerTransformer(),
 		new EntityOtherPlayerMPTransformer(),

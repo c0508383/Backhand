@@ -100,23 +100,10 @@ public class ClientEventHandler {
         }
     }
 
+    public static int renderPass;
     @SubscribeEvent
     public void onRenderHand(RenderHandEvent event) {
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-        renderingPlayer = player;
-        if (!Backhand.EmptyOffhand && BattlegearUtils.getOffhandItem(player) == null) {
-            return;
-        }
-        ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
-        if (offhandItem == null && !Backhand.RenderEmptyOffhandAtRest && ((IBattlePlayer)player).getOffSwingProgress(event.partialTicks) == 0) {
-            return;
-        }
-
-        MysteriumPatchesFixesO.onGround2 = 0;
-        GL11.glPushMatrix();
-        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-        renderOffhandPlayer.renderHand(event.partialTicks, event.renderPass);
-        GL11.glPopMatrix();
+        renderPass = event.renderPass;
     }
 
     /**

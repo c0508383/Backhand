@@ -31,7 +31,7 @@ import xonin.backhand.client.ClientEventHandler;
 import static net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED_FIRST_PERSON;
 
 public class RenderOffhandPlayer extends RenderPlayer {
-    public ItemRendererOffhand itemRenderer = new ItemRendererOffhand(Minecraft.getMinecraft());
+    public static ItemRendererOffhand itemRenderer = new ItemRendererOffhand(Minecraft.getMinecraft());
     public float tempRenderPartialTicks;
     private float debugCamFOV;
     private float prevDebugCamFOV;
@@ -108,7 +108,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
             {
                 itemRenderer.updateEquippedItem();
                 entityRenderer.enableLightmap((double)partialTicks);
-                this.renderOffhandItem(partialTicks);
+                renderOffhandItem(partialTicks);
                 entityRenderer.disableLightmap((double)partialTicks);
             }
 
@@ -222,7 +222,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
         }
     }
 
-    public void renderOffhandItem(float frame) {
+    public static void renderOffhandItem(float frame) {
         Minecraft mc = Minecraft.getMinecraft();
         float progress = itemRenderer.prevEquippedProgress + (itemRenderer.equippedProgress - itemRenderer.prevEquippedProgress) * frame;
 
@@ -428,7 +428,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
             GL11.glScalef(1.0F, 1.0F, -1.0F);
             GL11.glTranslatef(5.6F, 0.0F, 0.0F);
             GL11.glScalef(1.0F, 1.0F, 1.0F);
-            this.renderFirstPersonArm(mc.thePlayer);
+            renderFirstPersonLeftArm(mc.thePlayer);
             GL11.glPopMatrix();
         }
 
@@ -436,7 +436,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
         RenderHelper.disableStandardItemLighting();
     }
 
-    public void renderFirstPersonArm(EntityPlayer player) {
+    public static void renderFirstPersonLeftArm(EntityPlayer player) {
         Render render = RenderManager.instance.getEntityRenderObject(player);
         RenderPlayer renderplayer = (RenderPlayer)render;
 
