@@ -383,7 +383,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
                     GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
                 }
                 if (offhandItem.getItem() != null && offhandItem.getItem().getUnlocalizedName() != null && offhandItem.getItem().getUnlocalizedName().toLowerCase().endsWith("arrow")) {
-                    GL11.glTranslatef(-0.2F,0.0F,0.0F);
+                    GL11.glTranslatef(-0.55F,0.0F,0.5F);
                     GL11.glRotatef(-90,1,0,1);
                 }
                 itemRenderer.renderItem(player, offhandItem, 0);
