@@ -138,6 +138,7 @@ public class MysteriumPatchesFixesO {
 
         MysteriumPatchesFixesO.onGround2 = 0;
         ClientEventHandler.renderOffhandPlayer.renderHand(p_78440_1_,ClientEventHandler.renderPass);
+        Minecraft.getMinecraft().entityRenderer.enableLightmap(p_78440_1_);
     }
 	
 	@Fix
