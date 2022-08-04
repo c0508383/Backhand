@@ -8,6 +8,8 @@ import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -16,20 +18,26 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderHandEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.client.event.*;
 import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import xonin.backhand.Backhand;
+import xonin.backhand.client.gui.GuiOffhandInventory;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 public class ClientEventHandler {
     public static RenderOffhandPlayer renderOffhandPlayer = new RenderOffhandPlayer();
     public static EntityPlayer renderingPlayer;
     public static boolean cancelone = false;
+
+    @SubscribeEvent
+    public void renderGUI(GuiOpenEvent event) {
+        if (event.gui != null && event.gui.getClass() == GuiInventory.class && Backhand.ExtraInventorySlot) {
+            Minecraft mc = Minecraft.getMinecraft();
+            event.gui = new GuiOffhandInventory(mc.thePlayer);
+        }
+    }
 
     @SubscribeEvent
     public void renderHotbarOverlay(RenderGameOverlayEvent event) {
