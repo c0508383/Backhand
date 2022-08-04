@@ -9,6 +9,8 @@ import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.particle.EffectRenderer;
@@ -32,6 +34,7 @@ import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -43,6 +46,7 @@ import xonin.backhand.Backhand;
 import xonin.backhand.client.ClientEventHandler;
 
 public class MysteriumPatchesFixesO {
+    protected static final ResourceLocation field_147001_a = new ResourceLocation("textures/gui/container/inventory.png");
     /**Dirty hack to prevent random resetting of block removal (why does this even happen?!) when breaking blocks with the offhand.*/
     public static int countToCancel = 0;
     /**If we have hotswapped the breaking item with the one in offhand and should hotswap it back when called next*/
@@ -118,6 +122,17 @@ public class MysteriumPatchesFixesO {
 			return true;
 		}
 		return false;
+    }
+
+    @Fix(insertOnExit = true)
+    @SideOnly(Side.CLIENT)
+    public static void drawScreen(GuiScreen gui, int p_73863_1_, int p_73863_2_, float p_73863_3_)
+    {
+        if (gui.getClass() == GuiInventory.class) {
+            Minecraft mc = Minecraft.getMinecraft();
+            mc.getTextureManager().bindTexture(field_147001_a);
+            gui.drawTexturedModalRect(87 + ((GuiInventory)gui).guiLeft, 63 + ((GuiInventory)gui).guiTop, 7, 83, 18, 18);
+        }
     }
 
 	public static float onGround2;

@@ -20,6 +20,7 @@ public final class EntityPlayerTransformer extends TransformerBase {
 
     private String entityPlayerClassName;
     private String inventoryClassName;
+    private String inventoryContainerClassName;
     private String itemStackClassName;
     private String entityClassName;
     private String entityLivingClassName;
@@ -67,11 +68,14 @@ public final class EntityPlayerTransformer extends TransformerBase {
                     if (insn instanceof TypeInsnNode) {
                         if (((TypeInsnNode) insn).desc.equals(inventoryClassName)) {
                             ((TypeInsnNode) insn).desc = "mods/battlegear2/api/core/InventoryPlayerBattle";
+                        } else if (((TypeInsnNode) insn).desc.equals(inventoryContainerClassName)) {
+                            ((TypeInsnNode) insn).desc = "mods/battlegear2/api/core/ContainerPlayerBattle";
                         }
-
                     } else if (insn instanceof MethodInsnNode) {
                         if (((MethodInsnNode) insn).owner.equals(inventoryClassName)) {
                             ((MethodInsnNode) insn).owner = "mods/battlegear2/api/core/InventoryPlayerBattle";
+                        } else if (((MethodInsnNode) insn).owner.equals(inventoryContainerClassName)) {
+                            ((MethodInsnNode) insn).owner = "mods/battlegear2/api/core/ContainerPlayerBattle";
                         }
                     }
                 }
@@ -356,6 +360,7 @@ public final class EntityPlayerTransformer extends TransformerBase {
     void setupMappings() {
         entityPlayerClassName = BattlegearTranslator.getMapedClassName("entity.player.EntityPlayer");
         inventoryClassName = BattlegearTranslator.getMapedClassName("entity.player.InventoryPlayer");
+        inventoryContainerClassName = BattlegearTranslator.getMapedClassName("inventory.ContainerPlayer");
         itemStackClassName = BattlegearTranslator.getMapedClassName("item.ItemStack");
         entityClassName = BattlegearTranslator.getMapedClassName("entity.Entity");
         entityLivingClassName = BattlegearTranslator.getMapedClassName("entity.EntityLivingBase");
