@@ -4,6 +4,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
+import mods.battlegear2.api.core.ContainerPlayerBattle;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.client.Minecraft;
@@ -33,8 +34,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void renderGUI(GuiOpenEvent event) {
-        if (event.gui != null && event.gui.getClass() == GuiInventory.class && Backhand.ExtraInventorySlot) {
-            Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getMinecraft();
+        if (event.gui != null && event.gui.getClass() == GuiInventory.class && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle) {
             event.gui = new GuiOffhandInventory(mc.thePlayer);
         }
     }
