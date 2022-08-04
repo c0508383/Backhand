@@ -34,5 +34,12 @@ public class ServerTickHandler {
             }
             ServerEventsHandler.arrowHotSwapped = false;
         }
+        if (ServerEventsHandler.totemHotSwapped) {
+            final ItemStack oldItem = event.player.getCurrentEquippedItem();
+            final ItemStack offhandItem = BattlegearUtils.getOffhandItem(event.player);
+            BattlegearUtils.setPlayerCurrentItem(event.player, offhandItem);
+            BattlegearUtils.setPlayerOffhandItem(event.player, oldItem);
+            ServerEventsHandler.totemHotSwapped = false;
+        }
     }
 }

@@ -6,12 +6,38 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 
 public class ServerEventsHandler {
 
     public static boolean arrowHotSwapped = false;
+    public static boolean totemHotSwapped = false;
+
+    @SubscribeEvent
+    public void onLivingHurt(LivingHurtEvent event) {
+        if (!(event.entityLiving instanceof EntityPlayer) || event.entityLiving.getHealth() - event.ammount > 0)
+            return;
+        try {
+            Class<?> totemItem = Class.forName("ganymedes01.etfuturum.items.ItemTotemUndying");
+
+            EntityPlayer player = (EntityPlayer) event.entityLiving;
+            ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+            ItemStack mainhandItem = player.getCurrentEquippedItem();
+            if (offhandItem == null) {
+                return;
+            }
+
+            if (totemItem.isInstance(offhandItem.getItem()) && (mainhandItem == null || !totemItem.isInstance(mainhandItem.getItem()))) {
+                BattlegearUtils.setPlayerCurrentItem(player, offhandItem);
+                BattlegearUtils.setPlayerOffhandItem(player, mainhandItem);
+                totemHotSwapped = true;
+                MinecraftForge.EVENT_BUS.post(event);
+            }
+        } catch (Exception ignored) {}
+    }
 
     @SubscribeEvent
     public void onItemUseStart(PlayerUseItemEvent.Start event) {
