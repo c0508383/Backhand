@@ -59,7 +59,7 @@ public final class BattlemodeHookContainerClass {
                 throw new RuntimeException("Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
             }
             ItemStack offhandItem = BattlegearUtils.getOffhandItem((EntityPlayer) event.entity);
-            if (offhandItem != null && (!Backhand.EmptyOffhand || Backhand.isOffhandBlacklisted(offhandItem))) {
+            if (Backhand.isOffhandBlacklisted(offhandItem)) {
                 BattlegearUtils.setPlayerOffhandItem((EntityPlayer) event.entity,null);
                 if (!((EntityPlayer) event.entity).inventory.addItemStackToInventory(offhandItem)) {
                     event.entity.entityDropItem(offhandItem,0);
