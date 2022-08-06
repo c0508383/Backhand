@@ -1,10 +1,15 @@
 package net.tclproject.mysteriumlib.asm.fixes;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import invtweaks.InvTweaksContainerManager;
+import invtweaks.InvTweaksContainerSectionManager;
+import invtweaks.api.container.ContainerSection;
 import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.api.core.BattlegearUtils;
+import mods.battlegear2.api.core.ContainerPlayerBattle;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.block.material.Material;
@@ -20,6 +25,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -28,10 +34,10 @@ import net.minecraft.item.*;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
+import net.minecraft.network.play.client.C10PacketCreativeInventoryAction;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
@@ -44,6 +50,10 @@ import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import xonin.backhand.Backhand;
 import xonin.backhand.client.ClientEventHandler;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
 
 public class MysteriumPatchesFixesO {
     protected static final ResourceLocation field_147001_a = new ResourceLocation("textures/gui/container/inventory.png");
@@ -510,5 +520,150 @@ public class MysteriumPatchesFixesO {
         {
             System.out.println(server.playerEntity.getCommandSenderName() + " tried to set an invalid carried item " + p_147355_1_.func_149614_c());
         }
+    }
+
+    @Fix(returnSetting=EnumReturnSetting.NEVER)
+    public static void func_147112_ai(Minecraft mc)
+    {
+        if (mc.objectMouseOver != null)
+        {
+            boolean flag = mc.thePlayer.capabilities.isCreativeMode && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle;
+            int j;
+
+            if (!net.minecraftforge.common.ForgeHooks.onPickBlock(mc.objectMouseOver, mc.thePlayer, mc.theWorld)) return;
+            // We delete this code wholly instead of commenting it out, to make sure we detect changes in it between MC versions
+            if (flag)
+            {
+                j = mc.thePlayer.inventoryContainer.inventorySlots.size() - 10 + mc.thePlayer.inventory.currentItem;
+                mc.playerController.sendSlotPacket(mc.thePlayer.inventory.getStackInSlot(mc.thePlayer.inventory.currentItem), j);
+                mc.objectMouseOver = null;
+            }
+        }
+    }
+
+    private static final MethodHandle fieldGetSection;
+    private static final MethodHandle fieldGetContainerMgr;
+
+//    private static final MethodHandle fieldSetLightLevel;
+//    private static final Field fieldlightlevel;
+//
+//    private static final MethodHandle fieldGetEntity;
+//    private static final Field fieldentity;
+//
+//    private static final MethodHandle fieldGetEnabled;
+//    private static final Field fieldenabled;
+
+    static {
+        MethodHandle fs, fs2, fg, fg2, fg3;
+        Field f, f2, f3, f4;
+        try {
+            //f = HandlerCheckPin.class.getDeclaredField("shouldReset");
+            //f.setAccessible(true);
+            //fs = MethodHandles.publicLookup().unreflectSetter(f);
+
+            f2 = InvTweaksContainerSectionManager.class.getDeclaredField("containerMgr");
+            f3 = InvTweaksContainerSectionManager.class.getDeclaredField("section");
+
+            f2.setAccessible(true);
+            f3.setAccessible(true);
+
+            fg = MethodHandles.publicLookup().unreflectGetter(f2);
+            fg2 = MethodHandles.publicLookup().unreflectGetter(f3);
+        } catch (Exception e) {
+            f = null;
+            fs = null;
+            fg = null;
+            fg2 = null;
+            System.out.println("The 'Locks' mod compatibility hasn't been loaded due to not being able to find HandlerCheckPin. " +
+                    "If you don't have the Locks mod installed, you can ignore this error.");
+        } catch (NoClassDefFoundError e) {
+            f = null;
+            fs = null;
+            fg = null;
+            fg2 = null;
+            System.out.println("The 'Locks' mod compatibility hasn't been loaded due to not being able to find HandlerCheckPin. " +
+                    "If you don't have the Locks mod installed, you can ignore this error.");
+        }
+
+//        try {
+//            f2 = PlayerSelfAdaptor.class.getDeclaredField("thePlayer");
+//            f3 = BaseAdaptor.class.getDeclaredField("lightLevel");
+//            f4 = BaseAdaptor.class.getDeclaredField("enabled");
+//
+//            f2.setAccessible(true);
+//            f3.setAccessible(true);
+//            f4.setAccessible(true);
+//
+//            fs2 = MethodHandles.publicLookup().unreflectSetter(f3);
+//            fg = MethodHandles.publicLookup().unreflectGetter(f2);
+//            fg2 = MethodHandles.publicLookup().unreflectGetter(f4);
+//        } catch (Exception e) {
+//            f2 = f3 = f4 = null;
+//            fs2 = fg = fg2 = fg3 = null;
+//            System.out.println("The 'Dynamic Lights' mod compatibility hasn't been loaded due to not being able to find BaseAdaptor. " +
+//                    "If you don't have the Dynamic Lights mod installed, you can ignore this error.");
+//        } catch (NoClassDefFoundError e) {
+//            f2 = f3 = f4 = null;
+//            fs2 = fg = fg2 = fg3 = null;
+//            System.out.println("The 'Dynamic Lights' mod compatibility hasn't been loaded due to not being able to find BaseAdaptor. " +
+//                    "If you don't have the Dynamic Lights mod installed, you can ignore this error.");
+//        }
+
+        //field = f;
+        //fieldSet = fs;
+
+        fieldGetContainerMgr = fg;
+        fieldGetSection = fg2;
+
+//        fieldlightlevel = f3;
+//        fieldentity = f2;
+//        fieldenabled = f4;
+//
+//        fieldGetEnabled = fg2;
+//        fieldGetEntity = fg;
+//        fieldSetLightLevel = fs2;
+
+        System.out.println("Loaded Mod Compatibility!");
+    }
+
+    @Optional.Method(modid="inventorytweaks")
+    public static ContainerSection getContainerSection(InvTweaksContainerSectionManager itcm) {
+        ContainerSection section;
+        try {
+            section = (ContainerSection) fieldGetSection.invokeExact((InvTweaksContainerSectionManager)itcm);
+        } catch (Throwable e) {
+            /*System.out.println("The 'Inventory Tweaks' mod compatibility hasn't been loaded due to not being able to find ContainerSection. " +
+                    "If you don't have the 'Inventory Tweaks' mod installed, you can ignore this error.");*/
+            section = null;
+        }
+        return section;
+    }
+
+    @Optional.Method(modid="inventorytweaks")
+    public static InvTweaksContainerManager getContainerManager(InvTweaksContainerSectionManager itcm) {
+        InvTweaksContainerManager manager;
+        try {
+            manager = (InvTweaksContainerManager) fieldGetContainerMgr.invokeExact((InvTweaksContainerSectionManager)itcm);
+        } catch (Throwable e) {
+            /*System.out.println("The 'Inventory Tweaks' mod compatibility hasn't been loaded due to not being able to find InvTweaksContainerManager. " +
+                    "If you don't have the 'Inventory Tweaks' mod installed, you can ignore this error.");*/
+            manager = null;
+        }
+        return manager;
+    }
+
+    // inv tweaks compat starts here
+
+    public static int invTweaksDisableMove;
+
+    @Optional.Method(modid="inventorytweaks")
+    @Fix(returnSetting = EnumReturnSetting.ALWAYS)
+    public static boolean move(InvTweaksContainerSectionManager itcm, int srcIndex, int destIndex) {
+        if (invTweaksDisableMove > 0) {
+            MysteriumPatchesFixesO.invTweaksDisableMove--;
+            return getContainerManager(itcm).move(getContainerSection(itcm), srcIndex, getContainerSection(itcm), srcIndex);
+        }
+
+        return getContainerManager(itcm).move(getContainerSection(itcm), srcIndex, getContainerSection(itcm), destIndex);
     }
 }

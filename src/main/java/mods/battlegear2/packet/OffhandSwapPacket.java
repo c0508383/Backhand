@@ -3,10 +3,9 @@ package mods.battlegear2.packet;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import xonin.backhand.Backhand;
 
 public class OffhandSwapPacket extends AbstractMBPacket {
@@ -43,6 +42,7 @@ public class OffhandSwapPacket extends AbstractMBPacket {
         this.user = ByteBufUtils.readUTF8String(inputStream);
         this.player = player.worldObj.getPlayerEntityByName(user);
         if (this.player != null) {
+            MysteriumPatchesFixesO.invTweaksDisableMove = 3;
             ItemStack currentItem = ByteBufUtils.readItemStack(inputStream);
             ItemStack offhandItem = ByteBufUtils.readItemStack(inputStream);
             BattlegearUtils.setPlayerCurrentItem(this.player,currentItem);
