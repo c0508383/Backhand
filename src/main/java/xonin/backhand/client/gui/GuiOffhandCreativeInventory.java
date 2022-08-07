@@ -10,8 +10,18 @@ import net.minecraft.inventory.Slot;
 import java.util.ArrayList;
 
 public class GuiOffhandCreativeInventory extends GuiContainerCreative {
+
     public GuiOffhandCreativeInventory(EntityPlayer p_i1088_1_) {
         super(p_i1088_1_);
+    }
+
+    protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_)
+    {
+        super.drawGuiContainerBackgroundLayer(p_146976_1_,p_146976_2_,p_146976_3_);
+        if (selectedTabIndex == CreativeTabs.tabInventory.getTabIndex()) {
+            this.mc.getTextureManager().bindTexture(field_147001_a);
+            this.drawTexturedModalRect(81 + guiLeft, 32 + guiTop, 7, 83, 18, 18);
+        }
     }
 
     public void setCurrentCreativeTab(CreativeTabs p_147050_1_)
@@ -36,7 +46,7 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
             containercreative.inventorySlots = new ArrayList();
             int offset = container instanceof ContainerPlayerBattle ? -1 : 0;
 
-            for (int j = 0; j < container.inventorySlots.size() + offset; ++j)
+            for (int j = 0; j < container.inventorySlots.size(); ++j)
             {
                 GuiContainerCreative.CreativeSlot creativeslot = new GuiContainerCreative.CreativeSlot((Slot)container.inventorySlots.get(j), j);
                 containercreative.inventorySlots.add(creativeslot);
@@ -44,21 +54,19 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
                 int l;
                 int i1;
 
-                if (j >= 5 && j < 9)
-                {
+                if (j == container.inventorySlots.size()-1) {
+                    creativeslot.xDisplayPosition = 82;
+                    creativeslot.yDisplayPosition = 33;
+                } else if (j >= 5 && j < 9) {
                     k = j - 5;
                     l = k / 2;
                     i1 = k % 2;
                     creativeslot.xDisplayPosition = 9 + l * 54;
                     creativeslot.yDisplayPosition = 6 + i1 * 27;
-                }
-                else if (j >= 0 && j < 5)
-                {
+                } else if (j >= 0 && j < 5) {
                     creativeslot.yDisplayPosition = -2000;
                     creativeslot.xDisplayPosition = -2000;
-                }
-                else if (j < container.inventorySlots.size())
-                {
+                } else if (j < container.inventorySlots.size()) {
                     k = j - 9;
                     l = k % 9;
                     i1 = k / 9;
