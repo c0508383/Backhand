@@ -453,23 +453,39 @@ public class RenderOffhandPlayer extends RenderPlayer {
         float offsetY = leftArm.offsetY;
         float offsetZ = leftArm.offsetZ;
 
-        leftArm.setRotationPoint(rightArm.rotationPointX, rightArm.rotationPointY, rightArm.rotationPointZ);
-        leftArm.offsetX = rightArm.offsetX;
-        leftArm.offsetY = rightArm.offsetY - 0.04F;
-        leftArm.offsetZ = rightArm.offsetZ;
+        try {
+            Class<?> RenderPlayerJBRA = Class.forName("JinRyuu.JBRA.RenderPlayerJBRA");
+            Class<?> ModelBipedBody = Class.forName("JinRyuu.JRMCore.entity.ModelBipedBody");
+            Object modelMain = RenderPlayerJBRA.getField("modelMain").get(renderplayer);
+            if (RenderPlayerJBRA.isInstance(renderplayer)) {
+                ModelRenderer bipedRA = (ModelRenderer) ModelBipedBody.getField("bipedRightArm").get(modelMain);
+                ModelRenderer bipedLA = (ModelRenderer) ModelBipedBody.getField("bipedLeftArm").get(modelMain);
+                ModelBipedBody.getField("bipedRightArm").set(modelMain,bipedLA);
+                GL11.glRotatef(180,0,1,0);
+                renderplayer.renderFirstPersonArm(player);
+                ModelBipedBody.getField("bipedRightArm").set(modelMain,bipedRA);
+            }
+        } catch (Exception ignored) {
+            leftArm.setRotationPoint(rightArm.rotationPointX, rightArm.rotationPointY, rightArm.rotationPointZ);
+            leftArm.offsetX = rightArm.offsetX;
+            leftArm.offsetY = rightArm.offsetY - 0.04F;
+            leftArm.offsetZ = rightArm.offsetZ;
 
-        leftArm.rotateAngleX = -0.1F;
-        leftArm.rotateAngleZ = 0.1F;
-        leftArm.rotateAngleY = 90.95F;
-        leftArm.render(0.0625F);
-        leftArm.rotateAngleX = 0F;
-        leftArm.rotateAngleZ = 0;
-        leftArm.rotateAngleY = 0;
+            leftArm.rotateAngleX = -0.1F;
+            leftArm.rotateAngleZ = 0.1F;
+            leftArm.rotateAngleY = 90.95F;
 
-        leftArm.setRotationPoint(rotationPointX, rotationPointY, rotationPointZ);
-        leftArm.offsetX = offsetX;
-        leftArm.offsetY = offsetY;
-        leftArm.offsetZ = offsetZ;
+            leftArm.render(0.0625F);
+        } finally {
+            leftArm.rotateAngleX = 0;
+            leftArm.rotateAngleZ = 0;
+            leftArm.rotateAngleY = 0;
+
+            leftArm.setRotationPoint(rotationPointX, rotationPointY, rotationPointZ);
+            leftArm.offsetX = offsetX;
+            leftArm.offsetY = offsetY;
+            leftArm.offsetZ = offsetZ;
+        }
 
         GL11.glPopMatrix();
     }
