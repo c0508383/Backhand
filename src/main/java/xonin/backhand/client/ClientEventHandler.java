@@ -10,12 +10,14 @@ import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -24,6 +26,7 @@ import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import xonin.backhand.Backhand;
+import xonin.backhand.client.gui.GuiOffhandCreativeInventory;
 import xonin.backhand.client.gui.GuiOffhandInventory;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
@@ -33,10 +36,15 @@ public class ClientEventHandler {
     public static boolean cancelone = false;
 
     @SubscribeEvent
-    public void renderGUI(GuiOpenEvent event) {
+    public void openGUI(GuiOpenEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (event.gui != null && event.gui.getClass() == GuiInventory.class && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle) {
-            event.gui = new GuiOffhandInventory(mc.thePlayer);
+        if (event.gui != null && mc.thePlayer != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle) {
+            if (event.gui.getClass() == GuiInventory.class) {
+                event.gui = new GuiOffhandInventory(mc.thePlayer);
+            }
+            if (event.gui instanceof GuiContainerCreative) {
+                event.gui = new GuiOffhandCreativeInventory(mc.thePlayer);
+            }
         }
     }
 
