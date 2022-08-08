@@ -123,6 +123,7 @@ public final class BattlegearClientTickHandler {
                     }
                 }
 
+                offhandItem = BattlegearUtils.getOffhandItem(player);
                 if (offhandItem != null && mouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
                 {
                     int j = mouseOver.blockX;
