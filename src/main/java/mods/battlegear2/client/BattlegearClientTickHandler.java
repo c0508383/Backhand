@@ -66,17 +66,19 @@ public final class BattlegearClientTickHandler {
                 if (ticksBeforeUse == 0) {
                     tryCheckUseItem(offhand, player);
                 }
-                tryAttackEntity(offhand, player);
             } else {
                 ticksBeforeUse = 0;
             }
+        }
+        if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
+            tryAttackEntity(player);
         }
         if (player.getItemInUse() == null) {
             MysteriumPatchesFixesO.offhandItemUsed = null;
         }
     }
 
-    public void tryAttackEntity(ItemStack offhand, EntityPlayer player) {
+    public void tryAttackEntity(EntityPlayer player) {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             Entity target = mc.objectMouseOver.entityHit;

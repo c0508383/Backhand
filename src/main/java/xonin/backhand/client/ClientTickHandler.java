@@ -65,7 +65,9 @@ public class ClientTickHandler {
             return;
         }
 
-        if (event.player.worldObj.isRemote && Backhand.proxy.getLeftClickCounter() <= 0) {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (event.player.worldObj.isRemote && Backhand.proxy.getLeftClickCounter() <= 0 && mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
             if (event.player.capabilities.allowEdit) {
                 if (Backhand.proxy.isRightClickHeld()) { // if it's a block and we should try break it
                     MovingObjectPosition mop = BattlemodeHookContainerClass.getRaytraceBlock(event.player);
@@ -74,18 +76,18 @@ public class ClientTickHandler {
                             BattlegearClientTickHandler.tryBreakBlockOffhand(mop, offhandItem, mainHandItem, event);
                             Backhand.proxy.setLeftClickCounter(10);
                         } else {
-                            Minecraft.getMinecraft().playerController.resetBlockRemoving();
+                            mc.playerController.resetBlockRemoving();
                         }
                     } else {
-                        if (mop != null && !BattlegearUtils.usagePriorAttack(offhandItem) && !BattlemodeHookContainerClass.canBlockBeInteractedWith(Minecraft.getMinecraft().theWorld, mop.blockX, mop.blockY, mop.blockZ)) {
+                        if (mop != null && !BattlegearUtils.usagePriorAttack(offhandItem) && !BattlemodeHookContainerClass.canBlockBeInteractedWith(mc.theWorld, mop.blockX, mop.blockY, mop.blockZ)) {
                             BattlegearClientTickHandler.tryBreakBlockOffhand(mop, offhandItem, mainHandItem, event);
                             Backhand.proxy.setLeftClickCounter(10);
                         } else {
-                            Minecraft.getMinecraft().playerController.resetBlockRemoving();
+                            mc.playerController.resetBlockRemoving();
                         }
                     }
                 } else if (!Backhand.proxy.isLeftClickHeld()) {
-                    Minecraft.getMinecraft().playerController.resetBlockRemoving();
+                    mc.playerController.resetBlockRemoving();
                 }
             }
         }
