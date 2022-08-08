@@ -136,17 +136,6 @@ public class MysteriumPatchesFixesO {
 		return false;
     }
 
-    @Fix(insertOnExit = true)
-    @SideOnly(Side.CLIENT)
-    public static void drawScreen(GuiScreen gui, int p_73863_1_, int p_73863_2_, float p_73863_3_)
-    {
-        if (gui.getClass() == GuiInventory.class) {
-            Minecraft mc = Minecraft.getMinecraft();
-            mc.getTextureManager().bindTexture(field_147001_a);
-            gui.drawTexturedModalRect(87 + ((GuiInventory)gui).guiLeft, 63 + ((GuiInventory)gui).guiTop, 7, 83, 18, 18);
-        }
-    }
-
 	public static float onGround2;
 
     @Fix(insertOnExit = true)

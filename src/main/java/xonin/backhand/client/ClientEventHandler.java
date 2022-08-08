@@ -2,14 +2,11 @@ package xonin.backhand.client;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.ContainerPlayerBattle;
-import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBiped;
@@ -17,12 +14,10 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.*;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import xonin.backhand.Backhand;
@@ -38,7 +33,7 @@ public class ClientEventHandler {
     @SubscribeEvent
     public void openGUI(GuiOpenEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (event.gui != null && mc.thePlayer != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle) {
+        if (event.gui != null && mc.thePlayer != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle && Backhand.ExtraInventorySlot) {
             if (event.gui.getClass() == GuiInventory.class) {
                 event.gui = new GuiOffhandInventory(mc.thePlayer);
             }
