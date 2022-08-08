@@ -1,12 +1,14 @@
 package mods.battlegear2.client;
 
 import mods.battlegear2.packet.OffhandAttackPacket;
+import net.minecraft.block.BlockGrass;
+import net.minecraft.block.BlockLog;
+import net.minecraft.block.BlockWood;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemBow;
-import net.minecraft.item.ItemSword;
+import net.minecraft.item.*;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.ResourceLocation;
 import xonin.backhand.Backhand;
@@ -24,8 +26,6 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -156,6 +156,17 @@ public final class BattlegearClientTickHandler {
         boolean flag = false;
         int i1;
         final World worldObj = player.worldObj;
+
+        Minecraft mc = Minecraft.getMinecraft();
+        MovingObjectPosition objectMouseOver = mc.objectMouseOver;
+        Block block = mc.theWorld.getBlock(objectMouseOver.blockX, objectMouseOver.blockY, objectMouseOver.blockZ);
+        if (player.getCurrentEquippedItem() != null) {
+            if ((block instanceof BlockLog && player.getCurrentEquippedItem().getItem() instanceof ItemAxe)
+                    || (block instanceof BlockGrass && player.getCurrentEquippedItem().getItem() instanceof ItemSpade)) {
+                return false;
+            }
+        }
+
         if (offhand.getItem().onItemUseFirst(offhand, player, worldObj, i, j, k, l, f, f1, f2)){
             return true;
         }
