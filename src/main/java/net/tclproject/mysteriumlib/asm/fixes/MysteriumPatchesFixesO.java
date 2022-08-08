@@ -14,8 +14,6 @@ import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.particle.EffectRenderer;
@@ -25,7 +23,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -34,13 +31,11 @@ import net.minecraft.item.*;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
-import net.minecraft.network.play.client.C10PacketCreativeInventoryAction;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -48,7 +43,6 @@ import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
-import org.lwjgl.opengl.GL11;
 import xonin.backhand.Backhand;
 import xonin.backhand.client.ClientEventHandler;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
@@ -58,7 +52,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 
 public class MysteriumPatchesFixesO {
-    protected static final ResourceLocation field_147001_a = new ResourceLocation("textures/gui/container/inventory.png");
     /**Dirty hack to prevent random resetting of block removal (why does this even happen?!) when breaking blocks with the offhand.*/
     public static int countToCancel = 0;
     /**If we have hotswapped the breaking item with the one in offhand and should hotswap it back when called next*/
