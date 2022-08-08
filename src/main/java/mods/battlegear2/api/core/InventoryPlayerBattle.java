@@ -44,11 +44,14 @@ public class InventoryPlayerBattle extends InventoryPlayer {
         return amount + super.clearInventory(item,metadata);
     }
 
-    public boolean addItemStackToInventory(final ItemStack itemStack)
+    public boolean addItemStackToInventory(ItemStack itemStack)
     {
+        if (itemStack == null || itemStack.stackSize == 0 || itemStack.getItem() == null)
+            return false;
+
         if (!Backhand.isOffhandBlacklisted(itemStack)) {
             if (offhandItem == null && getFirstEmptyStack() == -1) {
-                offhandItem = itemStack;
+                offhandItem = ItemStack.copyItemStack(itemStack);
                 itemStack.stackSize = 0;
                 Backhand.packetHandler.sendPacketToPlayer(new BattlegearSyncItemPacket(player).generatePacket(), (EntityPlayerMP) player);
                 return true;
