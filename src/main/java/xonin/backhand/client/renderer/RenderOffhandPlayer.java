@@ -32,9 +32,6 @@ import static net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED_FI
 
 public class RenderOffhandPlayer extends RenderPlayer {
     public static ItemRendererOffhand itemRenderer = new ItemRendererOffhand(Minecraft.getMinecraft());
-    public float tempRenderPartialTicks;
-    private float debugCamFOV;
-    private float prevDebugCamFOV;
     private float fovModifierHand;
     private float fovModifierHandPrev;
     private float fovMultiplierTemp;
@@ -326,12 +323,22 @@ public class RenderOffhandPlayer extends RenderPlayer {
             Class<?> RenderPlayerJBRA = Class.forName("JinRyuu.JBRA.RenderPlayerJBRA");
             Class<?> ModelBipedBody = Class.forName("JinRyuu.JRMCore.entity.ModelBipedBody");
             Object modelMain = RenderPlayerJBRA.getField("modelMain").get(renderplayer);
-            ModelRenderer bipedRA = (ModelRenderer) ModelBipedBody.getField("bipedRightArm").get(modelMain);
-            ModelRenderer bipedLA = (ModelRenderer) ModelBipedBody.getField("bipedLeftArm").get(modelMain);
-            ModelBipedBody.getField("bipedRightArm").set(modelMain,bipedLA);
-            GL11.glRotatef(180,0,1,0);
-            ((RenderPlayer)RenderPlayerJBRA.cast(renderplayer)).renderFirstPersonArm(player);
-            ModelBipedBody.getField("bipedRightArm").set(modelMain,bipedRA);
+
+            try {
+                ModelRenderer bipedRA = (ModelRenderer) ModelBipedBody.getField("field_78112_f").get(modelMain);
+                ModelRenderer bipedLA = (ModelRenderer) ModelBipedBody.getField("field_78113_g").get(modelMain);
+                ModelBipedBody.getField("field_78112_f").set(modelMain, bipedLA);
+                GL11.glRotatef(180, 0, 1, 0);
+                RenderPlayerJBRA.getMethod("func_82441_a", EntityPlayer.class).invoke(renderplayer, player);
+                ModelBipedBody.getField("field_78112_f").set(modelMain, bipedRA);
+            } catch (NoSuchFieldException | NoSuchMethodException e) {
+                ModelRenderer bipedRA = (ModelRenderer) ModelBipedBody.getField("bipedRightArm").get(modelMain);
+                ModelRenderer bipedLA = (ModelRenderer) ModelBipedBody.getField("bipedLeftArm").get(modelMain);
+                ModelBipedBody.getField("bipedRightArm").set(modelMain,bipedLA);
+                GL11.glRotatef(180,0,1,0);
+                RenderPlayerJBRA.getMethod("renderFirstPersonArm", EntityPlayer.class).invoke(renderplayer, player);
+                ModelBipedBody.getField("bipedRightArm").set(modelMain,bipedRA);
+            }
         } catch (Exception ignored) {
             leftArm.setRotationPoint(rightArm.rotationPointX, rightArm.rotationPointY, rightArm.rotationPointZ);
             leftArm.offsetX = rightArm.offsetX;
