@@ -162,6 +162,13 @@ public class RenderOffhandPlayer extends RenderPlayer {
                         GL11.glRotatef(-var12 * 20.0F, 0.0F, 0.0F, 1.0F);
                         var11 = 0.4F;
                         GL11.glScalef(var11, var11, var11);
+                        if (offhandItem.getItem().shouldRotateAroundWhenRendering()) {
+                            GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+                        }
+                        if (offhandItem.getItem() != null && offhandItem.getItem().getUnlocalizedName() != null && offhandItem.getItem().getUnlocalizedName().toLowerCase().endsWith("arrow")) {
+                            GL11.glTranslatef(-0.55F,0.0F,0.5F);
+                            GL11.glRotatef(-90,1,0,1);
+                        }
                         itemRenderer.renderItem(player, offhandItem, 0);
                         if (offhandItem.getItem().requiresMultipleRenderPasses()) {
                             for (int x = 1; x < offhandItem.getItem().getRenderPasses(offhandItem.getItemDamage()); x++) {
@@ -174,6 +181,8 @@ public class RenderOffhandPlayer extends RenderPlayer {
                             }
                         }
                         GL11.glPopMatrix();
+                        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+                        RenderHelper.disableStandardItemLighting();
                         return;
                     }
                 } else {
