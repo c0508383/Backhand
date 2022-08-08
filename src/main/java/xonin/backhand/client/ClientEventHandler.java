@@ -166,9 +166,9 @@ public class ClientEventHandler {
 
         GL11.glPushMatrix();
         ModelBiped biped = (ModelBiped) event.renderer.modelBipedMain;
-        renderOffhandPlayer.itemRenderer.updateEquippedItem();
+        RenderOffhandPlayer.itemRenderer.updateEquippedItem();
         renderOffhandPlayer.updateFovModifierHand();
-        renderOffhandPlayer.itemRenderer.renderOffhandItemIn3rdPerson(event.entityPlayer, biped, event.partialRenderTick);
+        RenderOffhandPlayer.itemRenderer.renderOffhandItemIn3rdPerson(event.entityPlayer, biped, event.partialRenderTick);
         GL11.glPopMatrix();
     }
 }

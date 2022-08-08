@@ -48,8 +48,10 @@ import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
+import org.lwjgl.opengl.GL11;
 import xonin.backhand.Backhand;
 import xonin.backhand.client.ClientEventHandler;
+import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -162,7 +164,8 @@ public class MysteriumPatchesFixesO {
         }
 
         MysteriumPatchesFixesO.onGround2 = 0;
-        ClientEventHandler.renderOffhandPlayer.renderHand(p_78440_1_,ClientEventHandler.renderPass);
+        RenderOffhandPlayer.itemRenderer.updateEquippedItem();
+        ClientEventHandler.renderOffhandPlayer.renderOffhandItem(p_78440_1_);
     }
 	
 	@Fix
