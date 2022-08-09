@@ -306,7 +306,6 @@ public class BattlegearUtils {
         BattlegearUtils.setPlayerCurrentItem(player,oldItem);
 
         if (offhandItem != null && damage <= 0) {
-            offhandItem.setItemDamage(offhandItem.getMaxDamage());
             BattlegearUtils.setPlayerOffhandItem(player, null);
             ForgeEventFactory.onPlayerDestroyItem(player, offhandItem);
         }
