@@ -281,9 +281,10 @@ public final class BattlegearClientTickHandler {
 
                     if (itemstack != null)
                     {
+                        int prevDamage = itemstack.getItemDamage();
                         int damage = itemstack.getMaxDamage() - itemstack.getItemDamage();
                         itemstack.func_150999_a(mcInstance.theWorld, block, i, j, k, mcInstance.thePlayer);
-                        if (itemstack.stackSize == 0 || damage <= 0)
+                        if (itemstack.stackSize == 0 || (damage <= 0 && prevDamage != itemstack.getItemDamage()))
                         {
                             broken = true;
                             mcInstance.thePlayer.destroyCurrentEquippedItem();
