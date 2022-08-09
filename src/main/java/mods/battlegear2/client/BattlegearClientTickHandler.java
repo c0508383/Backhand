@@ -1,6 +1,7 @@
 package mods.battlegear2.client;
 
 import mods.battlegear2.packet.OffhandAttackPacket;
+import mods.battlegear2.packet.OffhandSwapPacket;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
@@ -216,6 +217,7 @@ public final class BattlegearClientTickHandler {
         int j = objectMouseOver.blockY;
         int k = objectMouseOver.blockZ;
         int prevHeldItem = event.player.inventory.currentItem;
+        boolean broken = false;
 
         if (mcInstance.thePlayer.capabilities.isCreativeMode)
         {
@@ -279,10 +281,11 @@ public final class BattlegearClientTickHandler {
 
                     if (itemstack != null)
                     {
+                        int damage = itemstack.getMaxDamage() - itemstack.getItemDamage();
                         itemstack.func_150999_a(mcInstance.theWorld, block, i, j, k, mcInstance.thePlayer);
-
-                        if (itemstack.stackSize == 0)
+                        if (itemstack.stackSize == 0 || damage <= 0)
                         {
+                            broken = true;
                             mcInstance.thePlayer.destroyCurrentEquippedItem();
                         }
                     }
@@ -304,6 +307,13 @@ public final class BattlegearClientTickHandler {
         }
         event.player.inventory.currentItem = prevHeldItem;
         mcInstance.playerController.syncCurrentPlayItem();
+
+        if (broken) {
+            BattlegearUtils.setPlayerOffhandItem(event.player,null);
+            ((EntityClientPlayerMP)event.player).sendQueue.addToSendQueue(
+                    new OffhandSwapPacket(null, event.player.getCurrentEquippedItem(), event.player).generatePacket()
+            );
+        }
     }
 
     public static float getPartialTick(){
