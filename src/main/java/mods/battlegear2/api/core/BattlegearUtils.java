@@ -299,10 +299,17 @@ public class BattlegearUtils {
         BattlegearUtils.setPlayerCurrentItem(player,offhandItem);
         refreshAttributes(player.getAttributeMap(), oldItem, player.getCurrentEquippedItem());
 
+        int damage = offhandItem == null ? 1 : offhandItem.getMaxDamage() - offhandItem.getItemDamage();
         player.attackTargetEntityWithCurrentItem(par1Entity);
 
         refreshAttributes(player.getAttributeMap(), player.getCurrentEquippedItem(), oldItem);
         BattlegearUtils.setPlayerCurrentItem(player,oldItem);
+
+        if (offhandItem != null && damage <= 0) {
+            offhandItem.setItemDamage(offhandItem.getMaxDamage());
+            BattlegearUtils.setPlayerOffhandItem(player, null);
+            ForgeEventFactory.onPlayerDestroyItem(player, offhandItem);
+        }
     }
 
     /**
