@@ -1,11 +1,21 @@
 package xonin.backhand.client.gui;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.ContainerPlayerBattle;
+import mods.battlegear2.api.core.InventoryPlayerBattle;
+import mods.battlegear2.packet.OffhandSwapPacket;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
 
 import java.util.ArrayList;
 
@@ -22,6 +32,14 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
             this.mc.getTextureManager().bindTexture(field_147001_a);
             this.drawTexturedModalRect(81 + guiLeft, 32 + guiTop, 7, 83, 18, 18);
         }
+    }
+
+    @Override
+    public void onGuiClosed() {
+        super.onGuiClosed();
+        this.mc.thePlayer.sendQueue.addToSendQueue(
+                new OffhandSwapPacket(BattlegearUtils.getOffhandItem(this.mc.thePlayer), this.mc.thePlayer.getCurrentEquippedItem(), this.mc.thePlayer).generatePacket()
+        );
     }
 
     public void setCurrentCreativeTab(CreativeTabs p_147050_1_)
@@ -44,8 +62,6 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
             }
 
             containercreative.inventorySlots = new ArrayList();
-            int offset = container instanceof ContainerPlayerBattle ? -1 : 0;
-
             for (int j = 0; j < container.inventorySlots.size(); ++j)
             {
                 GuiContainerCreative.CreativeSlot creativeslot = new GuiContainerCreative.CreativeSlot((Slot)container.inventorySlots.get(j), j);
