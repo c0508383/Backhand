@@ -261,6 +261,6 @@ public class InventoryPlayerBattle extends InventoryPlayer {
     }
 
     public void setOffhandItem(ItemStack stack) {
-        this.offhandItem = ItemStack.copyItemStack(stack);
+        this.offhandItem = stack;
     }
 }
