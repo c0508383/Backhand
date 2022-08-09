@@ -1,15 +1,14 @@
 package xonin.backhand;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.IGuiHandler;
-import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.utils.EnumBGAnimations;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 
 public class CommonProxy implements IGuiHandler {
+    public static int invTweaksDisableMove;
+    public static ItemStack offhandItemUsed;
 
     public void load() {
 

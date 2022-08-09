@@ -10,7 +10,6 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.packet.BattlegearPacketHandler;
 import mods.battlegear2.utils.BattlegearConfig;
-import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -48,14 +47,6 @@ public class Backhand {
     public void load(FMLPreInitializationEvent event) {
         Channel = NetworkRegistry.INSTANCE.newEventDrivenChannel("Backhand");
         ChannelPlayer = NetworkRegistry.INSTANCE.newEventDrivenChannel("BackhandPlayer");
-
-        MinecraftServer server = MinecraftServer.getServer();
-        String dir = "";
-        if (server != null) {
-            dir = new File(".").getAbsolutePath();
-        } else {
-            dir = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
-        }
 
         BattlegearConfig.getConfig(new Configuration(event.getSuggestedConfigurationFile()));
 

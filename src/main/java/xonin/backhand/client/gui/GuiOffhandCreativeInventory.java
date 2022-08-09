@@ -1,21 +1,12 @@
 package xonin.backhand.client.gui;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.ContainerPlayerBattle;
-import mods.battlegear2.api.core.InventoryPlayerBattle;
 import mods.battlegear2.packet.OffhandSwapPacket;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 
 import java.util.ArrayList;
 

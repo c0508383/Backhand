@@ -44,6 +44,7 @@ import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import xonin.backhand.Backhand;
+import xonin.backhand.CommonProxy;
 import xonin.backhand.client.ClientEventHandler;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
@@ -57,8 +58,6 @@ public class MysteriumPatchesFixesO {
     /**If we have hotswapped the breaking item with the one in offhand and should hotswap it back when called next*/
     public static boolean hotSwapped = false;
 
-    public static ItemStack offhandItemUsed;
-
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
 	public static boolean isPlayer(EntityPlayer p) {
 		return false;
@@ -71,7 +70,7 @@ public class MysteriumPatchesFixesO {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
                 EntityPlayer player = ClientEventHandler.renderingPlayer;
                 ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
-                if (offhandItemUsed != null && offhandItemUsed != itemStack
+                if (CommonProxy.offhandItemUsed != null && CommonProxy.offhandItemUsed != itemStack
                         && offhandItem != null && BattlegearUtils.checkForRightClickFunctionNoAction(offhandItem) && itemStack != offhandItem) {
                     return EnumAction.none;
                 }
@@ -107,7 +106,7 @@ public class MysteriumPatchesFixesO {
 		}
 		return false;
     }
-	
+
 	@Fix(returnSetting=EnumReturnSetting.ON_TRUE)
 	@SideOnly(Side.CLIENT)
 	public static boolean addBlockHitEffects(EffectRenderer er, int x, int y, int z, MovingObjectPosition target)
@@ -117,7 +116,7 @@ public class MysteriumPatchesFixesO {
 		}
 		return false;
     }
-	
+
 	@Fix(returnSetting=EnumReturnSetting.ON_TRUE)
 	@SideOnly(Side.CLIENT)
 	public static boolean onPlayerDamageBlock(PlayerControllerMP mp, int p_78759_1_, int p_78759_2_, int p_78759_3_, int p_78759_4_)
@@ -149,7 +148,7 @@ public class MysteriumPatchesFixesO {
         RenderOffhandPlayer.itemRenderer.updateEquippedItem();
         ClientEventHandler.renderOffhandPlayer.renderOffhandItem(p_78440_1_);
     }
-	
+
 	@Fix
 	@SideOnly(Side.CLIENT)
 	public static void doRender(RendererLivingEntity l, EntityLivingBase p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
@@ -158,7 +157,7 @@ public class MysteriumPatchesFixesO {
 			onGround2 = ((IBattlePlayer)p_76986_1_).getOffSwingProgress(p_76986_9_);
 		}
     }
-	
+
 	@Fix(returnSetting=EnumReturnSetting.ALWAYS)
 	@SideOnly(Side.CLIENT)
 	public static void setRotationAngles(ModelBiped b, float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
@@ -222,7 +221,7 @@ public class MysteriumPatchesFixesO {
             b.bipedRightArm.rotateAngleY += b.bipedBody.rotateAngleY * 2.0F;
             b.bipedRightArm.rotateAngleZ = MathHelper.sin(b.onGround * (float)Math.PI) * -0.4F;
         }
-        
+
         if (p_78087_7_ instanceof EntityPlayer) {
             if (onGround2 > -9990.0F) {
 	        	f6 = onGround2;
@@ -292,13 +291,13 @@ public class MysteriumPatchesFixesO {
             b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
         }
     }
-	
+
 	@Fix(returnSetting=EnumReturnSetting.ON_TRUE)
 	public static boolean processPlayerDigging(NetHandlerPlayServer serv, C07PacketPlayerDigging p_147345_1_)
     {
 		WorldServer worldserver = MinecraftServer.getServer().worldServerForDimension(serv.playerEntity.dimension);
 	    serv.playerEntity.func_143004_u();
-	
+
 	    if (p_147345_1_.func_149506_g() == 4)
 	    {
 	        serv.playerEntity.dropOneItem(false);
@@ -317,22 +316,22 @@ public class MysteriumPatchesFixesO {
 	    else
 	    {
 	        boolean flag = false;
-	
+
 	        if (p_147345_1_.func_149506_g() == 0)
 	        {
 	            flag = true;
 	        }
-	
+
 	        if (p_147345_1_.func_149506_g() == 1)
 	        {
 	            flag = true;
 	        }
-	
+
 	        if (p_147345_1_.func_149506_g() == 2)
 	        {
 	            flag = true;
 	        }
-	
+
 	        int i = p_147345_1_.func_149505_c();
 	        int j = p_147345_1_.func_149503_d();
 	        int k = p_147345_1_.func_149502_e();
@@ -342,21 +341,21 @@ public class MysteriumPatchesFixesO {
 	            double d1 = serv.playerEntity.posY - ((double)j + 0.5D) + 1.5D;
 	            double d2 = serv.playerEntity.posZ - ((double)k + 0.5D);
 	            double d3 = d0 * d0 + d1 * d1 + d2 * d2;
-	
+
 	            double dist = serv.playerEntity.theItemInWorldManager.getBlockReachDistance() + 1;
 	            dist *= dist;
-	
+
 	            if (d3 > dist)
 	            {
 	                return true;
 	            }
 	        }
-	        
+
 	        if (p_147345_1_.func_149506_g() == 2)
 	        {
 	        	customUncheckedTryHarvestBlock(serv.playerEntity.theItemInWorldManager, i, j, k);
 	            serv.playerEntity.theItemInWorldManager.uncheckedTryHarvestBlock(i, j, k);
-	
+
 	            if (worldserver.getBlock(i, j, k).getMaterial() != Material.air)
 	            {
 	                serv.playerEntity.playerNetServerHandler.sendPacket(new S23PacketBlockChange(i, j, k, worldserver));
@@ -366,7 +365,7 @@ public class MysteriumPatchesFixesO {
 	        else if (p_147345_1_.func_149506_g() == 1)
 	        {
 	            serv.playerEntity.theItemInWorldManager.cancelDestroyingBlock(i, j, k);
-	
+
 	            if (worldserver.getBlock(i, j, k).getMaterial() != Material.air)
 	            {
 	                serv.playerEntity.playerNetServerHandler.sendPacket(new S23PacketBlockChange(i, j, k, worldserver));
@@ -376,7 +375,7 @@ public class MysteriumPatchesFixesO {
 	    }
 	    return false;
     }
-	
+
 	// This might be a bad idea. (but if I didn't do this I would have to insert ~10 more fixes into forge-hooked methods and it might not even have worked)
 	@Fix
 	public static void uncheckedTryHarvestBlock(ItemInWorldManager m, int p_73082_1_, int p_73082_2_, int p_73082_3_)
@@ -384,7 +383,7 @@ public class MysteriumPatchesFixesO {
         m.theWorld.destroyBlockInWorldPartially(m.thisPlayerMP.getEntityId(), p_73082_1_, p_73082_2_, p_73082_3_, -1);
         m.tryHarvestBlock(p_73082_1_, p_73082_2_, p_73082_3_);
     }
-	
+
 	public static void customUncheckedTryHarvestBlock(ItemInWorldManager m, int p_73082_1_, int p_73082_2_, int p_73082_3_)
     {
         m.theWorld.destroyBlockInWorldPartially(m.thisPlayerMP.getEntityId(), p_73082_1_, p_73082_2_, p_73082_3_, -1);
@@ -507,6 +506,7 @@ public class MysteriumPatchesFixesO {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     @Fix(returnSetting=EnumReturnSetting.NEVER)
     public static void func_147112_ai(Minecraft mc)
     {
@@ -639,13 +639,11 @@ public class MysteriumPatchesFixesO {
 
     // inv tweaks compat starts here
 
-    public static int invTweaksDisableMove;
-
     @Optional.Method(modid="inventorytweaks")
     @Fix(returnSetting = EnumReturnSetting.ALWAYS)
     public static boolean move(InvTweaksContainerSectionManager itcm, int srcIndex, int destIndex) {
-        if (invTweaksDisableMove > 0) {
-            MysteriumPatchesFixesO.invTweaksDisableMove--;
+        if (CommonProxy.invTweaksDisableMove > 0) {
+            CommonProxy.invTweaksDisableMove--;
             return getContainerManager(itcm).move(getContainerSection(itcm), srcIndex, getContainerSection(itcm), srcIndex);
         }
 

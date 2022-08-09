@@ -3,7 +3,6 @@ package mods.battlegear2.client;
 import mods.battlegear2.packet.OffhandAttackPacket;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockLog;
-import net.minecraft.block.BlockWood;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -33,6 +32,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
+import xonin.backhand.CommonProxy;
 import xonin.backhand.client.ClientTickHandler;
 
 public final class BattlegearClientTickHandler {
@@ -74,7 +74,7 @@ public final class BattlegearClientTickHandler {
             tryAttackEntity(player);
         }
         if (player.getItemInUse() == null) {
-            MysteriumPatchesFixesO.offhandItemUsed = null;
+            CommonProxy.offhandItemUsed = null;
         }
     }
 

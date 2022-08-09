@@ -31,12 +31,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import xonin.backhand.Backhand;
+import xonin.backhand.CommonProxy;
 
 public final class BattlemodeHookContainerClass {
 
@@ -73,7 +72,7 @@ public final class BattlemodeHookContainerClass {
             }
         }
     }
-    
+
     public static MovingObjectPosition getRaytraceBlock(EntityPlayer p) {
     	float scaleFactor = 1.0F;
 		float rotPitch = p.prevRotationPitch + (p.rotationPitch - p.prevRotationPitch) * scaleFactor;
@@ -92,7 +91,7 @@ public final class BattlemodeHookContainerClass {
 		Vec3 testVectorFar = testVector.addVector(vectorX * reachLength, vectorY * reachLength, vectorZ * reachLength);
 		return p.worldObj.rayTraceBlocks(testVector, testVectorFar, false);
     }
-    
+
     public static List<IInventory> tobeclosed = new ArrayList<IInventory>();
 
     @SubscribeEvent
@@ -206,7 +205,7 @@ public final class BattlemodeHookContainerClass {
         final int i = itemStack.stackSize;
         final int j = itemStack.getItemDamage();
         ItemStack itemStackResult = itemStack.useItemRightClick(entityPlayer.getEntityWorld(), entityPlayer);
-        MysteriumPatchesFixesO.offhandItemUsed = itemStackResult;
+        CommonProxy.offhandItemUsed = itemStackResult;
 
         if (itemStackResult == itemStack && (itemStackResult == null || itemStackResult.stackSize == i && (side.isServer()?(itemStackResult.getMaxItemUseDuration() <= 0 && itemStackResult.getItemDamage() == j):true)))
         {
