@@ -31,9 +31,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.*;
 import xonin.backhand.Backhand;
 import xonin.backhand.CommonProxy;
 
@@ -207,7 +205,7 @@ public final class BattlemodeHookContainerClass {
         ItemStack itemStackResult = itemStack.useItemRightClick(entityPlayer.getEntityWorld(), entityPlayer);
         CommonProxy.offhandItemUsed = itemStackResult;
 
-        if (itemStackResult == itemStack && (itemStackResult == null || itemStackResult.stackSize == i && (side.isServer()?(itemStackResult.getMaxItemUseDuration() <= 0 && itemStackResult.getItemDamage() == j):true)))
+        if (itemStackResult == itemStack && itemStackResult.stackSize == i && (!side.isServer() || itemStackResult.getMaxItemUseDuration() <= 0 && itemStackResult.getItemDamage() == j))
         {
             return false;
         }
@@ -221,11 +219,6 @@ public final class BattlemodeHookContainerClass {
                 {
                     itemStackResult.setItemDamage(j);
                 }
-            }
-            if (itemStackResult.stackSize <= 0 || itemStackResult.getMaxDamage() - itemStackResult.getItemDamage() <= 0)
-            {
-                BattlegearUtils.setPlayerOffhandItem(entityPlayer, null);
-                ForgeEventFactory.onPlayerDestroyItem(entityPlayer, itemStackResult);
             }
             if (side.isServer() && !entityPlayer.isUsingItem())
             {

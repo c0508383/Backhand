@@ -39,6 +39,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
@@ -62,6 +63,20 @@ public class MysteriumPatchesFixesO {
 	public static boolean isPlayer(EntityPlayer p) {
 		return false;
 	}
+
+    @Fix(insertOnExit = true)
+    public static void damageItem(ItemStack itemStack, int p_77972_1_, EntityLivingBase p_77972_2_)
+    {
+        if (!(p_77972_2_ instanceof EntityPlayer) || itemStack == null)
+            return;
+
+        EntityPlayer player = (EntityPlayer) p_77972_2_;
+        ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+        if (offhandItem != null && itemStack == offhandItem && itemStack.stackSize == 0) {
+            BattlegearUtils.setPlayerOffhandItem(player,null);
+            ForgeEventFactory.onPlayerDestroyItem(player,offhandItem);
+        }
+    }
 
     @Fix(insertOnExit = true, returnSetting=EnumReturnSetting.ALWAYS)
     public static EnumAction getItemUseAction(ItemStack itemStack, @ReturnedValue EnumAction returnedAction)
