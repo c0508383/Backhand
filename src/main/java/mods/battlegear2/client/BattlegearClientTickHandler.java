@@ -120,7 +120,10 @@ public final class BattlegearClientTickHandler {
                     offhandItem = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
                     PlayerEventChild.UseOffhandItemEvent useItemEvent = new PlayerEventChild.UseOffhandItemEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, 0, 0, 0, -1, player.worldObj), offhandItem);
                     if (offhandItem != null && !MinecraftForge.EVENT_BUS.post(useItemEvent)) {
-                        BattlemodeHookContainerClass.tryUseItem(player, offhandItem, Side.CLIENT);
+                        ItemStack heldItem = player.getCurrentEquippedItem();
+                        player.setCurrentItemOrArmor(0, offhandItem);
+                        BattlemodeHookContainerClass.tryUseItem(player, player.getCurrentEquippedItem(), Side.CLIENT);
+                        player.setCurrentItemOrArmor(0, heldItem);
                     }
                 }
 
