@@ -82,9 +82,9 @@ public final class OffhandPlaceBlockPacket extends AbstractMBPacket{
         }catch(Exception io){
             return;
         }
-        if(player == null || !(player instanceof EntityPlayerMP))
+        if(!(player instanceof EntityPlayerMP))
             return;
-        ItemStack offhandWeapon = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
+        ItemStack offhandWeapon = BattlegearUtils.getOffhandItem(player);
         if(offhandWeapon!=null && !BattlegearUtils.usagePriorAttack(offhandWeapon))
             return;
         boolean flag = true;
@@ -139,7 +139,7 @@ public final class OffhandPlaceBlockPacket extends AbstractMBPacket{
             }
             ((EntityPlayerMP) player).playerNetServerHandler.sendPacket(new S23PacketBlockChange(i, j, k, player.getEntityWorld()));
         }
-        offhandWeapon = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
+        offhandWeapon = BattlegearUtils.getOffhandItem(player);
         if (offhandWeapon != null && BattlemodeHookContainerClass.isItemBlock(offhandWeapon.getItem())) {
 
             if (offhandWeapon != null && offhandWeapon.stackSize <= 0) {
@@ -148,11 +148,11 @@ public final class OffhandPlaceBlockPacket extends AbstractMBPacket{
             }
             if (offhandWeapon == null || offhandWeapon.getMaxItemUseDuration() == 0) {
                 ((EntityPlayerMP) player).isChangingQuantityOnly = true;
-                BattlegearUtils.setPlayerOffhandItem(player, ItemStack.copyItemStack(((InventoryPlayerBattle) player.inventory).getOffhandItem()));
+                BattlegearUtils.setPlayerOffhandItem(player, ItemStack.copyItemStack(BattlegearUtils.getOffhandItem(player)));
                 player.openContainer.detectAndSendChanges();
                 ((EntityPlayerMP) player).isChangingQuantityOnly = false;
 
-                if (!ItemStack.areItemStacksEqual(((InventoryPlayerBattle) player.inventory).getOffhandItem(), this.itemStack)) {
+                if (!ItemStack.areItemStacksEqual(BattlegearUtils.getOffhandItem(player), this.itemStack)) {
                     Backhand.packetHandler.sendPacketToPlayer(new BattlegearSyncItemPacket(player).generatePacket(), (EntityPlayerMP) player);
                 }
             }
@@ -180,8 +180,8 @@ public final class OffhandPlaceBlockPacket extends AbstractMBPacket{
             return true;
         }
 
-        boolean useBlock = !playerMP.isSneaking() || ((InventoryPlayerBattle)playerMP.inventory).getOffhandItem() == null;
-        if (!useBlock) useBlock = ((InventoryPlayerBattle)playerMP.inventory).getOffhandItem().getItem().doesSneakBypassUse(theWorld, x, y, z, playerMP);
+        boolean useBlock = !playerMP.isSneaking() || BattlegearUtils.getOffhandItem(playerMP) == null;
+        if (!useBlock) useBlock = BattlegearUtils.getOffhandItem(playerMP).getItem().doesSneakBypassUse(theWorld, x, y, z, playerMP);
         boolean result = false;
 
         if (useBlock)

@@ -94,7 +94,7 @@ public class ClientTickHandler {
         }
 
         ItemStack mainHandItem = event.player.getCurrentEquippedItem();
-        ItemStack offhandItem = ((InventoryPlayerBattle) event.player.inventory).getOffhandItem();
+        ItemStack offhandItem = BattlegearUtils.getOffhandItem(event.player);
 
         if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || offhandItem == null)) {
             return;

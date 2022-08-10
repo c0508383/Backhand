@@ -103,7 +103,7 @@ public final class BattlemodeHookContainerClass {
 
         if(event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR || event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {//Right click
             ItemStack mainHandItem = event.entityPlayer.getCurrentEquippedItem();
-            ItemStack offhandItem = ((InventoryPlayerBattle) event.entityPlayer.inventory).getOffhandItem();
+            ItemStack offhandItem = BattlegearUtils.getOffhandItem(event.entityPlayer);
 
             if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || offhandItem == null)) {
                 return;

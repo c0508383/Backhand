@@ -61,7 +61,7 @@ public final class BattlegearClientTickHandler {
 
     @SideOnly(Side.CLIENT)
     public void tickStart(EntityPlayer player) {
-        ItemStack offhand = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
+        ItemStack offhand = BattlegearUtils.getOffhandItem(player);
         if (offhand != null) {
             if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
                 if (ticksBeforeUse == 0) {
@@ -117,7 +117,7 @@ public final class BattlegearClientTickHandler {
 
                 if (flag)
                 {
-                    offhandItem = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
+                    offhandItem = BattlegearUtils.getOffhandItem(player);
                     PlayerEventChild.UseOffhandItemEvent useItemEvent = new PlayerEventChild.UseOffhandItemEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, 0, 0, 0, -1, player.worldObj), offhandItem);
                     if (offhandItem != null && !MinecraftForge.EVENT_BUS.post(useItemEvent)) {
                         BattlemodeHookContainerClass.tryUseItem(player, offhandItem, Side.CLIENT);
@@ -171,7 +171,7 @@ public final class BattlegearClientTickHandler {
         if (offhand.getItem().onItemUseFirst(offhand, player, worldObj, i, j, k, l, f, f1, f2)){
             return true;
         }
-        if (!player.isSneaking() || ((InventoryPlayerBattle) player.inventory).getOffhandItem() == null || ((InventoryPlayerBattle) player.inventory).getOffhandItem().getItem().doesSneakBypassUse(worldObj, i, j, k, player)){
+        if (!player.isSneaking() || BattlegearUtils.getOffhandItem(player) == null || BattlegearUtils.getOffhandItem(player).getItem().doesSneakBypassUse(worldObj, i, j, k, player)){
             Block b = worldObj.getBlock(i, j, k);
             if (!b.isAir(worldObj, i, j, k) && b.onBlockActivated(worldObj, i, j, k, player, l, f, f1, f2)){
                 flag = true;
@@ -253,7 +253,7 @@ public final class BattlegearClientTickHandler {
                     }
 
                     mcInstance.thePlayer.inventory.currentItem = InventoryPlayerBattle.OFFHAND_HOTBAR_SLOT;
-                    mcInstance.playerController.currentItemHittingBlock = ((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffhandItem();
+                    mcInstance.playerController.currentItemHittingBlock = BattlegearUtils.getOffhandItem(mcInstance.thePlayer);
                     mcInstance.playerController.syncCurrentPlayItem();
                 }
 

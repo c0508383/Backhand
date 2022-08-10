@@ -15,7 +15,7 @@ public class ServerTickHandler {
     )
     public void onUpdatePlayer(TickEvent.PlayerTickEvent event)
     {
-        ItemStack itemstack = ((InventoryPlayerBattle)event.player.inventory).getOffhandItem();
+        ItemStack itemstack = BattlegearUtils.getOffhandItem(event.player);
         if (itemstack != event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX)) {
             if (event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX) == null || event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX).stackSize == 0) {
                 ((InventoryPlayerBattle)event.player.inventory).setInventorySlotContents(InventoryPlayerBattle.OFFHAND_ITEM_INDEX, null);

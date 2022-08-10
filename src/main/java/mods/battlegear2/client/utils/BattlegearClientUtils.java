@@ -14,7 +14,7 @@ public final class BattlegearClientUtils {
      */
     public static boolean entityOtherPlayerIsItemInUseHook(EntityOtherPlayerMP player, boolean isItemInUse){
         ItemStack itemStack = player.getCurrentEquippedItem();
-        ItemStack offhand = ((InventoryPlayerBattle)player.inventory).getOffhandItem();
+        ItemStack offhand = BattlegearUtils.getOffhandItem(player);
         if(BattlegearUtils.usagePriorAttack(offhand))
             itemStack = offhand;
         if (!isItemInUse && player.isEating() && itemStack != null){
