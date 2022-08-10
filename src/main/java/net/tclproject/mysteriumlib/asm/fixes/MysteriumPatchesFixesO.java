@@ -47,6 +47,7 @@ import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import xonin.backhand.Backhand;
 import xonin.backhand.CommonProxy;
 import xonin.backhand.client.ClientEventHandler;
+import xonin.backhand.client.ClientProxy;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 import java.lang.invoke.MethodHandle;
@@ -103,7 +104,6 @@ public class MysteriumPatchesFixesO {
             return true;
         } else {
             if (MysteriumPatchesFixesO.hotSwapped) {
-                Minecraft.getMinecraft().thePlayer.inventory.currentItem -= BattlemodeHookContainerClass.prevOffhandOffset;
                 Minecraft.getMinecraft().playerController.syncCurrentPlayItem();
                 MysteriumPatchesFixesO.hotSwapped = false;
             }

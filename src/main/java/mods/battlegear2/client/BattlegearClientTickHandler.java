@@ -250,11 +250,6 @@ public final class BattlegearClientTickHandler {
 
                 if (offhandItem != null)
                 {
-                    if (mcInstance.gameSettings.heldItemTooltips) {
-                        mcInstance.gameSettings.heldItemTooltips = false;
-                        BattlemodeHookContainerClass.changedHeldItemTooltips = true;
-                    }
-
                     mcInstance.thePlayer.inventory.currentItem = InventoryPlayerBattle.OFFHAND_HOTBAR_SLOT;
                     mcInstance.playerController.currentItemHittingBlock = ((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffhandItem();
                     mcInstance.playerController.syncCurrentPlayItem();
