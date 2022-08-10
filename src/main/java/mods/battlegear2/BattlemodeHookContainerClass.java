@@ -220,6 +220,10 @@ public final class BattlemodeHookContainerClass {
                     itemStackResult.setItemDamage(j);
                 }
             }
+            if (itemStackResult.stackSize <= 0) {
+                BattlegearUtils.setPlayerOffhandItem(entityPlayer,null);
+                ForgeEventFactory.onPlayerDestroyItem(entityPlayer,itemStackResult);
+            }
             if (side.isServer() && !entityPlayer.isUsingItem())
             {
                 ((EntityPlayerMP)entityPlayer).sendContainerToPlayer(entityPlayer.inventoryContainer);
