@@ -47,14 +47,14 @@ public class BattlegearUtils {
     }
 
     public static void setPlayerCurrentItem(EntityPlayer player, ItemStack stack) {
-        if (hasOffhandInventory(player)) {
-            (player.inventory).setInventorySlotContents(player.inventory.currentItem, stack);
-        }
+        player.inventory.setInventorySlotContents(player.inventory.currentItem, stack);
     }
 
     public static void setPlayerOffhandItem(EntityPlayer player, ItemStack stack) {
         if (hasOffhandInventory(player)) {
             ((InventoryPlayerBattle) player.inventory).setOffhandItem(stack);
+        } else {
+            player.inventory.setInventorySlotContents(Backhand.AlternateOffhandSlot,stack);
         }
     }
 
@@ -62,7 +62,7 @@ public class BattlegearUtils {
         if (hasOffhandInventory(player)) {
             return ((InventoryPlayerBattle) player.inventory).getOffhandItem();
         } else {
-            return null;
+            return player.inventory.getStackInSlot(Backhand.AlternateOffhandSlot);
         }
     }
 

@@ -16,16 +16,20 @@ public class ServerTickHandler {
     public void onUpdatePlayer(TickEvent.PlayerTickEvent event)
     {
         ItemStack itemstack = BattlegearUtils.getOffhandItem(event.player);
+
+        int slot = Backhand.AlternateOffhandSlot;
         if (BattlegearUtils.hasOffhandInventory(event.player)) {
-            if (itemstack != event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX)) {
-                if (event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX) == null || event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX).stackSize == 0) {
-                    BattlegearUtils.setPlayerOffhandItem(event.player, null);
-                    event.player.inventory.setInventorySlotContents(InventoryPlayerBattle.OFFHAND_ITEM_INDEX, null);
-                } else {
-                    BattlegearUtils.setPlayerOffhandItem(event.player, BattlegearUtils.getOffhandItem(event.player));
-                }
-                event.player.inventory.markDirty();
+
+        }
+
+        if (itemstack != event.player.inventory.getStackInSlot(slot)) {
+            if (event.player.inventory.getStackInSlot(slot) == null || event.player.inventory.getStackInSlot(slot).stackSize == 0) {
+                BattlegearUtils.setPlayerOffhandItem(event.player, null);
+                event.player.inventory.setInventorySlotContents(slot, null);
+            } else {
+                BattlegearUtils.setPlayerOffhandItem(event.player, BattlegearUtils.getOffhandItem(event.player));
             }
+            event.player.inventory.markDirty();
         }
 
         if (ServerEventsHandler.arrowHotSwapped) {

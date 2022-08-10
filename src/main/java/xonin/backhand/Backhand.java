@@ -36,6 +36,7 @@ public class Backhand {
     public static boolean UseOffhandArrows = true;
     public static boolean UseOffhandBow = true;
     public static boolean ExtraInventorySlot = true;
+    public static int AlternateOffhandSlot = 9;
     public static Item[] offhandBlacklist;
     public static boolean RenderEmptyOffhandAtRest = false;
 

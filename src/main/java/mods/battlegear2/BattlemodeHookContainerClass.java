@@ -3,6 +3,8 @@ package mods.battlegear2;
 import java.util.ArrayList;
 import java.util.List;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -32,6 +34,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.*;
+import org.apache.logging.log4j.Level;
 import xonin.backhand.Backhand;
 import xonin.backhand.CommonProxy;
 
@@ -53,7 +56,10 @@ public final class BattlemodeHookContainerClass {
     public void onEntityJoin(EntityJoinWorldEvent event){
         if (event.entity instanceof EntityPlayer && !(isFake(event.entity))) {
             if (!(((EntityPlayer) event.entity).inventory instanceof InventoryPlayerBattle)) {
-                throw new RuntimeException("Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
+                //throw new RuntimeException("Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
+                if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+                    FMLLog.log("Backhand", Level.INFO, "Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
+                }
             }
             ItemStack offhandItem = BattlegearUtils.getOffhandItem((EntityPlayer) event.entity);
             if (Backhand.isOffhandBlacklisted(offhandItem)) {
