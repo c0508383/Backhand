@@ -98,11 +98,6 @@ public class InventoryPlayerBattle extends InventoryPlayer {
         return super.hasItem(item);
     }
 
-    public ItemStack getCurrentItem()
-    {
-        return this.currentItem < 9 && this.currentItem >= 0 ? this.mainInventory[this.currentItem] : this.currentItem == InventoryPlayerBattle.OFFHAND_HOTBAR_SLOT ? getOffhandItem() : null;
-    }
-
     /**
      * Patch used for "set current slot" vanilla packets
      * @param id the value to test for currentItem setting

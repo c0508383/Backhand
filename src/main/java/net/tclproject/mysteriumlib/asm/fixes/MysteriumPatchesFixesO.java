@@ -517,6 +517,12 @@ public class MysteriumPatchesFixesO {
         }
     }
 
+    @Fix(insertOnExit=true,returnSetting=EnumReturnSetting.ON_NOT_NULL)
+    public static ItemStack getCurrentItem(InventoryPlayer inv)
+    {
+        return inv.currentItem < 9 && inv.currentItem >= 0 ? inv.mainInventory[inv.currentItem] : inv.currentItem == InventoryPlayerBattle.OFFHAND_HOTBAR_SLOT ? BattlegearUtils.getOffhandItem(inv.player) : null;
+    }
+
     @SideOnly(Side.CLIENT)
     @Fix(returnSetting=EnumReturnSetting.NEVER)
     public static void func_147112_ai(Minecraft mc)
