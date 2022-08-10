@@ -3,22 +3,19 @@ package mods.battlegear2.packet;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import mods.battlegear2.api.core.BattlegearUtils;
+import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import xonin.backhand.Backhand;
-import xonin.backhand.CommonProxy;
 
 public class OffhandSwapPacket extends AbstractMBPacket {
     public static final String packetName = "MB2|Swap";
 
-    private ItemStack offhandItem;
-    private ItemStack mainItem;
     private String user;
     EntityPlayer player;
 
-    public OffhandSwapPacket(ItemStack offhandItem, ItemStack mainItem, EntityPlayer player) {
-        this.offhandItem = offhandItem;
-        this.mainItem = mainItem;
+    public OffhandSwapPacket(EntityPlayer player) {
         this.player = player;
         this.user = player.getCommandSenderName();
     }
@@ -33,8 +30,6 @@ public class OffhandSwapPacket extends AbstractMBPacket {
     @Override
     public void write(ByteBuf out) {
         ByteBufUtils.writeUTF8String(out, player.getCommandSenderName());
-        ByteBufUtils.writeItemStack(out, mainItem);
-        ByteBufUtils.writeItemStack(out, offhandItem);
     }
 
     @Override
@@ -42,12 +37,12 @@ public class OffhandSwapPacket extends AbstractMBPacket {
         this.user = ByteBufUtils.readUTF8String(inputStream);
         this.player = player.worldObj.getPlayerEntityByName(user);
         if (this.player != null) {
-            CommonProxy.invTweaksDisableMove = 3;
-            ItemStack currentItem = ByteBufUtils.readItemStack(inputStream);
-            ItemStack offhandItem = ByteBufUtils.readItemStack(inputStream);
-            BattlegearUtils.setPlayerCurrentItem(this.player,currentItem);
-            BattlegearUtils.setPlayerOffhandItem(this.player,offhandItem);
-            Backhand.packetHandler.sendPacketToAll(new BattlegearSyncItemPacket(this.player).generatePacket());
+            ItemStack offhandItem = BattlegearUtils.getOffhandItem(this.player);
+            if (!(Backhand.isOffhandBlacklisted(player.getCurrentEquippedItem()) || Backhand.isOffhandBlacklisted(offhandItem))) {
+                BattlegearUtils.setPlayerOffhandItem(this.player,this.player.getCurrentEquippedItem());
+                BattlegearUtils.setPlayerCurrentItem(this.player,offhandItem);
+            }
+            Backhand.packetHandler.sendPacketToPlayer(new OffhandSwapClientPacket().generatePacket(), (EntityPlayerMP) player);
         }
     }
 }

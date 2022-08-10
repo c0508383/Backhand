@@ -1,7 +1,7 @@
 package xonin.backhand.client.gui;
 
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.packet.OffhandSwapPacket;
+import mods.battlegear2.packet.OffhandToServerPacket;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,7 +29,7 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
     public void onGuiClosed() {
         super.onGuiClosed();
         this.mc.thePlayer.sendQueue.addToSendQueue(
-                new OffhandSwapPacket(BattlegearUtils.getOffhandItem(this.mc.thePlayer), this.mc.thePlayer.getCurrentEquippedItem(), this.mc.thePlayer).generatePacket()
+                new OffhandToServerPacket(BattlegearUtils.getOffhandItem(this.mc.thePlayer), this.mc.thePlayer).generatePacket()
         );
     }
 

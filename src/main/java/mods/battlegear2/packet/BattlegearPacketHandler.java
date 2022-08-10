@@ -23,7 +23,9 @@ public final class BattlegearPacketHandler {
         map.put(BattlegearSyncItemPacket.packetName, new BattlegearSyncItemPacket());
         map.put(BattlegearAnimationPacket.packetName, new BattlegearAnimationPacket());
         map.put(OffhandPlaceBlockPacket.packetName, new OffhandPlaceBlockPacket());
+        map.put(OffhandToServerPacket.packetName, new OffhandToServerPacket());
         map.put(OffhandSwapPacket.packetName, new OffhandSwapPacket());
+        map.put(OffhandSwapClientPacket.packetName, new OffhandSwapClientPacket());
         map.put(OffhandAttackPacket.packetName, new OffhandAttackPacket());
     }
     

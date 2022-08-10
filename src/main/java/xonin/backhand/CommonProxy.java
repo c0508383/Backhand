@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 public class CommonProxy implements IGuiHandler {
-    public static int invTweaksDisableMove;
     public static ItemStack offhandItemUsed;
 
     public void load() {

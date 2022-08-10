@@ -21,31 +21,27 @@ import xonin.backhand.Backhand;
 
 public class ClientTickHandler {
     public static int delay;
-    public static int swapDelay;
     public static boolean prevInvTweaksAutoRefill;
     public static boolean prevInvTweaksBreakRefill;
+
+    public static int swapDelay;
+    public static boolean allowSwap = true;
 
     @SubscribeEvent
     public void onKeyInputEvent(InputEvent.KeyInputEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
         EntityClientPlayerMP player = mc.thePlayer;
 
-        if (ClientProxy.swapOffhand.getIsKeyPressed() && Keyboard.isKeyDown(Keyboard.getEventKey()) && swapDelay <= 0) {
-            ItemStack offhandItem = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
-            if (Backhand.isOffhandBlacklisted(player.getCurrentEquippedItem()) || Backhand.isOffhandBlacklisted(offhandItem)) {
-                return;
-            }
+        if (ClientProxy.swapOffhand.getIsKeyPressed() && Keyboard.isKeyDown(Keyboard.getEventKey()) && swapDelay <= 0 && allowSwap) {
             swapDelay = 5;
+            allowSwap = false;
             try {
                 this.getClass().getMethod("invTweaksSwapPatch");
                 invTweaksSwapPatch();
             } catch (Exception ignored) {}
-
-            player.sendQueue.addToSendQueue(
-                new OffhandSwapPacket(player.getCurrentEquippedItem(), offhandItem, player).generatePacket()
+            ((EntityClientPlayerMP)player).sendQueue.addToSendQueue(
+                    new OffhandSwapPacket(player).generatePacket()
             );
-            ((InventoryPlayerBattle) player.inventory).setOffhandItem(player.getCurrentEquippedItem());
-            BattlegearUtils.setPlayerCurrentItem(player, offhandItem);
         }
     }
 

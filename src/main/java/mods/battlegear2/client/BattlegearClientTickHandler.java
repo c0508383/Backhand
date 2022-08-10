@@ -1,7 +1,7 @@
 package mods.battlegear2.client;
 
 import mods.battlegear2.packet.OffhandAttackPacket;
-import mods.battlegear2.packet.OffhandSwapPacket;
+import mods.battlegear2.packet.OffhandToServerPacket;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
@@ -312,7 +312,7 @@ public final class BattlegearClientTickHandler {
         if (broken) {
             BattlegearUtils.setPlayerOffhandItem(event.player,null);
             ((EntityClientPlayerMP)event.player).sendQueue.addToSendQueue(
-                    new OffhandSwapPacket(null, event.player.getCurrentEquippedItem(), event.player).generatePacket()
+                    new OffhandToServerPacket(null, event.player).generatePacket()
             );
         }
     }
