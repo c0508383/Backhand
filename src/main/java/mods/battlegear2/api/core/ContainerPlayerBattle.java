@@ -10,7 +10,7 @@ public class ContainerPlayerBattle extends ContainerPlayer {
 
     public ContainerPlayerBattle(InventoryPlayer p_i1819_1_, boolean p_i1819_2_, EntityPlayer p_i1819_3_) {
         super(p_i1819_1_, p_i1819_2_, p_i1819_3_);
-        if (Backhand.ExtraInventorySlot) {
+        if (Backhand.ExtraInventorySlot && BattlegearUtils.hasOffhandInventory(p_i1819_3_)) {
             for (Object s : this.inventorySlots) {
                 Slot slot = (Slot) s;
                 if (slot instanceof SlotCrafting) {
