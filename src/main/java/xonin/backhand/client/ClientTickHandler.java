@@ -1,10 +1,12 @@
 package xonin.backhand.client;
 
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import invtweaks.InvTweaks;
 import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
@@ -19,17 +21,25 @@ import xonin.backhand.Backhand;
 
 public class ClientTickHandler {
     public static int delay;
+    public static int swapDelay;
+    public static boolean prevInvTweaksAutoRefill;
+    public static boolean prevInvTweaksBreakRefill;
 
     @SubscribeEvent
     public void onKeyInputEvent(InputEvent.KeyInputEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
         EntityClientPlayerMP player = mc.thePlayer;
 
-        if (ClientProxy.swapOffhand.getIsKeyPressed() && Keyboard.isKeyDown(Keyboard.getEventKey())) {
+        if (ClientProxy.swapOffhand.getIsKeyPressed() && Keyboard.isKeyDown(Keyboard.getEventKey()) && swapDelay <= 0) {
             ItemStack offhandItem = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
             if (Backhand.isOffhandBlacklisted(player.getCurrentEquippedItem()) || Backhand.isOffhandBlacklisted(offhandItem)) {
                 return;
             }
+            swapDelay = 5;
+            try {
+                this.getClass().getMethod("invTweaksSwapPatch");
+                invTweaksSwapPatch();
+            } catch (Exception ignored) {}
 
             player.sendQueue.addToSendQueue(
                 new OffhandSwapPacket(player.getCurrentEquippedItem(), offhandItem, player).generatePacket()
@@ -37,6 +47,33 @@ public class ClientTickHandler {
             ((InventoryPlayerBattle) player.inventory).setOffhandItem(player.getCurrentEquippedItem());
             BattlegearUtils.setPlayerCurrentItem(player, offhandItem);
         }
+    }
+
+    @Optional.Method(modid="inventorytweaks")
+    public void invTweaksSwapPatch() {
+        prevInvTweaksAutoRefill = Boolean.parseBoolean(InvTweaks.getConfigManager().getConfig().getProperty("enableAutoRefill"));
+        prevInvTweaksBreakRefill = Boolean.parseBoolean(InvTweaks.getConfigManager().getConfig().getProperty("autoRefillBeforeBreak"));
+        InvTweaks.getConfigManager().getConfig().setProperty("enableAutoRefill", "false");
+        InvTweaks.getConfigManager().getConfig().setProperty("autoRefillBeforeBreak","false");
+    }
+
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (swapDelay > 0) {
+            swapDelay--;
+            if (swapDelay == 0) {
+                try {
+                    this.getClass().getMethod("restoreInvTweaksConfigs");
+                    restoreInvTweaksConfigs();
+                } catch (Exception ignored) {}
+            }
+        }
+    }
+
+    @Optional.Method(modid="inventorytweaks")
+    public void restoreInvTweaksConfigs() {
+        InvTweaks.getConfigManager().getConfig().setProperty("enableAutoRefill",String.valueOf(prevInvTweaksAutoRefill));
+        InvTweaks.getConfigManager().getConfig().setProperty("autoRefillBeforeBreak",String.valueOf(prevInvTweaksBreakRefill));
     }
 
     @SideOnly(Side.CLIENT)

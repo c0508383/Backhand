@@ -654,7 +654,7 @@ public class MysteriumPatchesFixesO {
 
     // inv tweaks compat starts here
 
-    @Optional.Method(modid="inventorytweaks")
+    /*@Optional.Method(modid="inventorytweaks")
     @Fix(returnSetting = EnumReturnSetting.ALWAYS)
     public static boolean move(InvTweaksContainerSectionManager itcm, int srcIndex, int destIndex) {
         if (CommonProxy.invTweaksDisableMove > 0) {
@@ -663,5 +663,5 @@ public class MysteriumPatchesFixesO {
         }
 
         return getContainerManager(itcm).move(getContainerSection(itcm), srcIndex, getContainerSection(itcm), destIndex);
-    }
+    }*/
 }
