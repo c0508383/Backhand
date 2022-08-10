@@ -24,7 +24,7 @@ public class ClientTickHandler {
     public static boolean prevInvTweaksAutoRefill;
     public static boolean prevInvTweaksBreakRefill;
 
-    public static int swapDelay;
+    public static int invTweaksDelay;
     public static boolean allowSwap = true;
 
     @SubscribeEvent
@@ -32,8 +32,7 @@ public class ClientTickHandler {
         Minecraft mc = Minecraft.getMinecraft();
         EntityClientPlayerMP player = mc.thePlayer;
 
-        if (ClientProxy.swapOffhand.getIsKeyPressed() && Keyboard.isKeyDown(Keyboard.getEventKey()) && swapDelay <= 0 && allowSwap) {
-            swapDelay = 5;
+        if (ClientProxy.swapOffhand.getIsKeyPressed() && Keyboard.isKeyDown(Keyboard.getEventKey()) && allowSwap) {
             allowSwap = false;
             try {
                 this.getClass().getMethod("invTweaksSwapPatch");
@@ -47,17 +46,20 @@ public class ClientTickHandler {
 
     @Optional.Method(modid="inventorytweaks")
     public void invTweaksSwapPatch() {
-        prevInvTweaksAutoRefill = Boolean.parseBoolean(InvTweaks.getConfigManager().getConfig().getProperty("enableAutoRefill"));
-        prevInvTweaksBreakRefill = Boolean.parseBoolean(InvTweaks.getConfigManager().getConfig().getProperty("autoRefillBeforeBreak"));
-        InvTweaks.getConfigManager().getConfig().setProperty("enableAutoRefill", "false");
-        InvTweaks.getConfigManager().getConfig().setProperty("autoRefillBeforeBreak","false");
+        if (invTweaksDelay <= 0) {
+            prevInvTweaksAutoRefill = Boolean.parseBoolean(InvTweaks.getConfigManager().getConfig().getProperty("enableAutoRefill"));
+            prevInvTweaksBreakRefill = Boolean.parseBoolean(InvTweaks.getConfigManager().getConfig().getProperty("autoRefillBeforeBreak"));
+            InvTweaks.getConfigManager().getConfig().setProperty("enableAutoRefill", "false");
+            InvTweaks.getConfigManager().getConfig().setProperty("autoRefillBeforeBreak", "false");
+        }
+        invTweaksDelay = 15;
     }
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (swapDelay > 0) {
-            swapDelay--;
-            if (swapDelay == 0) {
+        if (invTweaksDelay > 0) {
+            invTweaksDelay--;
+            if (invTweaksDelay == 0) {
                 try {
                     this.getClass().getMethod("restoreInvTweaksConfigs");
                     restoreInvTweaksConfigs();
