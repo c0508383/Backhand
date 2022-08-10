@@ -63,7 +63,7 @@ public final class BattlemodeHookContainerClass {
                 }
             }
             if(event.entity instanceof EntityPlayerMP){
-            	Backhand.packetHandler.sendPacketToPlayer(
+                Backhand.packetHandler.sendPacketToPlayer(
                         new BattlegearSyncItemPacket((EntityPlayer) event.entity).generatePacket(),
                         (EntityPlayerMP) event.entity);
 
@@ -72,22 +72,22 @@ public final class BattlemodeHookContainerClass {
     }
 
     public static MovingObjectPosition getRaytraceBlock(EntityPlayer p) {
-    	float scaleFactor = 1.0F;
-		float rotPitch = p.prevRotationPitch + (p.rotationPitch - p.prevRotationPitch) * scaleFactor;
-		float rotYaw = p.prevRotationYaw + (p.rotationYaw - p.prevRotationYaw) * scaleFactor;
-		double testX = p.prevPosX + (p.posX - p.prevPosX) * scaleFactor;
-		double testY = p.prevPosY + (p.posY - p.prevPosY) * scaleFactor + 1.62D - p.yOffset;//1.62 is player eye height
-		double testZ = p.prevPosZ + (p.posZ - p.prevPosZ) * scaleFactor;
-		Vec3 testVector = Vec3.createVectorHelper(testX, testY, testZ);
-		float var14 = MathHelper.cos(-rotYaw * 0.017453292F - (float)Math.PI);
-		float var15 = MathHelper.sin(-rotYaw * 0.017453292F - (float)Math.PI);
-		float var16 = -MathHelper.cos(-rotPitch * 0.017453292F);
-		float vectorY = MathHelper.sin(-rotPitch * 0.017453292F);
-		float vectorX = var15 * var16;
-		float vectorZ = var14 * var16;
-		double reachLength = 5.0D;
-		Vec3 testVectorFar = testVector.addVector(vectorX * reachLength, vectorY * reachLength, vectorZ * reachLength);
-		return p.worldObj.rayTraceBlocks(testVector, testVectorFar, false);
+        float scaleFactor = 1.0F;
+        float rotPitch = p.prevRotationPitch + (p.rotationPitch - p.prevRotationPitch) * scaleFactor;
+        float rotYaw = p.prevRotationYaw + (p.rotationYaw - p.prevRotationYaw) * scaleFactor;
+        double testX = p.prevPosX + (p.posX - p.prevPosX) * scaleFactor;
+        double testY = p.prevPosY + (p.posY - p.prevPosY) * scaleFactor + 1.62D - p.yOffset;//1.62 is player eye height
+        double testZ = p.prevPosZ + (p.posZ - p.prevPosZ) * scaleFactor;
+        Vec3 testVector = Vec3.createVectorHelper(testX, testY, testZ);
+        float var14 = MathHelper.cos(-rotYaw * 0.017453292F - (float)Math.PI);
+        float var15 = MathHelper.sin(-rotYaw * 0.017453292F - (float)Math.PI);
+        float var16 = -MathHelper.cos(-rotPitch * 0.017453292F);
+        float vectorY = MathHelper.sin(-rotPitch * 0.017453292F);
+        float vectorX = var15 * var16;
+        float vectorZ = var14 * var16;
+        double reachLength = 5.0D;
+        Vec3 testVectorFar = testVector.addVector(vectorX * reachLength, vectorY * reachLength, vectorZ * reachLength);
+        return p.worldObj.rayTraceBlocks(testVector, testVectorFar, false);
     }
 
     public static List<IInventory> tobeclosed = new ArrayList<IInventory>();
@@ -189,49 +189,47 @@ public final class BattlemodeHookContainerClass {
     public static int prevOffhandOffset;
 
     public static boolean isItemBlock(Item item) {
-    	return item instanceof ItemBlock || item instanceof ItemDoor || item instanceof ItemSign || item instanceof ItemReed || item instanceof ItemSeedFood || item instanceof ItemRedstone || item instanceof ItemBucket || item instanceof ItemSkull;
+        return item instanceof ItemBlock || item instanceof ItemDoor || item instanceof ItemSign || item instanceof ItemReed || item instanceof ItemSeedFood || item instanceof ItemRedstone || item instanceof ItemBucket || item instanceof ItemSkull;
     }
 
-	/**
+    /**
      * Attempts to right-click-use an item by the given EntityPlayer
      */
-    public static boolean tryUseItem(EntityPlayer player, ItemStack itemStack, Side side)
+    public static boolean tryUseItem(EntityPlayer entityPlayer, ItemStack itemStack, Side side)
     {
         if(side.isClient()){
-        	Backhand.packetHandler.sendPacketToServer(new OffhandPlaceBlockPacket(-1, -1, -1, 255, itemStack, 0.0F, 0.0F, 0.0F).generatePacket());
+            Backhand.packetHandler.sendPacketToServer(new OffhandPlaceBlockPacket(-1, -1, -1, 255, itemStack, 0.0F, 0.0F, 0.0F).generatePacket());
         }
         final int i = itemStack.stackSize;
         final int j = itemStack.getItemDamage();
-        ItemStack itemStackResult = itemStack.useItemRightClick(player.getEntityWorld(), player);
+        ItemStack itemStackResult = itemStack.useItemRightClick(entityPlayer.getEntityWorld(), entityPlayer);
         CommonProxy.offhandItemUsed = itemStackResult;
 
         if (itemStackResult == itemStack && itemStackResult.stackSize == i && (!side.isServer() || itemStackResult.getMaxItemUseDuration() <= 0 && itemStackResult.getItemDamage() == j))
         {
-            itemStackResult = player.getCurrentEquippedItem();
-            if (itemStackResult == itemStack && itemStackResult.stackSize == i && (!side.isServer() || itemStackResult.getMaxItemUseDuration() <= 0 && itemStackResult.getItemDamage() == j))
-            {
-                return false;
-            }
+            return false;
         }
-
-        BattlegearUtils.setPlayerOffhandItem(player, itemStackResult);
-        if (side.isServer() && (player).capabilities.isCreativeMode && itemStackResult != null)
+        else
         {
-            itemStackResult.stackSize = i;
-            if (itemStackResult.isItemStackDamageable())
+            BattlegearUtils.setPlayerOffhandItem(entityPlayer, itemStackResult);
+            if (side.isServer() && (entityPlayer).capabilities.isCreativeMode)
             {
-                itemStackResult.setItemDamage(j);
+                itemStackResult.stackSize = i;
+                if (itemStackResult.isItemStackDamageable())
+                {
+                    itemStackResult.setItemDamage(j);
+                }
             }
+            if (itemStackResult.stackSize <= 0) {
+                BattlegearUtils.setPlayerOffhandItem(entityPlayer,null);
+                ForgeEventFactory.onPlayerDestroyItem(entityPlayer,itemStackResult);
+            }
+            if (side.isServer() && !entityPlayer.isUsingItem())
+            {
+                ((EntityPlayerMP)entityPlayer).sendContainerToPlayer(entityPlayer.inventoryContainer);
+            }
+            return true;
         }
-        if (itemStackResult != null && itemStackResult.stackSize <= 0) {
-            BattlegearUtils.setPlayerOffhandItem(player,null);
-            ForgeEventFactory.onPlayerDestroyItem(player,itemStackResult);
-        }
-        if (side.isServer() && !player.isUsingItem())
-        {
-            ((EntityPlayerMP)player).sendContainerToPlayer(player.inventoryContainer);
-        }
-        return true;
     }
 
     @SideOnly(Side.CLIENT)
@@ -252,7 +250,7 @@ public final class BattlemodeHookContainerClass {
     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public void onOffhandSwing(PlayerEventChild.OffhandSwingEvent event){
     }
-    
+
     public boolean interactWithNoEvent(EntityPlayer pl, Entity p_70998_1_)
     {
         ItemStack itemstack = pl.getCurrentEquippedItem();
@@ -300,9 +298,9 @@ public final class BattlemodeHookContainerClass {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onOffhandAttack(PlayerEventChild.OffhandAttackEvent event){
-    	if(event.offHand != null){
+        if(event.offHand != null){
             if(hasEntityInteraction(event.getPlayer().capabilities.isCreativeMode?event.offHand.copy():event.offHand, event.getTarget(), event.getPlayer(), false)){
-            	event.setCanceled(true);
+                event.setCanceled(true);
                 if(event.offHand.stackSize<=0 && !event.getPlayer().capabilities.isCreativeMode){
                     ItemStack orig = event.offHand;
                     BattlegearUtils.setPlayerOffhandItem(event.getPlayer(), null);

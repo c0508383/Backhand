@@ -84,7 +84,7 @@ public final class BattlegearClientTickHandler {
         if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             Entity target = mc.objectMouseOver.entityHit;
             ((EntityClientPlayerMP) player).sendQueue.addToSendQueue(
-                new OffhandAttackPacket(player,target).generatePacket()
+                    new OffhandAttackPacket(player,target).generatePacket()
             );
         }
     }
@@ -100,10 +100,10 @@ public final class BattlegearClientTickHandler {
             return;
         }
 
-    	MovingObjectPosition mop = BattlemodeHookContainerClass.getRaytraceBlock(player);
-		if (mop != null && BattlemodeHookContainerClass.canBlockBeInteractedWith(player.worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
-			return;
-		}
+        MovingObjectPosition mop = BattlemodeHookContainerClass.getRaytraceBlock(player);
+        if (mop != null && BattlemodeHookContainerClass.canBlockBeInteractedWith(player.worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
+            return;
+        }
         if (BattlegearUtils.usagePriorAttack(offhandItem)) {
             MovingObjectPosition mouseOver = mc.objectMouseOver;
             boolean flag = true;
@@ -120,10 +120,7 @@ public final class BattlegearClientTickHandler {
                     offhandItem = ((InventoryPlayerBattle) player.inventory).getOffhandItem();
                     PlayerEventChild.UseOffhandItemEvent useItemEvent = new PlayerEventChild.UseOffhandItemEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, 0, 0, 0, -1, player.worldObj), offhandItem);
                     if (offhandItem != null && !MinecraftForge.EVENT_BUS.post(useItemEvent)) {
-                        ItemStack heldItem = player.getCurrentEquippedItem();
-                        player.setCurrentItemOrArmor(0, offhandItem);
-                        BattlemodeHookContainerClass.tryUseItem(player, player.getCurrentEquippedItem(), Side.CLIENT);
-                        player.setCurrentItemOrArmor(0, heldItem);
+                        BattlemodeHookContainerClass.tryUseItem(player, offhandItem, Side.CLIENT);
                     }
                 }
 
@@ -250,6 +247,11 @@ public final class BattlegearClientTickHandler {
 
                 if (offhandItem != null)
                 {
+                    if (mcInstance.gameSettings.heldItemTooltips) {
+                        mcInstance.gameSettings.heldItemTooltips = false;
+                        BattlemodeHookContainerClass.changedHeldItemTooltips = true;
+                    }
+
                     mcInstance.thePlayer.inventory.currentItem = InventoryPlayerBattle.OFFHAND_HOTBAR_SLOT;
                     mcInstance.playerController.currentItemHittingBlock = ((InventoryPlayerBattle)mcInstance.thePlayer.inventory).getOffhandItem();
                     mcInstance.playerController.syncCurrentPlayItem();
@@ -314,16 +316,4 @@ public final class BattlegearClientTickHandler {
             );
         }
     }
-
-    public static float getPartialTick(){
-        return INSTANCE.partialTick;
-    }
-
-    public static ItemStack getPreviousMainhand(EntityPlayer player){
-        return player.inventory.getStackInSlot(INSTANCE.previousBattlemode);
-    }
-
-    /*public static ItemStack getPreviousOffhand(EntityPlayer player){
-        return player.inventory.getStackInSlot(INSTANCE.previousBattlemode+((InventoryPlayerBattle)player.inventory).getOffsetToInactiveHand());
-    }*/
 }
