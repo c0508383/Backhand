@@ -195,14 +195,26 @@ public final class BattlemodeHookContainerClass {
     /**
      * Attempts to right-click-use an item by the given EntityPlayer
      */
-    public static boolean tryUseItem(EntityPlayer entityPlayer, ItemStack itemStack, Side side)
+    public static boolean tryUseItem(EntityPlayer player, ItemStack itemStack, Side side)
     {
         if(side.isClient()){
             Backhand.packetHandler.sendPacketToServer(new OffhandPlaceBlockPacket(-1, -1, -1, 255, itemStack, 0.0F, 0.0F, 0.0F).generatePacket());
         }
         final int i = itemStack.stackSize;
         final int j = itemStack.getItemDamage();
-        ItemStack itemStackResult = itemStack.useItemRightClick(entityPlayer.getEntityWorld(), entityPlayer);
+        ItemStack prevHeldItem = player.getCurrentEquippedItem();
+
+        player.setCurrentItemOrArmor(0, itemStack);
+        ItemStack itemUsed = player.getCurrentEquippedItem();
+        ItemStack itemStackResult = itemStack.useItemRightClick(player.getEntityWorld(), player);
+        if (itemUsed != player.getCurrentEquippedItem()) {
+            BattlegearUtils.setPlayerOffhandItem(player, player.getCurrentEquippedItem());
+            if (player.getCurrentEquippedItem() == null || player.getCurrentEquippedItem().stackSize == 0) {
+                ForgeEventFactory.onPlayerDestroyItem(player, player.getCurrentEquippedItem());
+            }
+        }
+
+        player.setCurrentItemOrArmor(0, prevHeldItem);
         CommonProxy.offhandItemUsed = itemStackResult;
 
         if (itemStackResult == itemStack && itemStackResult.stackSize == i && (!side.isServer() || itemStackResult.getMaxItemUseDuration() <= 0 && itemStackResult.getItemDamage() == j))
@@ -211,8 +223,8 @@ public final class BattlemodeHookContainerClass {
         }
         else
         {
-            BattlegearUtils.setPlayerOffhandItem(entityPlayer, itemStackResult);
-            if (side.isServer() && (entityPlayer).capabilities.isCreativeMode)
+            BattlegearUtils.setPlayerOffhandItem(player, itemStackResult);
+            if (side.isServer() && (player).capabilities.isCreativeMode)
             {
                 itemStackResult.stackSize = i;
                 if (itemStackResult.isItemStackDamageable())
@@ -221,12 +233,12 @@ public final class BattlemodeHookContainerClass {
                 }
             }
             if (itemStackResult.stackSize <= 0) {
-                BattlegearUtils.setPlayerOffhandItem(entityPlayer,null);
-                ForgeEventFactory.onPlayerDestroyItem(entityPlayer,itemStackResult);
+                BattlegearUtils.setPlayerOffhandItem(player,null);
+                ForgeEventFactory.onPlayerDestroyItem(player,itemStackResult);
             }
-            if (side.isServer() && !entityPlayer.isUsingItem())
+            if (side.isServer() && !player.isUsingItem())
             {
-                ((EntityPlayerMP)entityPlayer).sendContainerToPlayer(entityPlayer.inventoryContainer);
+                ((EntityPlayerMP)player).sendContainerToPlayer(player.inventoryContainer);
             }
             return true;
         }
