@@ -17,6 +17,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import xonin.backhand.Backhand;
 
 /**
  * Store commonly used method, mostly for the {@link EntityPlayer} {@link ItemStack}s management
@@ -294,6 +295,9 @@ public class BattlegearUtils {
      * @param par1Entity the attacked
      */
     public static void attackTargetEntityWithCurrentOffItem(EntityPlayer player, Entity par1Entity){
+        if (!Backhand.OffhandAttack)
+            return;
+
         final ItemStack oldItem = player.getCurrentEquippedItem();
         final ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
         BattlegearUtils.setPlayerCurrentItem(player,offhandItem);
