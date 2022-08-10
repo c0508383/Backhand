@@ -18,10 +18,11 @@ public class ServerTickHandler {
         ItemStack itemstack = BattlegearUtils.getOffhandItem(event.player);
         if (itemstack != event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX)) {
             if (event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX) == null || event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX).stackSize == 0) {
-                ((InventoryPlayerBattle)event.player.inventory).setInventorySlotContents(InventoryPlayerBattle.OFFHAND_ITEM_INDEX, null);
+                BattlegearUtils.setPlayerOffhandItem(event.player,null);
                 event.player.inventory.setInventorySlotContents(InventoryPlayerBattle.OFFHAND_ITEM_INDEX, null);
+            } else {
+                BattlegearUtils.setPlayerOffhandItem(event.player,BattlegearUtils.getOffhandItem(event.player));
             }
-            else ((InventoryPlayerBattle)event.player.inventory).setInventorySlotContents(InventoryPlayerBattle.OFFHAND_ITEM_INDEX, event.player.inventory.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX));
             event.player.inventory.markDirty();
         }
 

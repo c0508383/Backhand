@@ -65,7 +65,7 @@ public final class BattlegearSyncItemPacket extends AbstractMBPacket {
         ByteBufUtils.writeUTF8String(out, user);
         out.writeInt(inventory.currentItem);
         ByteBufUtils.writeItemStack(out, inventory.getCurrentItem());
-        ByteBufUtils.writeItemStack(out, ((InventoryPlayerBattle)inventory).offhandItem);
+        ByteBufUtils.writeItemStack(out, BattlegearUtils.getOffhandItem(player));
         if(player.worldObj.isRemote){//client-side only thing
             ByteBufUtils.writeItemStack(out, player.getItemInUse());
         	out.writeInt(player.getItemInUseCount());

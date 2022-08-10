@@ -408,7 +408,7 @@ public class MysteriumPatchesFixesO {
 	@Fix(returnSetting=EnumReturnSetting.ON_TRUE)
 	public static boolean onPlayerStoppedUsing(ItemBow bow, ItemStack p_77615_1_, World p_77615_2_, EntityPlayer p_77615_3_, int p_77615_4_)
     {
-		if (!(BattlegearUtils.getOffhandItem(p_77615_3_) != null && ((InventoryPlayerBattle)p_77615_3_.inventory).getCurrentItem() != null && BattlegearUtils.getOffhandItem(p_77615_3_).getItem() == Items.bow && ((InventoryPlayerBattle)p_77615_3_.inventory).getCurrentItem().getItem() == Items.bow)) {
+		if (!(BattlegearUtils.getOffhandItem(p_77615_3_) != null && p_77615_3_.inventory.getCurrentItem() != null && BattlegearUtils.getOffhandItem(p_77615_3_).getItem() == Items.bow && p_77615_3_.inventory.getCurrentItem().getItem() == Items.bow)) {
         	return false;
         }
 
@@ -500,7 +500,7 @@ public class MysteriumPatchesFixesO {
             }
         }
 
-        return BattlegearUtils.getOffhandItem(p_77615_3_) != null && ((InventoryPlayerBattle) p_77615_3_.inventory).getCurrentItem() != null && BattlegearUtils.getOffhandItem(p_77615_3_).getItem() instanceof ItemBow && ((InventoryPlayerBattle) p_77615_3_.inventory).getCurrentItem().getItem() instanceof ItemBow;
+        return BattlegearUtils.getOffhandItem(p_77615_3_) != null && p_77615_3_.inventory.getCurrentItem() != null && BattlegearUtils.getOffhandItem(p_77615_3_).getItem() instanceof ItemBow && p_77615_3_.inventory.getCurrentItem().getItem() instanceof ItemBow;
     }
 
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
