@@ -42,16 +42,28 @@ public class BattlegearUtils {
      */
     private static String genericAttack = SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName();
 
+    public static boolean hasOffhandInventory(EntityPlayer player) {
+        return player.inventory instanceof InventoryPlayerBattle;
+    }
+
     public static void setPlayerCurrentItem(EntityPlayer player, ItemStack stack) {
-        (player.inventory).setInventorySlotContents(player.inventory.currentItem, stack);
+        if (hasOffhandInventory(player)) {
+            (player.inventory).setInventorySlotContents(player.inventory.currentItem, stack);
+        }
     }
 
     public static void setPlayerOffhandItem(EntityPlayer player, ItemStack stack) {
-        ((InventoryPlayerBattle)player.inventory).setOffhandItem(stack);
+        if (hasOffhandInventory(player)) {
+            ((InventoryPlayerBattle) player.inventory).setOffhandItem(stack);
+        }
     }
 
     public static ItemStack getOffhandItem(EntityPlayer player) {
-        return ((InventoryPlayerBattle)player.inventory).getOffhandItem();
+        if (hasOffhandInventory(player)) {
+            return ((InventoryPlayerBattle) player.inventory).getOffhandItem();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -104,7 +116,7 @@ public class BattlegearUtils {
      * @return
      */
     public static ItemStack getCurrentItemOnUpdate(EntityPlayer entityPlayer, ItemStack itemInUse) {
-        ItemStack itemStack = ((InventoryPlayerBattle) entityPlayer.inventory).getOffhandItem();
+        ItemStack itemStack = getOffhandItem(entityPlayer);
         if (itemInUse == itemStack) {
             return itemStack;
         }
@@ -362,7 +374,7 @@ public class BattlegearUtils {
                 } else {
                     setPlayerCurrentItem(entityPlayer, result);
                 }
-            } else if (itemInUse == ((InventoryPlayerBattle) entityPlayer.inventory).getOffhandItem()) {
+            } else if (itemInUse == getOffhandItem(entityPlayer)) {
                 if (result != null && result.stackSize == 0) {
                     setPlayerOffhandItem(entityPlayer, null);
                 } else {
