@@ -44,7 +44,7 @@ public class ServerTickHandler {
                     BattlegearUtils.setPlayerOffhandItem(event.player,null);
 
                     boolean foundSlot = false;
-                    for (int i = 0; i < event.player.inventory.getSizeInventory(); i++) {
+                    for (int i = 0; i < event.player.inventory.getSizeInventory() - 4; i++) {
                         if (i == Backhand.AlternateOffhandSlot)
                             continue;
                         if (event.player.inventory.getStackInSlot(i) == null) {
