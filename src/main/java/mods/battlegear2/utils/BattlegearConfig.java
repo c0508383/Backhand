@@ -50,6 +50,10 @@ public class BattlegearConfig {
         Backhand.AlternateOffhandSlot = config.get(category, "Alternate Inventory Slot",Backhand.AlternateOffhandSlot, sb.toString()).getInt();
 
         sb = new StringBuilder();
+        sb.append("If enabled, a slot in the inventory will be used for the offhand slot instead of a separate slot outside the inventory. False by default.");
+        Backhand.UseInventorySlot = config.get(category, "Use inventory slot",Backhand.UseInventorySlot, sb.toString()).getBoolean();
+
+        sb = new StringBuilder();
         sb.append("These items will be unable to be swapped into the offhand.\n");
         sb.append("Formatting of an item should be: modid:itemname\n");
         sb.append("These should all be placed on separate lines between the provided \'<\' and \'>\'.");

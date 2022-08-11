@@ -20,7 +20,7 @@ public class ServerTickHandler {
     {
         ItemStack offhandItem = BattlegearUtils.getOffhandItem(event.player);
 
-        if (BattlegearUtils.hasOffhandInventory(event.player)) {
+        if (BattlegearUtils.hasOffhandInventory(event.player) && !Backhand.UseInventorySlot) {
             int slot = InventoryPlayerBattle.OFFHAND_ITEM_INDEX;
             if (offhandItem != event.player.inventory.getStackInSlot(slot)) {
                 if (event.player.inventory.getStackInSlot(slot) == null || event.player.inventory.getStackInSlot(slot).stackSize == 0) {
