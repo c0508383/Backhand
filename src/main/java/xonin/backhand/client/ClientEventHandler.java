@@ -33,7 +33,7 @@ public class ClientEventHandler {
     @SubscribeEvent
     public void openGUI(GuiOpenEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (event.gui != null && mc.thePlayer != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle && Backhand.ExtraInventorySlot) {
+        if (event.gui != null && mc.thePlayer != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle && Backhand.ExtraInventorySlot && !Backhand.UseInventorySlot) {
             if (event.gui.getClass() == GuiInventory.class) {
                 event.gui = new GuiOffhandInventory(mc.thePlayer);
             }
