@@ -96,7 +96,7 @@ public final class BattlegearClientTickHandler {
         }
 
         ItemStack mainHandItem = player.getCurrentEquippedItem();
-        if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || offhandItem == null)) {
+        if (mainHandItem != null && BattlegearUtils.checkForRightClickFunction(mainHandItem)) {
             return;
         }
 

@@ -440,12 +440,10 @@ public class MysteriumPatchesFixesO {
             }
 
             EntityArrow entityarrow = new EntityArrow(p_77615_2_, p_77615_3_, f * 2.0F);
-            EntityArrow entityarrow2 = new EntityArrow(p_77615_2_, p_77615_3_, f * 1.5F);
 
             if (flag)
             {
                 entityarrow.canBePickedUp = 2;
-                entityarrow2.canBePickedUp = 2;
             }
             else
             {
@@ -464,7 +462,6 @@ public class MysteriumPatchesFixesO {
             if (f == 1.0F)
             {
                 entityarrow.setIsCritical(true);
-                entityarrow2.setIsCritical(true);
             }
 
             int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, p_77615_1_);
@@ -472,7 +469,6 @@ public class MysteriumPatchesFixesO {
             if (k > 0)
             {
                 entityarrow.setDamage(entityarrow.getDamage() + k * 0.5D + 0.5D);
-                entityarrow2.setDamage(entityarrow2.getDamage() + k * 0.5D + 0.5D);
             }
 
             int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, p_77615_1_);
@@ -480,13 +476,11 @@ public class MysteriumPatchesFixesO {
             if (l > 0)
             {
                 entityarrow.setKnockbackStrength(l);
-                entityarrow2.setKnockbackStrength(l);
             }
 
             if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, p_77615_1_) > 0)
             {
                 entityarrow.setFire(100);
-                entityarrow2.setFire(100);
             }
 
             p_77615_1_.damageItem(1, p_77615_3_);
@@ -495,7 +489,6 @@ public class MysteriumPatchesFixesO {
             if (!p_77615_2_.isRemote)
             {
                 p_77615_2_.spawnEntityInWorld(entityarrow);
-                p_77615_2_.spawnEntityInWorld(entityarrow2);
 
             }
         }
