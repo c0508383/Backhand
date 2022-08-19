@@ -34,6 +34,7 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -93,6 +94,35 @@ public class MysteriumPatchesFixesO {
             }
         }
         return itemStack.getItem().getItemUseAction(itemStack);
+    }
+
+    private static boolean disableMainhandAnimation = false;
+    @SideOnly(Side.CLIENT)
+    @Fix(insertOnExit = true, returnSetting = EnumReturnSetting.ALWAYS)
+    public static IIcon getItemIcon(EntityLivingBase entity, ItemStack p_70620_1_, int p_70620_2_, @ReturnedValue IIcon returnValue)
+    {
+        if (entity instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) entity;
+            if (p_70620_1_ == player.getCurrentEquippedItem() && player.getCurrentEquippedItem() != null
+                    && player.getItemInUse() != null
+                    && player.getCurrentEquippedItem().getItem() instanceof ItemBow
+                    && player.getCurrentEquippedItem() != player.getItemInUse()) {
+                disableMainhandAnimation = true;
+            }
+        }
+        return returnValue;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Fix(insertOnExit = true, returnSetting = EnumReturnSetting.ALWAYS)
+    public static IIcon getItemIconForUseDuration(ItemBow bow, int p_94599_1_, @ReturnedValue IIcon returnValue)
+    {
+        if (disableMainhandAnimation) {
+            disableMainhandAnimation = false;
+            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+            return bow.getIcon(player.getCurrentEquippedItem(),0, player, player.getItemInUse(),0);
+        }
+        return returnValue;
     }
 
     @SideOnly(Side.CLIENT)
