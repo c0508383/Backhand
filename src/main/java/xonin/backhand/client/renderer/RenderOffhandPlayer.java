@@ -318,15 +318,8 @@ public class RenderOffhandPlayer extends RenderPlayer {
         GL11.glPushMatrix();
         renderplayer.modelBipedMain.onGround = 0.0F;
         renderplayer.modelBipedMain.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, player);
-
         ModelRenderer rightArm = renderplayer.modelBipedMain.bipedRightArm;
         ModelRenderer leftArm = renderplayer.modelBipedMain.bipedLeftArm;
-        float rotationPointX = leftArm.rotationPointX;
-        float rotationPointY = leftArm.rotationPointY;
-        float rotationPointZ = leftArm.rotationPointZ;
-        float offsetX = leftArm.offsetX;
-        float offsetY = leftArm.offsetY;
-        float offsetZ = leftArm.offsetZ;
 
         try {
             Class<?> RenderPlayerJBRA = Class.forName("JinRyuu.JBRA.RenderPlayerJBRA");
@@ -349,25 +342,10 @@ public class RenderOffhandPlayer extends RenderPlayer {
                 ModelBipedBody.getField("bipedRightArm").set(modelMain,bipedRA);
             }
         } catch (Exception ignored) {
-            leftArm.setRotationPoint(rightArm.rotationPointX, rightArm.rotationPointY, rightArm.rotationPointZ);
-            leftArm.offsetX = rightArm.offsetX;
-            leftArm.offsetY = rightArm.offsetY - 0.04F;
-            leftArm.offsetZ = rightArm.offsetZ;
-
-            leftArm.rotateAngleX = -0.1F;
-            leftArm.rotateAngleZ = 0.1F;
-            leftArm.rotateAngleY = 90.95F;
-
-            leftArm.render(0.0625F);
-        } finally {
-            leftArm.rotateAngleX = 0;
-            leftArm.rotateAngleZ = 0;
-            leftArm.rotateAngleY = 0;
-
-            leftArm.setRotationPoint(rotationPointX, rotationPointY, rotationPointZ);
-            leftArm.offsetX = offsetX;
-            leftArm.offsetY = offsetY;
-            leftArm.offsetZ = offsetZ;
+            renderplayer.modelBipedMain.bipedRightArm = leftArm;
+            GL11.glRotatef(180,0,1,0);
+            renderplayer.renderFirstPersonArm(player);
+            renderplayer.modelBipedMain.bipedRightArm = rightArm;
         }
 
         GL11.glPopMatrix();
