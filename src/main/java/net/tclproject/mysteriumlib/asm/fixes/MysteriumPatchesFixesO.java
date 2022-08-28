@@ -553,12 +553,13 @@ public class MysteriumPatchesFixesO {
         if (mc.objectMouseOver != null)
         {
             boolean flag = mc.thePlayer.capabilities.isCreativeMode && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle;
-            int j;
-
-            if (!net.minecraftforge.common.ForgeHooks.onPickBlock(mc.objectMouseOver, mc.thePlayer, mc.theWorld)) return;
-            // We delete this code wholly instead of commenting it out, to make sure we detect changes in it between MC versions
             if (flag)
             {
+                int j;
+
+                if (!net.minecraftforge.common.ForgeHooks.onPickBlock(mc.objectMouseOver, mc.thePlayer, mc.theWorld)) return;
+                // We delete this code wholly instead of commenting it out, to make sure we detect changes in it between MC versions
+
                 j = mc.thePlayer.inventoryContainer.inventorySlots.size() - 10 + mc.thePlayer.inventory.currentItem;
                 mc.playerController.sendSlotPacket(mc.thePlayer.inventory.getStackInSlot(mc.thePlayer.inventory.currentItem), j);
                 mc.objectMouseOver = null;
