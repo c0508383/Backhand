@@ -365,7 +365,11 @@ public class RenderOffhandPlayer extends RenderPlayer {
             Class<?> RenderCNPCPlayer = Class.forName("noppes.npcs.client.renderer.RenderCNPCPlayer");
             Class<?> ClientEventHandler = Class.forName("noppes.npcs.client.ClientEventHandler");
             Object renderCNPCPlayer = ClientEventHandler.getField("renderCNPCPlayer").get(null);
+
+            ModelRenderer rightArm = ((RenderPlayer)renderCNPCPlayer).modelBipedMain.bipedRightArm;
+            ((RenderPlayer)renderCNPCPlayer).modelBipedMain.bipedRightArm = ((RenderPlayer)renderCNPCPlayer).modelBipedMain.bipedLeftArm;
             RenderCNPCPlayer.getMethod("renderFirstPersonArmOverlay",EntityPlayer.class).invoke(renderCNPCPlayer,player);
+            ((RenderPlayer)renderCNPCPlayer).modelBipedMain.bipedRightArm = rightArm;
         } catch (Exception ignored) {}
     }
 }
