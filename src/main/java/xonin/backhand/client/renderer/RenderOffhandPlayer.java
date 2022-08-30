@@ -312,6 +312,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
     }
 
     public void renderFirstPersonLeftArm(EntityPlayer player) {
+        Minecraft mc = Minecraft.getMinecraft();
         Render render = RenderManager.instance.getEntityRenderObject(player);
         RenderPlayer renderplayer = (RenderPlayer)render;
 
@@ -332,6 +333,9 @@ public class RenderOffhandPlayer extends RenderPlayer {
                 ModelBipedBody.getField("field_78112_f").set(modelMain, bipedLA);
                 GL11.glRotatef(180, 0, 1, 0);
                 RenderPlayerJBRA.getMethod("func_82441_a", EntityPlayer.class).invoke(renderplayer, player);
+                renderplayer.modelBipedMain.bipedRightArm = leftArm;
+                this.renderCNPCOverlays(player);
+                renderplayer.modelBipedMain.bipedRightArm = rightArm;
                 ModelBipedBody.getField("field_78112_f").set(modelMain, bipedRA);
             } catch (NoSuchFieldException | NoSuchMethodException e) {
                 ModelRenderer bipedRA = (ModelRenderer) ModelBipedBody.getField("bipedRightArm").get(modelMain);
@@ -339,15 +343,29 @@ public class RenderOffhandPlayer extends RenderPlayer {
                 ModelBipedBody.getField("bipedRightArm").set(modelMain,bipedLA);
                 GL11.glRotatef(180,0,1,0);
                 RenderPlayerJBRA.getMethod("renderFirstPersonArm", EntityPlayer.class).invoke(renderplayer, player);
+                renderplayer.modelBipedMain.bipedRightArm = leftArm;
+                this.renderCNPCOverlays(player);
+                renderplayer.modelBipedMain.bipedRightArm = rightArm;
                 ModelBipedBody.getField("bipedRightArm").set(modelMain,bipedRA);
             }
         } catch (Exception ignored) {
             renderplayer.modelBipedMain.bipedRightArm = leftArm;
             GL11.glRotatef(180,0,1,0);
+            mc.getTextureManager().bindTexture(((AbstractClientPlayer)player).getLocationSkin());
             renderplayer.renderFirstPersonArm(player);
+            this.renderCNPCOverlays(player);
             renderplayer.modelBipedMain.bipedRightArm = rightArm;
         }
 
         GL11.glPopMatrix();
+    }
+
+    private void renderCNPCOverlays(EntityPlayer player) {
+        try {
+            Class<?> RenderCNPCPlayer = Class.forName("noppes.npcs.client.renderer.RenderCNPCPlayer");
+            Class<?> ClientEventHandler = Class.forName("noppes.npcs.client.ClientEventHandler");
+            Object renderCNPCPlayer = ClientEventHandler.getField("renderCNPCPlayer").get(null);
+            RenderCNPCPlayer.getMethod("renderFirstPersonArmOverlay",EntityPlayer.class).invoke(renderCNPCPlayer,player);
+        } catch (Exception ignored) {}
     }
 }
