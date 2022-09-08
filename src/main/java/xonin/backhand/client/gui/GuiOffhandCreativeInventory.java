@@ -19,7 +19,8 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
     protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_)
     {
         super.drawGuiContainerBackgroundLayer(p_146976_1_,p_146976_2_,p_146976_3_);
-        if (selectedTabIndex == CreativeTabs.tabInventory.getTabIndex()) {
+        CreativeTabs creativetabs = CreativeTabs.creativeTabArray[GuiContainerCreative.selectedTabIndex];
+        if (creativetabs == CreativeTabs.tabInventory) {
             this.mc.getTextureManager().bindTexture(field_147001_a);
             this.drawTexturedModalRect(81 + guiLeft, 32 + guiTop, 7, 83, 18, 18);
         }
@@ -36,8 +37,8 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
     public void setCurrentCreativeTab(CreativeTabs p_147050_1_)
     {
         if (p_147050_1_ == null) return;
-        int i = selectedTabIndex;
-        selectedTabIndex = p_147050_1_.getTabIndex();
+        int i = GuiContainerCreative.selectedTabIndex;
+        GuiContainerCreative.selectedTabIndex = p_147050_1_.getTabIndex();
         GuiContainerCreative.ContainerCreative containercreative = (GuiContainerCreative.ContainerCreative)this.inventorySlots;
         this.field_147008_s.clear();
         containercreative.itemList.clear();
