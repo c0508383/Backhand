@@ -5,6 +5,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
+import mods.battlegear2.packet.BattlegearSyncItemPacket;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
@@ -60,6 +61,11 @@ public class ServerTickHandler {
                 }
             }
             prevStackInSlot = offhandItem;
+        }
+
+        if (event.player.inventory instanceof InventoryPlayerBattle && ((InventoryPlayerBattle)event.player.inventory).offhandItemChanged) {
+            Backhand.packetHandler.sendPacketToAll(new BattlegearSyncItemPacket(event.player).generatePacket());
+            ((InventoryPlayerBattle)event.player.inventory).offhandItemChanged = false;
         }
 
         if (ServerEventsHandler.arrowHotSwapped) {

@@ -3,7 +3,6 @@ package mods.battlegear2.packet;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -38,10 +37,11 @@ public class OffhandSwapPacket extends AbstractMBPacket {
         this.player = player.worldObj.getPlayerEntityByName(user);
         if (this.player != null) {
             ItemStack offhandItem = BattlegearUtils.getOffhandItem(this.player);
-            if (!(Backhand.isOffhandBlacklisted(player.getCurrentEquippedItem()) || Backhand.isOffhandBlacklisted(offhandItem))) {
-                BattlegearUtils.setPlayerOffhandItem(this.player,this.player.getCurrentEquippedItem());
-                BattlegearUtils.setPlayerCurrentItem(this.player,offhandItem);
-            }
+            if (Backhand.isOffhandBlacklisted(player.getCurrentEquippedItem()) || Backhand.isOffhandBlacklisted(offhandItem))
+                return;
+
+            BattlegearUtils.setPlayerOffhandItem(this.player,this.player.getCurrentEquippedItem());
+            BattlegearUtils.setPlayerCurrentItem(this.player,offhandItem);
             Backhand.packetHandler.sendPacketToPlayer(new OffhandSwapClientPacket().generatePacket(), (EntityPlayerMP) player);
         }
     }

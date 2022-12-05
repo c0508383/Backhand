@@ -1,8 +1,6 @@
 package mods.battlegear2.api.core;
 
-import mods.battlegear2.packet.BattlegearSyncItemPacket;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -20,7 +18,7 @@ import xonin.backhand.ServerEventsHandler;
  */
 public class InventoryPlayerBattle extends InventoryPlayer {
 
-    public boolean hasChanged = true;
+    public boolean offhandItemChanged = true;
     public static int ARMOR_OFFSET = 100;
     public static int OFFSET = 150;
 
@@ -38,7 +36,7 @@ public class InventoryPlayerBattle extends InventoryPlayer {
         if (itemstack != null && (item == null || itemstack.getItem() == item) && (metadata <= -1 || itemstack.getItemDamage() == metadata))
         {
             amount += itemstack.stackSize;
-            offhandItem = null;
+            this.setOffhandItem(null);
         }
 
         return amount + super.clearInventory(item,metadata);
@@ -50,10 +48,10 @@ public class InventoryPlayerBattle extends InventoryPlayer {
             return false;
 
         if (!Backhand.isOffhandBlacklisted(itemStack)) {
+            this.markDirty();
             if (offhandItem == null && getFirstEmptyStack() == -1) {
-                offhandItem = ItemStack.copyItemStack(itemStack);
+                this.setOffhandItem(ItemStack.copyItemStack(itemStack));
                 itemStack.stackSize = 0;
-                Backhand.packetHandler.sendPacketToPlayer(new BattlegearSyncItemPacket(player).generatePacket(), (EntityPlayerMP) player);
                 return true;
             }
 
@@ -61,12 +59,10 @@ public class InventoryPlayerBattle extends InventoryPlayer {
                 if (offhandItem.stackSize + itemStack.stackSize > offhandItem.getMaxStackSize()) {
                     itemStack.stackSize -= offhandItem.stackSize;
                     offhandItem.stackSize = offhandItem.getMaxStackSize();
-                    Backhand.packetHandler.sendPacketToPlayer(new BattlegearSyncItemPacket(player).generatePacket(), (EntityPlayerMP) player);
                     return super.addItemStackToInventory(itemStack);
                 } else {
                     offhandItem.stackSize += itemStack.stackSize;
                     itemStack.stackSize = 0;
-                    Backhand.packetHandler.sendPacketToPlayer(new BattlegearSyncItemPacket(player).generatePacket(), (EntityPlayerMP) player);
                     return true;
                 }
             }
@@ -80,7 +76,7 @@ public class InventoryPlayerBattle extends InventoryPlayer {
         {
             if (--this.offhandItem.stackSize <= 0)
             {
-                this.offhandItem = null;
+                this.setOffhandItem(null);
             }
             return true;
         } else {
@@ -117,13 +113,13 @@ public class InventoryPlayerBattle extends InventoryPlayer {
 
                 if (offhandItem.stackSize <= amount) {
                     itemstack = offhandItem;
-                    offhandItem = null;
+                    this.setOffhandItem(null);
                     return itemstack;
                 } else {
                     itemstack = offhandItem.splitStack(amount);
 
                     if (offhandItem.stackSize == 0) {
-                        offhandItem = null;
+                        this.setOffhandItem(null);
                     }
 
                     return itemstack;
@@ -216,7 +212,7 @@ public class InventoryPlayerBattle extends InventoryPlayer {
                     this.armorInventory[j - ARMOR_OFFSET] = itemstack;
                 }
                 else if (j >= OFFSET) {
-                    this.offhandItem = itemstack;
+                    this.setOffhandItem(itemstack);
                 }
                 /*else{
                     MinecraftForge.EVENT_BUS.post(new UnhandledInventoryItemEvent(player, j, itemstack));
@@ -235,8 +231,7 @@ public class InventoryPlayerBattle extends InventoryPlayer {
         this.armorInventory = new ItemStack[par1InventoryPlayer.armorInventory.length];
         super.copyInventory(par1InventoryPlayer);
         if (par1InventoryPlayer instanceof InventoryPlayerBattle) {
-            hasChanged = true;
-            this.offhandItem = ItemStack.copyItemStack(par1InventoryPlayer.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX));
+            this.setOffhandItem(ItemStack.copyItemStack(par1InventoryPlayer.getStackInSlot(InventoryPlayerBattle.OFFHAND_ITEM_INDEX)));
         }
     }
 
@@ -244,7 +239,7 @@ public class InventoryPlayerBattle extends InventoryPlayer {
     {
         super.dropAllItems();
         this.player.func_146097_a(offhandItem, true, false);
-        this.offhandItem = null;
+        this.setOffhandItem(null);
     }
 
     /**
@@ -256,6 +251,9 @@ public class InventoryPlayerBattle extends InventoryPlayer {
     }
 
     public void setOffhandItem(ItemStack stack) {
+        if (!ItemStack.areItemStacksEqual(stack,this.offhandItem)) {
+            this.offhandItemChanged = true;
+        }
         this.offhandItem = stack;
     }
 }

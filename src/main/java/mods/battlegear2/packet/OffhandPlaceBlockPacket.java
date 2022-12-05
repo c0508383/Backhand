@@ -151,10 +151,6 @@ public final class OffhandPlaceBlockPacket extends AbstractMBPacket{
                 BattlegearUtils.setPlayerOffhandItem(player, ItemStack.copyItemStack(BattlegearUtils.getOffhandItem(player)));
                 player.openContainer.detectAndSendChanges();
                 ((EntityPlayerMP) player).isChangingQuantityOnly = false;
-
-                if (!ItemStack.areItemStacksEqual(BattlegearUtils.getOffhandItem(player), this.itemStack)) {
-                    Backhand.packetHandler.sendPacketToPlayer(new BattlegearSyncItemPacket(player).generatePacket(), (EntityPlayerMP) player);
-                }
             }
         }
     }

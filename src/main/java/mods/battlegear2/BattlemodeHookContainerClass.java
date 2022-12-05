@@ -68,12 +68,6 @@ public final class BattlemodeHookContainerClass {
                     event.entity.entityDropItem(offhandItem,0);
                 }
             }
-            if(event.entity instanceof EntityPlayerMP){
-                Backhand.packetHandler.sendPacketToPlayer(
-                        new BattlegearSyncItemPacket((EntityPlayer) event.entity).generatePacket(),
-                        (EntityPlayerMP) event.entity);
-
-            }
         }
     }
 
