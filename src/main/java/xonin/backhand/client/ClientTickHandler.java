@@ -102,7 +102,7 @@ public class ClientTickHandler {
 
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (event.player.worldObj.isRemote && Backhand.proxy.getLeftClickCounter() <= 0 && mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
+        if (event.player.worldObj.isRemote && Backhand.proxy.getLeftClickCounter() <= 0 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
             if (event.player.capabilities.allowEdit) {
                 if (Backhand.proxy.isRightClickHeld()) { // if it's a block and we should try break it
                     MovingObjectPosition mop = BattlemodeHookContainerClass.getRaytraceBlock(event.player);
