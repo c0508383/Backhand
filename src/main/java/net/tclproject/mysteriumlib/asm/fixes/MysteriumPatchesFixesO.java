@@ -174,10 +174,11 @@ public class MysteriumPatchesFixesO {
     }
 
 	public static float onGround2;
+    public static float firstPersonFrame;
 
     @Fix(insertOnExit = true)
     @SideOnly(Side.CLIENT)
-    public static void renderItemInFirstPerson(ItemRenderer i, float p_78440_1_)
+    public static void renderItemInFirstPerson(ItemRenderer i, float frame)
     {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         ClientEventHandler.renderingPlayer = player;
@@ -185,13 +186,15 @@ public class MysteriumPatchesFixesO {
         if (!Backhand.EmptyOffhand && !Backhand.RenderEmptyOffhandAtRest && offhandItem == null) {
             return;
         }
-        if (offhandItem == null && !Backhand.RenderEmptyOffhandAtRest && ((IBattlePlayer)player).getOffSwingProgress(p_78440_1_) == 0) {
+        if (offhandItem == null && !Backhand.RenderEmptyOffhandAtRest && ((IBattlePlayer)player).getOffSwingProgress(frame) == 0) {
             return;
         }
 
+        MysteriumPatchesFixesO.firstPersonFrame = frame;
+
         MysteriumPatchesFixesO.onGround2 = 0;
         RenderOffhandPlayer.itemRenderer.updateEquippedItem();
-        ClientEventHandler.renderOffhandPlayer.renderOffhandItem(p_78440_1_);
+        ClientEventHandler.renderOffhandPlayer.renderOffhandItem(frame);
     }
 
 	@Fix
@@ -267,7 +270,7 @@ public class MysteriumPatchesFixesO {
             b.bipedRightArm.rotateAngleZ = MathHelper.sin(b.onGround * (float)Math.PI) * -0.4F;
         }
 
-        if (p_78087_7_ instanceof EntityPlayer) {
+        if (p_78087_7_ instanceof EntityPlayer && (p_78087_7_ != Minecraft.getMinecraft().thePlayer || ((IBattlePlayer)p_78087_7_).getOffSwingProgress(MysteriumPatchesFixesO.firstPersonFrame) != 0)) {
             if (onGround2 > -9990.0F) {
 	        	f6 = onGround2;
 	            b.bipedBody.rotateAngleY = MathHelper.sin(MathHelper.sqrt_float(f6) * (float)Math.PI * 2.0F) * 0.2F;
