@@ -182,11 +182,16 @@ public class MysteriumPatchesFixesO {
     {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         ClientEventHandler.renderingPlayer = player;
+
+        ItemStack mainhandItem = player.getCurrentEquippedItem();
         ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
         if (!Backhand.EmptyOffhand && !Backhand.RenderEmptyOffhandAtRest && offhandItem == null) {
             return;
         }
         if (offhandItem == null && !Backhand.RenderEmptyOffhandAtRest && ((IBattlePlayer)player).getOffSwingProgress(frame) == 0) {
+            return;
+        }
+        if (mainhandItem != null && mainhandItem.getItem() instanceof ItemMap) {
             return;
         }
 
