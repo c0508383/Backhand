@@ -105,10 +105,6 @@ public final class BattlegearClientTickHandler {
             return;
         }
 
-        if (mouseOver != null && BattlemodeHookContainerClass.canBlockBeInteractedWith(player.worldObj, mouseOver.blockX, mouseOver.blockY, mouseOver.blockZ) && !player.isSneaking()) {
-            ticksBeforeUse = 4;
-            return;
-        }
         if (BattlegearUtils.usagePriorAttack(offhandItem)) {
             boolean flag = true;
             if (mouseOver != null)
@@ -165,6 +161,18 @@ public final class BattlegearClientTickHandler {
         Minecraft mc = Minecraft.getMinecraft();
         MovingObjectPosition objectMouseOver = mc.objectMouseOver;
         Block block = mc.theWorld.getBlock(objectMouseOver.blockX, objectMouseOver.blockY, objectMouseOver.blockZ);
+
+        Block b = worldObj.getBlock(i, j, k);
+        boolean blockActivated = b.onBlockActivated(worldObj, i, j, k, player, l, f, f1, f2);
+        boolean prevSneaking = player.isSneaking();
+        player.setSneaking(true);
+        boolean blockSneakActivated = b.onBlockActivated(worldObj, i, j, k, player, l, f, f1, f2);
+        player.setSneaking(prevSneaking);
+
+        if (blockActivated && !(player.isSneaking() && blockSneakActivated)) {
+            return false;
+        }
+
         if (player.getCurrentEquippedItem() != null) {
             if ((block instanceof BlockLog && player.getCurrentEquippedItem().getItem() instanceof ItemAxe)
                     || (block instanceof BlockGrass && player.getCurrentEquippedItem().getItem() instanceof ItemSpade)) {
@@ -176,8 +184,7 @@ public final class BattlegearClientTickHandler {
             return true;
         }
         if (!player.isSneaking() || BattlegearUtils.getOffhandItem(player) == null || BattlegearUtils.getOffhandItem(player).getItem().doesSneakBypassUse(worldObj, i, j, k, player)){
-            Block b = worldObj.getBlock(i, j, k);
-            if (!b.isAir(worldObj, i, j, k) && b.onBlockActivated(worldObj, i, j, k, player, l, f, f1, f2)){
+            if (!b.isAir(worldObj, i, j, k)){
                 flag = true;
             }
         }
