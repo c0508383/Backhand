@@ -54,6 +54,8 @@ public class ItemRendererOffhand extends ItemRenderer {
     public void renderItem(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type)
     {
         GL11.glPushMatrix();
+        GL11.glScalef(-1,1,1);
+        GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
         TextureManager texturemanager = this.mc.getTextureManager();
         Item item = p_78443_2_.getItem();
         Block block = Block.getBlockFromItem(item);

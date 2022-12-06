@@ -10,31 +10,36 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.storage.MapData;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.MinecraftForgeClient;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.util.glu.Project;
 import xonin.backhand.client.ClientEventHandler;
 
 import static net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED_FIRST_PERSON;
+import static net.minecraftforge.client.IItemRenderer.ItemRenderType.FIRST_PERSON_MAP;
 
 public class RenderOffhandPlayer extends RenderPlayer {
     public static ItemRendererOffhand itemRenderer = new ItemRendererOffhand(Minecraft.getMinecraft());
     private float fovModifierHand;
     private float fovModifierHandPrev;
     private float fovMultiplierTemp;
+    private RenderBlocks renderBlocksIr = new RenderBlocks();
 
     public RenderOffhandPlayer() {
         super();
@@ -88,7 +93,279 @@ public class RenderOffhandPlayer extends RenderPlayer {
         }
     }
 
-    public void renderOffhandItem(float frame) {
+    public void renderOffhandItem(float frame)
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityClientPlayerMP player = mc.thePlayer;
+        ItemStack itemstack = BattlegearUtils.getOffhandItem(mc.thePlayer);
+        if (itemstack == null) {
+            this.renderFirstPersonLeftArm(frame);
+            return;
+        }
+
+        GL11.glPushMatrix();
+
+        GL11.glScalef(-1,1,1);
+
+        float f1 = itemRenderer.prevEquippedProgress + (itemRenderer.equippedProgress - itemRenderer.prevEquippedProgress) * frame;
+        float f2 = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * frame;
+        GL11.glPushMatrix();
+        GL11.glRotatef(f2, 1.0F, 0.0F, 0.0F);
+        GL11.glRotatef(player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * frame, 0.0F, 1.0F, 0.0F);
+        RenderHelper.enableStandardItemLighting();
+        GL11.glPopMatrix();
+        float f3 = ((EntityPlayerSP)player).prevRenderArmPitch + (((EntityPlayerSP)player).renderArmPitch - ((EntityPlayerSP)player).prevRenderArmPitch) * frame;
+        float f4 = ((EntityPlayerSP)player).prevRenderArmYaw + (((EntityPlayerSP)player).renderArmYaw - ((EntityPlayerSP)player).prevRenderArmYaw) * frame;
+        GL11.glRotatef((player.rotationPitch - f3) * 0.1F, 1.0F, 0.0F, 0.0F);
+        GL11.glRotatef((player.rotationYaw - f4) * 0.1F, 0.0F, 1.0F, 0.0F);
+
+        if (itemstack != null && itemstack.getItem() instanceof ItemCloth)
+        {
+            GL11.glEnable(GL11.GL_BLEND);
+            OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        }
+
+        int i = mc.theWorld.getLightBrightnessForSkyBlocks(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ), 0);
+        int j = i % 65536;
+        int k = i / 65536;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        float f5;
+        float f6;
+        float f7;
+
+        if (itemstack != null)
+        {
+            int l = itemstack.getItem().getColorFromItemStack(itemstack, 0);
+            f5 = (float)(l >> 16 & 255) / 255.0F;
+            f6 = (float)(l >> 8 & 255) / 255.0F;
+            f7 = (float)(l & 255) / 255.0F;
+            GL11.glColor4f(f5, f6, f7, 1.0F);
+        }
+        else
+        {
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+
+        float f8;
+        float f9;
+        float f10;
+        float f13;
+        Render render;
+        RenderPlayer renderplayer;
+
+        if (itemstack != null && itemstack.getItem() instanceof ItemMap)
+        {
+            GL11.glPushMatrix();
+            f13 = 0.8F;
+            f5 = ((IBattlePlayer)player).getOffSwingProgress(frame);
+            f6 = MathHelper.sin(f5 * (float)Math.PI);
+            f7 = MathHelper.sin(MathHelper.sqrt_float(f5) * (float)Math.PI);
+            GL11.glTranslatef(-f7 * 0.4F, MathHelper.sin(MathHelper.sqrt_float(f5) * (float)Math.PI * 2.0F) * 0.2F, -f6 * 0.2F);
+            f5 = 1.0F - f2 / 45.0F + 0.1F;
+
+            if (f5 < 0.0F)
+            {
+                f5 = 0.0F;
+            }
+
+            if (f5 > 1.0F)
+            {
+                f5 = 1.0F;
+            }
+
+            f5 = -MathHelper.cos(f5 * (float)Math.PI) * 0.5F + 0.5F;
+            GL11.glTranslatef(0.0F, 0.0F * f13 - (1.0F - f1) * 1.2F - f5 * 0.5F + 0.04F, -0.9F * f13);
+            GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(f5 * -85.0F, 0.0F, 0.0F, 1.0F);
+            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+            mc.getTextureManager().bindTexture(player.getLocationSkin());
+
+            for (int i1 = 0; i1 < 2; ++i1)
+            {
+                int j1 = i1 * 2 - 1;
+                GL11.glPushMatrix();
+                GL11.glTranslatef(-0.0F, -0.6F, 1.1F * (float)j1);
+                GL11.glRotatef((float)(-45 * j1), 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(-90.0F, 0.0F, 0.0F, 1.0F);
+                GL11.glRotatef(59.0F, 0.0F, 0.0F, 1.0F);
+                GL11.glRotatef((float)(-65 * j1), 0.0F, 1.0F, 0.0F);
+                render = RenderManager.instance.getEntityRenderObject(mc.thePlayer);
+                renderplayer = (RenderPlayer)render;
+                f10 = 1.0F;
+                GL11.glScalef(f10, f10, f10);
+                renderplayer.renderFirstPersonArm(mc.thePlayer);
+                GL11.glPopMatrix();
+            }
+
+            f6 = ((IBattlePlayer)player).getOffSwingProgress(frame);
+            f7 = MathHelper.sin(f6 * f6 * (float)Math.PI);
+            f8 = MathHelper.sin(MathHelper.sqrt_float(f6) * (float)Math.PI);
+            GL11.glRotatef(-f7 * 20.0F, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(-f8 * 20.0F, 0.0F, 0.0F, 1.0F);
+            GL11.glRotatef(-f8 * 80.0F, 1.0F, 0.0F, 0.0F);
+            f9 = 0.38F;
+            GL11.glScalef(f9, f9, f9);
+            GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
+            GL11.glTranslatef(-1.0F, -1.0F, 0.0F);
+            f10 = 0.015625F;
+            GL11.glScalef(f10, f10, f10);
+            mc.getTextureManager().bindTexture(ItemRenderer.RES_MAP_BACKGROUND);
+            Tessellator tessellator = Tessellator.instance;
+            GL11.glNormal3f(0.0F, 0.0F, -1.0F);
+            tessellator.startDrawingQuads();
+            byte b0 = 7;
+            tessellator.addVertexWithUV((double)(0 - b0), (double)(128 + b0), 0.0D, 0.0D, 1.0D);
+            tessellator.addVertexWithUV((double)(128 + b0), (double)(128 + b0), 0.0D, 1.0D, 1.0D);
+            tessellator.addVertexWithUV((double)(128 + b0), (double)(0 - b0), 0.0D, 1.0D, 0.0D);
+            tessellator.addVertexWithUV((double)(0 - b0), (double)(0 - b0), 0.0D, 0.0D, 0.0D);
+            tessellator.draw();
+
+            IItemRenderer custom = MinecraftForgeClient.getItemRenderer(itemstack, FIRST_PERSON_MAP);
+            MapData mapdata = ((ItemMap)itemstack.getItem()).getMapData(itemstack, mc.theWorld);
+
+            if (custom == null)
+            {
+                if (mapdata != null)
+                {
+                    mc.entityRenderer.getMapItemRenderer().func_148250_a(mapdata, false);
+                }
+            }
+            else
+            {
+                custom.renderItem(FIRST_PERSON_MAP, itemstack, mc.thePlayer, mc.getTextureManager(), mapdata);
+            }
+
+            GL11.glPopMatrix();
+        }
+        else if (itemstack != null)
+        {
+            GL11.glPushMatrix();
+            f13 = 0.8F;
+
+            if (player.getItemInUseCount() > 0)
+            {
+                EnumAction enumaction = itemstack.getItemUseAction();
+
+                if (enumaction == EnumAction.eat || enumaction == EnumAction.drink)
+                {
+                    f6 = (float)player.getItemInUseCount() - frame + 1.0F;
+                    f7 = 1.0F - f6 / (float)itemstack.getMaxItemUseDuration();
+                    f8 = 1.0F - f7;
+                    f8 = f8 * f8 * f8;
+                    f8 = f8 * f8 * f8;
+                    f8 = f8 * f8 * f8;
+                    f9 = 1.0F - f8;
+                    GL11.glTranslatef(0.0F, MathHelper.abs(MathHelper.cos(f6 / 4.0F * (float)Math.PI) * 0.1F) * (float)((double)f7 > 0.2D ? 1 : 0), 0.0F);
+                    GL11.glTranslatef(f9 * 0.6F, -f9 * 0.5F, 0.0F);
+                    GL11.glRotatef(f9 * 90.0F, 0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(f9 * 10.0F, 1.0F, 0.0F, 0.0F);
+                    GL11.glRotatef(f9 * 30.0F, 0.0F, 0.0F, 1.0F);
+                }
+            }
+            else
+            {
+                f5 = ((IBattlePlayer)player).getOffSwingProgress(frame);
+                f6 = MathHelper.sin(f5 * (float)Math.PI);
+                f7 = MathHelper.sin(MathHelper.sqrt_float(f5) * (float)Math.PI);
+                GL11.glTranslatef(-f7 * 0.4F, MathHelper.sin(MathHelper.sqrt_float(f5) * (float)Math.PI * 2.0F) * 0.2F, -f6 * 0.2F);
+            }
+
+            GL11.glTranslatef(0.7F * f13, -0.65F * f13 - (1.0F - f1) * 0.6F, -0.9F * f13);
+            GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+            f5 = ((IBattlePlayer)player).getOffSwingProgress(frame);
+            f6 = MathHelper.sin(f5 * f5 * (float)Math.PI);
+            f7 = MathHelper.sin(MathHelper.sqrt_float(f5) * (float)Math.PI);
+            GL11.glRotatef(-f6 * 20.0F, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(-f7 * 20.0F, 0.0F, 0.0F, 1.0F);
+            GL11.glRotatef(-f7 * 80.0F, 1.0F, 0.0F, 0.0F);
+            f8 = 0.4F;
+            GL11.glScalef(f8, f8, f8);
+            float f11;
+            float f12;
+
+            if (player.getItemInUseCount() > 0)
+            {
+                EnumAction enumaction1 = itemstack.getItemUseAction();
+
+                if (enumaction1 == EnumAction.block)
+                {
+                    GL11.glTranslatef(-0.5F, 0.2F, 0.0F);
+                    GL11.glRotatef(30.0F, 0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(-80.0F, 1.0F, 0.0F, 0.0F);
+                    GL11.glRotatef(60.0F, 0.0F, 1.0F, 0.0F);
+                }
+                else if (enumaction1 == EnumAction.bow)
+                {
+                    GL11.glRotatef(-18.0F, 0.0F, 0.0F, 1.0F);
+                    GL11.glRotatef(-12.0F, 0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(-8.0F, 1.0F, 0.0F, 0.0F);
+                    GL11.glTranslatef(-0.9F, 0.2F, 0.0F);
+                    f10 = (float)itemstack.getMaxItemUseDuration() - ((float)player.getItemInUseCount() - frame + 1.0F);
+                    f11 = f10 / 20.0F;
+                    f11 = (f11 * f11 + f11 * 2.0F) / 3.0F;
+
+                    if (f11 > 1.0F)
+                    {
+                        f11 = 1.0F;
+                    }
+
+                    if (f11 > 0.1F)
+                    {
+                        GL11.glTranslatef(0.0F, MathHelper.sin((f10 - 0.1F) * 1.3F) * 0.01F * (f11 - 0.1F), 0.0F);
+                    }
+
+                    GL11.glTranslatef(0.0F, 0.0F, f11 * 0.1F);
+                    GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
+                    GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
+                    GL11.glTranslatef(0.0F, 0.5F, 0.0F);
+                    f12 = 1.0F + f11 * 0.2F;
+                    GL11.glScalef(1.0F, 1.0F, f12);
+                    GL11.glTranslatef(0.0F, -0.5F, 0.0F);
+                    GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
+                }
+            }
+
+            if (itemstack.getItem().shouldRotateAroundWhenRendering())
+            {
+                GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+            }
+
+            if (itemstack.getItem().requiresMultipleRenderPasses())
+            {
+                itemRenderer.renderItem(player, itemstack, 0, EQUIPPED_FIRST_PERSON);
+                for (int x = 1; x < itemstack.getItem().getRenderPasses(itemstack.getItemDamage()); x++)
+                {
+                    int k1 = itemstack.getItem().getColorFromItemStack(itemstack, x);
+                    f10 = (float)(k1 >> 16 & 255) / 255.0F;
+                    f11 = (float)(k1 >> 8 & 255) / 255.0F;
+                    f12 = (float)(k1 & 255) / 255.0F;
+                    GL11.glColor4f(1.0F * f10, 1.0F * f11, 1.0F * f12, 1.0F);
+                    itemRenderer.renderItem(player, itemstack, x, EQUIPPED_FIRST_PERSON);
+                }
+            }
+            else
+            {
+                itemRenderer.renderItem(player, itemstack, 0, EQUIPPED_FIRST_PERSON);
+            }
+
+            GL11.glPopMatrix();
+        }
+
+        if (itemstack != null && itemstack.getItem() instanceof ItemCloth)
+        {
+            GL11.glDisable(GL11.GL_BLEND);
+        }
+
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        RenderHelper.disableStandardItemLighting();
+        GL11.glPopMatrix();
+    }
+
+    public void renderFirstPersonLeftArm(float frame) {
         Minecraft mc = Minecraft.getMinecraft();
         float progress = itemRenderer.prevEquippedProgress + (itemRenderer.equippedProgress - itemRenderer.prevEquippedProgress) * frame;
 
@@ -116,172 +393,15 @@ public class RenderOffhandPlayer extends RenderPlayer {
         float var21;
         float var20;
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        float f5;
-        float f6;
-        float f7;
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-        ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
-        if (offhandItem != null)
-        {
-            int l = offhandItem.getItem().getColorFromItemStack(offhandItem, 0);
-            f5 = (float)(l >> 16 & 255) / 255.0F;
-            f6 = (float)(l >> 8 & 255) / 255.0F;
-            f7 = (float)(l & 255) / 255.0F;
-            GL11.glColor4f(f5, f6, f7, 1.0F);
-        }
-        else
-        {
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        }
-
-        float var11;
-        float var12;
-        float var13;
         var7 = 0.8F;
-        if (offhandItem != null) {
-            {
-                GL11.glPushMatrix();
-
-                if (player.getItemInUseCount() > 0 && player.getItemInUse() == offhandItem) {
-                    EnumAction action = offhandItem.getItemUseAction();
-
-                    if (action == EnumAction.eat || action == EnumAction.drink) {
-                        GL11.glTranslatef(-0.7F * var7, -0.65F * var7 - (1.0F - progress) * 0.6F, -0.9F * var7);
-
-                        var21 = (float) player.getItemInUseCount() - frame + 1.0F;
-                        var10 = 1.0F - var21 / (float) offhandItem.getMaxItemUseDuration();
-                        var11 = 1.0F - var10;
-                        var11 = var11 * var11 * var11;
-                        var11 = var11 * var11 * var11;
-                        var11 = var11 * var11 * var11;
-                        var12 = 1.0F - var11;
-                        GL11.glTranslatef(0.0F, MathHelper.abs(MathHelper.cos(1.0F + (var21 / 4.0F * (float) Math.PI)) * 0.1F) * (float) ((double) var10 > 0.15D ? 1 : 0), 0.0F);
-                        GL11.glTranslatef(var12 * 0.7F, -var12 * 0.025F, 0.0F);
-                        GL11.glRotatef(-var12 * 65.0F, 0.0F, 1.0F, 0.0F);
-                        GL11.glRotatef(var12 * 30.0F, 1.0F, 0.0F, 0.0F);
-                        GL11.glRotatef(-var12 * 20.0F, 0.0F, 0.0F, 1.0F);
-                        var11 = 0.4F;
-                        GL11.glScalef(var11, var11, var11);
-                        if (offhandItem.getItem().shouldRotateAroundWhenRendering()) {
-                            GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
-                        }
-                        if (offhandItem.getItem() != null && offhandItem.getItem().getUnlocalizedName() != null && offhandItem.getItem().getUnlocalizedName().toLowerCase().endsWith("arrow")) {
-                            GL11.glTranslatef(-0.55F,0.0F,0.5F);
-                            GL11.glRotatef(-90,1,0,1);
-                        }
-                        itemRenderer.renderItem(player, offhandItem, 0);
-                        if (offhandItem.getItem().requiresMultipleRenderPasses()) {
-                            for (int x = 1; x < offhandItem.getItem().getRenderPasses(offhandItem.getItemDamage()); x++) {
-                                int k1 = offhandItem.getItem().getColorFromItemStack(offhandItem, x);
-                                float f10 = (float)(k1 >> 16 & 255) / 255.0F;
-                                float f11 = (float)(k1 >> 8 & 255) / 255.0F;
-                                float f12 = (float)(k1 & 255) / 255.0F;
-                                GL11.glColor4f(f10, f11, f12, 1.0F);
-                                itemRenderer.renderItem(player, offhandItem, x, EQUIPPED_FIRST_PERSON);
-                            }
-                        }
-                        GL11.glPopMatrix();
-                        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-                        RenderHelper.disableStandardItemLighting();
-                        return;
-                    }
-                } else {
-                    var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
-                    var21 = MathHelper.sin(var20 * (float) Math.PI);
-                    var10 = MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI);
-                    //Flip the (x direction)
-                    GL11.glTranslatef(var10 * 0.4F, MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI * 2.0F) * 0.2F, -var21 * 0.2F);
-                }
-                //Translate x in the opposite direction
-                GL11.glTranslatef(-0.7F * var7, -0.65F * var7 - (1.0F - progress) * 0.6F, -0.9F * var7);
-
-                //Rotate y in the opposite direction
-                GL11.glRotatef(-45.0F, 0.0F, 1.0F, 0.0F);
-
-                GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-                var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
-
-                var21 = MathHelper.sin(var20 * var20 * (float) Math.PI);
-                var10 = MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI);
-
-                GL11.glRotatef(-var21 * 20.0F, 0.0F, 1.0F, 0.0F);
-                //Rotate z in the opposite direction
-                GL11.glRotatef(var10 * 20.0F, 0.0F, 0.0F, 1.0F);
-                GL11.glRotatef(-var10 * 80.0F, 1.0F, 0.0F, 0.0F);
-
-                //Rotate y back to original position + 45
-                GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
-
-                var11 = 0.4F;
-                GL11.glScalef(var11, var11, var11);
-                float var14;
-                float var15;
-
-                if (player.getItemInUseCount() > 0 && player.getItemInUse() == offhandItem) {
-                    EnumAction action = offhandItem.getItemUseAction();
-
-                    if (action == EnumAction.block) {
-                        GL11.glTranslatef(0.0F, 0.2F, 0.0F);
-                        GL11.glRotatef(30.0F, 0.0F, 1.0F, 0.0F);
-                        GL11.glRotatef(30.0F, 1.0F, 0.0F, 0.0F);
-                        GL11.glRotatef(60.0F, 0.0F, 1.0F, 0.0F);
-                    } else if (action == EnumAction.bow) {
-                        GL11.glRotatef(-18.0F, 0.0F, 0.0F, 1.0F);
-                        GL11.glRotatef(-12.0F, 0.0F, 1.0F, 0.0F);
-                        GL11.glRotatef(-8.0F, 1.0F, 0.0F, 0.0F);
-                        GL11.glTranslatef(-0.9F, 0.2F, 0.0F);
-                        var13 = (float) offhandItem.getMaxItemUseDuration() - ((float) player.getItemInUseCount() - frame + 1.0F);
-                        var14 = var13 / 20.0F;
-                        var14 = (var14 * var14 + var14 * 2.0F) / 3.0F;
-
-                        if (var14 > 1.0F) {
-                            var14 = 1.0F;
-                        }
-
-                        if (var14 > 0.1F) {
-                            GL11.glTranslatef(0.0F, MathHelper.sin((var13 - 0.1F) * 1.3F) * 0.01F * (var14 - 0.1F), 0.0F);
-                        }
-
-                        GL11.glTranslatef(0.0F, 0.0F, var14 * 0.1F);
-                        GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
-                        GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
-                        GL11.glTranslatef(0.0F, 0.5F, 0.0F);
-                        var15 = 1.0F + var14 * 0.2F;
-                        GL11.glScalef(1.0F, 1.0F, var15);
-                        GL11.glTranslatef(0.0F, -0.5F, 0.0F);
-                        GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
-                        GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
-                    }
-                }
-
-                if (offhandItem.getItem().shouldRotateAroundWhenRendering()) {
-                    GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
-                }
-                if (offhandItem.getItem() != null && offhandItem.getItem().getUnlocalizedName() != null && offhandItem.getItem().getUnlocalizedName().toLowerCase().endsWith("arrow")) {
-                    GL11.glTranslatef(-0.55F,0.0F,0.5F);
-                    GL11.glRotatef(-90,1,0,1);
-                }
-                itemRenderer.renderItem(player, offhandItem, 0);
-                if (offhandItem.getItem().requiresMultipleRenderPasses()) {
-                    for (int x = 1; x < offhandItem.getItem().getRenderPasses(offhandItem.getItemDamage()); x++) {
-                        int k1 = offhandItem.getItem().getColorFromItemStack(offhandItem, x);
-                        float f10 = (float)(k1 >> 16 & 255) / 255.0F;
-                        float f11 = (float)(k1 >> 8 & 255) / 255.0F;
-                        float f12 = (float)(k1 & 255) / 255.0F;
-                        GL11.glColor4f(f10, f11, f12, 1.0F);
-                        itemRenderer.renderItem(player, offhandItem, x, EQUIPPED_FIRST_PERSON);
-                    }
-                }
-
-                GL11.glPopMatrix();
-            }
-        } else if (!player.isInvisible()) {
+        if (!player.isInvisible()) {
             GL11.glPushMatrix();
 
             GL11.glScalef(-1.0F, 1.0F, 1.0F);
 
             var20 = ((IBattlePlayer)player).getOffSwingProgress(frame);
-            //var20 = player.getSwingProgress(frame);
             var21 = MathHelper.sin(var20 * (float) Math.PI);
             var10 = MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI);
             GL11.glTranslatef(-var10 * 0.3F, MathHelper.sin(MathHelper.sqrt_float(var20) * (float) Math.PI * 2.0F) * 0.4F, -var21 * 0.4F);
