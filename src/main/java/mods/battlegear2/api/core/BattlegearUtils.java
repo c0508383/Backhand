@@ -46,6 +46,13 @@ public class BattlegearUtils {
         return player.inventory instanceof InventoryPlayerBattle;
     }
 
+    public static void swapOffhandItem(EntityPlayer player) {
+        final ItemStack mainhandItem = player.getCurrentEquippedItem();
+        final ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+        BattlegearUtils.setPlayerCurrentItem(player, offhandItem);
+        BattlegearUtils.setPlayerOffhandItem(player, mainhandItem);
+    }
+
     public static void setPlayerCurrentItem(EntityPlayer player, ItemStack stack) {
         player.inventory.setInventorySlotContents(player.inventory.currentItem, stack);
     }
