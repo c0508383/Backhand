@@ -38,11 +38,8 @@ import xonin.backhand.client.ClientTickHandler;
 
 public final class BattlegearClientTickHandler {
     public final Minecraft mc = Minecraft.getMinecraft();
-
-    public float partialTick;
-    public int previousBattlemode = 0;
     public static float ticksBeforeUse = 0;
-    public static final BattlegearClientTickHandler INSTANCE = new BattlegearClientTickHandler();
+    public static boolean prevRightClickHeld = false;
 
     public BattlegearClientTickHandler() {
     }
@@ -72,7 +69,12 @@ public final class BattlegearClientTickHandler {
             }
         }
         if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
-            tryAttackEntity(player);
+            if (!prevRightClickHeld) {
+                tryAttackEntity(player);
+            }
+            prevRightClickHeld = true;
+        } else {
+            prevRightClickHeld = false;
         }
         if (player.getItemInUse() == null) {
             CommonProxy.offhandItemUsed = null;
