@@ -59,15 +59,7 @@ public class BattlegearConfig {
         sb.append("These should all be placed on separate lines between the provided \'<\' and \'>\'.");
         blacklistedItems = config.get(category, "Blacklisted items", new String[0], sb.toString()).getStringList();
         Arrays.sort(blacklistedItems);
-
-        ArrayList<Item> items = new ArrayList<>();
-        for (String s : blacklistedItems) {
-            try {
-                String[] split = s.split(":");
-                items.add(GameRegistry.findItem(split[0], split[1]));
-            } catch (Exception ignored) {}
-        }
-        Backhand.offhandBlacklist = items.toArray(new Item[0]);
+        Backhand.offhandBlacklist = blacklistedItems;
 
         /*==============================================================================================================
          * RENDERING CONFIGS

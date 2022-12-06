@@ -38,7 +38,7 @@ public class Backhand {
     public static boolean ExtraInventorySlot = true;
     public static int AlternateOffhandSlot = 9;
     public static boolean UseInventorySlot = false;
-    public static Item[] offhandBlacklist;
+    public static String[] offhandBlacklist;
     public static boolean RenderEmptyOffhandAtRest = false;
 
     public Backhand() {
@@ -76,8 +76,8 @@ public class Backhand {
         if (stack == null)
             return false;
 
-        for (Item item : offhandBlacklist) {
-            if (stack.getItem() == item) {
+        for (String itemName : offhandBlacklist) {
+            if (stack.getItem().delegate.name().equals(itemName)) {
                 return true;
             }
         }
