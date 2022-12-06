@@ -91,21 +91,23 @@ public final class BattlegearClientTickHandler {
 
     @SideOnly(Side.CLIENT)
     public void tryCheckUseItem(ItemStack offhandItem, EntityPlayer player){
+        MovingObjectPosition mouseOver = mc.objectMouseOver;
+
         if (offhandItem.getItem() instanceof ItemBow && !Backhand.UseOffhandBow) {
             return;
         }
 
         ItemStack mainHandItem = player.getCurrentEquippedItem();
-        if (mainHandItem != null && BattlegearUtils.checkForRightClickFunction(mainHandItem)) {
+        if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()))) {
+            ticksBeforeUse = 10;
             return;
         }
 
-        MovingObjectPosition mop = BattlemodeHookContainerClass.getRaytraceBlock(player);
-        if (mop != null && BattlemodeHookContainerClass.canBlockBeInteractedWith(player.worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
+        if (mouseOver != null && BattlemodeHookContainerClass.canBlockBeInteractedWith(player.worldObj, mouseOver.blockX, mouseOver.blockY, mouseOver.blockZ) && !player.isSneaking()) {
+            ticksBeforeUse = 4;
             return;
         }
         if (BattlegearUtils.usagePriorAttack(offhandItem)) {
-            MovingObjectPosition mouseOver = mc.objectMouseOver;
             boolean flag = true;
             if (mouseOver != null)
             {
