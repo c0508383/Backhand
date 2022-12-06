@@ -253,49 +253,64 @@ public class ItemRendererOffhand extends ItemRenderer {
 
     public void renderOffhandItemIn3rdPerson(EntityPlayer player, ModelBiped modelBipedMain, float frame) {
         ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
-        if (offhandItem != null) {
-            float var7;
+        float f2;
+        float f4;
+
+        if (offhandItem != null)
+        {
             GL11.glPushMatrix();
             modelBipedMain.bipedLeftArm.postRender(0.0625F);
-            GL11.glTranslatef(0.0625F, 0.4375F, 0.0625F);
-            thirdPersonRenderModCompatibility(player,modelBipedMain,frame,offhandItem);
+            GL11.glTranslatef(-modelBipedMain.bipedLeftArm.rotationPointX * 0.0625F, -modelBipedMain.bipedLeftArm.rotationPointY * 0.0625F, -modelBipedMain.bipedLeftArm.rotationPointZ * 0.0625F);
+            GL11.glScalef(-1,1,1);
+            GL11.glTranslatef(-modelBipedMain.bipedLeftArm.rotationPointX * 0.0625F, modelBipedMain.bipedLeftArm.rotationPointY * 0.0625F, -modelBipedMain.bipedLeftArm.rotationPointZ * 0.0625F);
 
-            if (player.fishEntity != null) {
+            GL11.glTranslatef(-0.0625F, 0.4375F, 0.0625F);
+
+            if (player.fishEntity != null)
+            {
                 offhandItem = new ItemStack(Items.stick);
             }
 
-            EnumAction var23 = null;
+            EnumAction enumaction = null;
 
-            if (player.getItemInUseCount() > 0 && player.getItemInUse() == offhandItem) {
-                var23 = offhandItem.getItemUseAction();
+            if (player.getItemInUseCount() > 0)
+            {
+                enumaction = offhandItem.getItemUseAction();
             }
 
-            IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(offhandItem, EQUIPPED);
-            boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(EQUIPPED, offhandItem, BLOCK_3D));
+            net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient.getItemRenderer(offhandItem, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
+            boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED, offhandItem, net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D));
 
-            if (offhandItem.getItem() instanceof ItemBlock && (is3D || RenderBlocks.renderItemIn3d(Block.getBlockFromItem(offhandItem.getItem()).getRenderType()))) {
-                var7 = 0.5F;
+            if (is3D || offhandItem.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(offhandItem.getItem()).getRenderType()))
+            {
+                f2 = 0.5F;
                 GL11.glTranslatef(0.0F, 0.1875F, -0.3125F);
-                var7 *= 0.75F;
+                f2 *= 0.75F;
                 GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
                 GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-                GL11.glScalef(-var7, -var7, var7);
-            } else if (BattlegearUtils.isBow(offhandItem.getItem())) {
-                var7 = 0.625F;
+                GL11.glScalef(-f2, -f2, f2);
+            }
+            else if (offhandItem.getItem() == Items.bow)
+            {
+                f2 = 0.625F;
                 GL11.glTranslatef(0.0F, 0.125F, 0.3125F);
                 GL11.glRotatef(-20.0F, 0.0F, 1.0F, 0.0F);
-                GL11.glScalef(var7, -var7, var7);
+                GL11.glScalef(f2, -f2, f2);
                 GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
                 GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-            } else if (offhandItem.getItem().isFull3D()) {
-                var7 = 0.625F;
+            }
+            else if (offhandItem.getItem().isFull3D())
+            {
+                f2 = 0.625F;
 
-                if (offhandItem.getItem().shouldRotateAroundWhenRendering()) {
+                if (offhandItem.getItem().shouldRotateAroundWhenRendering())
+                {
                     GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
                     GL11.glTranslatef(0.0F, -0.125F, 0.0F);
                 }
 
-                if (player.getItemInUseCount() > 0 && player.getItemInUse() == offhandItem && var23 == EnumAction.block) {
+                if (player.getItemInUseCount() > 0 && enumaction == EnumAction.block)
+                {
                     GL11.glTranslatef(0.05F, 0.0F, -0.1F);
                     GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
                     GL11.glRotatef(-10.0F, 1.0F, 0.0F, 0.0F);
@@ -303,27 +318,46 @@ public class ItemRendererOffhand extends ItemRenderer {
                 }
 
                 GL11.glTranslatef(0.0F, 0.1875F, 0.0F);
-                GL11.glScalef(var7, -var7, var7);
+                GL11.glScalef(f2, -f2, f2);
                 GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
                 GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-            } else {
-                var7 = 0.375F;
+            }
+            else
+            {
+                f2 = 0.375F;
                 GL11.glTranslatef(0.25F, 0.1875F, -0.1875F);
-                GL11.glScalef(var7, var7, var7);
+                GL11.glScalef(f2, f2, f2);
                 GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
                 GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
                 GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
             }
 
-            if (offhandItem.getItem().requiresMultipleRenderPasses()) {
-                for (int var27 = 0; var27 < offhandItem.getItem().getRenderPasses(offhandItem.getItemDamage()); ++var27) {
-                    applyColorFromItemStack(offhandItem, var27);
-                    this.renderItem(player, offhandItem, var27);
+            float f3;
+            int k;
+            float f12;
+
+            if (offhandItem.getItem().requiresMultipleRenderPasses())
+            {
+                for (k = 0; k < offhandItem.getItem().getRenderPasses(offhandItem.getItemDamage()); ++k)
+                {
+                    int i = offhandItem.getItem().getColorFromItemStack(offhandItem, k);
+                    f12 = (float)(i >> 16 & 255) / 255.0F;
+                    f3 = (float)(i >> 8 & 255) / 255.0F;
+                    f4 = (float)(i & 255) / 255.0F;
+                    GL11.glColor4f(f12, f3, f4, 1.0F);
+                    this.renderItem(player, offhandItem, k);
                 }
-            } else {
-                applyColorFromItemStack(offhandItem, 0);
+            }
+            else
+            {
+                k = offhandItem.getItem().getColorFromItemStack(offhandItem, 0);
+                float f11 = (float)(k >> 16 & 255) / 255.0F;
+                f12 = (float)(k >> 8 & 255) / 255.0F;
+                f3 = (float)(k & 255) / 255.0F;
+                GL11.glColor4f(f11, f12, f3, 1.0F);
                 this.renderItem(player, offhandItem, 0);
             }
+
             GL11.glPopMatrix();
         }
     }
