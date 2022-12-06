@@ -87,13 +87,23 @@ public class MysteriumPatchesFixesO {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT && ClientEventHandler.renderingPlayer != null) {
                 EntityPlayer player = ClientEventHandler.renderingPlayer;
                 ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
-                if (CommonProxy.offhandItemUsed != null && CommonProxy.offhandItemUsed != itemStack
-                        && offhandItem != null && BattlegearUtils.checkForRightClickFunctionNoAction(offhandItem) && itemStack != offhandItem) {
-                    return EnumAction.none;
+
+                if (offhandItem != null) {
+                    ItemStack mainHandItem = player.getCurrentEquippedItem();
+                    if (mainHandItem != null
+                            && (BattlegearUtils.checkForRightClickFunctionNoAction(mainHandItem)
+                            || BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()))) {
+                        if (itemStack == offhandItem) {
+                            return EnumAction.none;
+                        }
+                    } else if (itemStack == mainHandItem && (!(BattlegearUtils.checkForRightClickFunctionNoAction(offhandItem)
+                            || BattlemodeHookContainerClass.isItemBlock(offhandItem.getItem())) || player.getItemInUse() != mainHandItem)) {
+                        return EnumAction.none;
+                    }
                 }
             }
         }
-        return itemStack.getItem().getItemUseAction(itemStack);
+        return itemStack != null && itemStack.getItem() != null ? itemStack.getItem().getItemUseAction(itemStack) : EnumAction.none;
     }
 
     private static boolean disableMainhandAnimation = false;
