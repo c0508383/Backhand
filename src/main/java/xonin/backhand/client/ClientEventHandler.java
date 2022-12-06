@@ -45,7 +45,7 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void renderHotbarOverlay(RenderGameOverlayEvent event) {
-        if (event.isCancelable() || event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) {
+        if (event.isCancelable() || event.type != RenderGameOverlayEvent.ElementType.ALL) {
             return;
         }
 
