@@ -243,6 +243,11 @@ public final class BattlegearClientTickHandler {
             else
             {
                 mcInstance.playerController.isHittingBlock = true;
+
+                if (mcInstance.playerController.currentBlockX != i || mcInstance.playerController.currentBlockY != j || mcInstance.playerController.currentblockZ != k) {
+                    mcInstance.playerController.curBlockDamageMP = 0f;
+                }
+
                 mcInstance.playerController.currentBlockX = i;
                 mcInstance.playerController.currentBlockY = j;
                 mcInstance.playerController.currentblockZ = k;
