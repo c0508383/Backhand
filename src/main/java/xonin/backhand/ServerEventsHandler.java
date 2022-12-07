@@ -6,6 +6,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -62,10 +63,10 @@ public class ServerEventsHandler {
         ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
         ItemStack mainhandItem = player.getCurrentEquippedItem();
 
-        boolean offHandUse = BattlegearUtils.checkForRightClickFunction(offhandItem);
+        //boolean offHandUse = BattlegearUtils.checkForRightClickFunction(offhandItem);
         boolean mainhandUse = BattlegearUtils.checkForRightClickFunction(mainhandItem);
 
-        if (!offHandUse && !mainhandUse) {
+        if (offhandItem != null && !mainhandUse) {
             event.setCanceled(true);
         }
     }
