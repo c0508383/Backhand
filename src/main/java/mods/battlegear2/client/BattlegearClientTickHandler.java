@@ -69,7 +69,7 @@ public final class BattlegearClientTickHandler {
             }
         }
         if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
-            if (!prevRightClickHeld) {
+            if (!prevRightClickHeld && player.getItemInUse() == null) {
                 tryAttackEntity(player);
             }
             prevRightClickHeld = true;
@@ -100,7 +100,8 @@ public final class BattlegearClientTickHandler {
         }
 
         ItemStack mainHandItem = player.getCurrentEquippedItem();
-        if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()))) {
+        if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem)
+                    || BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()) || player.getItemInUse() == mainHandItem)) {
             ticksBeforeUse = 10;
             return;
         }
@@ -183,11 +184,11 @@ public final class BattlegearClientTickHandler {
         if (offhand.getItem().onItemUseFirst(offhand, player, worldObj, i, j, k, l, f, f1, f2)){
             return true;
         }
-        if (!player.isSneaking() || BattlegearUtils.getOffhandItem(player) == null || BattlegearUtils.getOffhandItem(player).getItem().doesSneakBypassUse(worldObj, i, j, k, player)){
+        /*if (!player.isSneaking() || BattlegearUtils.getOffhandItem(player) == null || BattlegearUtils.getOffhandItem(player).getItem().doesSneakBypassUse(worldObj, i, j, k, player)){
             if (!b.isAir(worldObj, i, j, k)){
                 flag = true;
             }
-        }
+        }*/
         if (!flag && offhand.getItem() instanceof ItemBlock){
             ItemBlock itemblock = (ItemBlock)offhand.getItem();
             if (!itemblock.func_150936_a(worldObj, i, j, k, l, player, offhand)){
