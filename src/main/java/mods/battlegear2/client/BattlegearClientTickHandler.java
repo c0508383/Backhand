@@ -58,6 +58,7 @@ public final class BattlegearClientTickHandler {
 
     @SideOnly(Side.CLIENT)
     public void tickStart(EntityPlayer player) {
+        ItemStack mainhand = player.getCurrentEquippedItem();
         ItemStack offhand = BattlegearUtils.getOffhandItem(player);
         if (offhand != null) {
             if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
@@ -69,7 +70,9 @@ public final class BattlegearClientTickHandler {
             }
         }
         if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
-            if (!prevRightClickHeld && player.getItemInUse() == null) {
+            boolean mainhandUse = BattlegearUtils.checkForRightClickFunction(mainhand);
+            boolean offhandUse = BattlegearUtils.checkForRightClickFunction(offhand);
+            if (!prevRightClickHeld && player.getItemInUse() == null && !mainhandUse && !offhandUse) {
                 tryAttackEntity(player);
             }
             prevRightClickHeld = true;

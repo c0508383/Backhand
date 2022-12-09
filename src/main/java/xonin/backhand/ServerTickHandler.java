@@ -3,6 +3,7 @@ package xonin.backhand;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import mods.battlegear2.packet.BattlegearSyncItemPacket;
@@ -23,7 +24,13 @@ public class ServerTickHandler {
     public void onUpdatePlayer(TickEvent.PlayerTickEvent event)
     {
         EntityPlayer player = event.player;
+        ItemStack mainHandItem = player.getCurrentEquippedItem();
         ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+
+        if (mainHandItem != null && player.getItemInUse() == offhandItem && (BattlegearUtils.checkForRightClickFunction(mainHandItem)
+                || BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()))) {
+            player.clearItemInUse();
+        }
 
         if (BattlegearUtils.hasOffhandInventory(player) && !Backhand.UseInventorySlot) {
             int slot = InventoryPlayerBattle.OFFHAND_ITEM_INDEX;
@@ -73,7 +80,6 @@ public class ServerTickHandler {
         }
 
         if (ServerEventsHandler.arrowHotSwapped) {
-            final ItemStack oldItem = player.getCurrentEquippedItem();
             if (offhandItem.getItem() != Items.arrow) {
                 BattlegearUtils.swapOffhandItem(player);
             }

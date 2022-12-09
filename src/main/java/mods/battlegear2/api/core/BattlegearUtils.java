@@ -172,6 +172,9 @@ public class BattlegearUtils {
 
     @SuppressWarnings("unchecked")
     public static boolean checkForRightClickFunction(ItemStack stack) {
+        if (stack == null) {
+            return false;
+        }
         try {
             if (stack.getItemUseAction() == EnumAction.block || stack.getItemUseAction() == EnumAction.none) {
 
@@ -207,6 +210,9 @@ public class BattlegearUtils {
 
     @SuppressWarnings("unchecked")
     public static boolean checkForRightClickFunctionNoAction(ItemStack stack) {
+        if (stack == null) {
+            return false;
+        }
         try {
             Class c = stack.getItem().getClass();
             while (!(c.equals(Item.class) || c.equals(ItemTool.class) || c.equals(ItemSword.class))) {
