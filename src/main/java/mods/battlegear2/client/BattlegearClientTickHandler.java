@@ -109,6 +109,14 @@ public final class BattlegearClientTickHandler {
             return;
         }
 
+        if (mouseOver != null && mouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+        {
+            if (BattlegearUtils.blockHasUse(player.worldObj.getBlock(mouseOver.blockX, mouseOver.blockY,mouseOver.blockZ))) {
+                ticksBeforeUse = 4;
+                return;
+            }
+        }
+
         if (BattlegearUtils.usagePriorAttack(offhandItem)) {
             boolean flag = true;
             if (mouseOver != null)

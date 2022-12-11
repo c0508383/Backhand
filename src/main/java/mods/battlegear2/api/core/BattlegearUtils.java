@@ -7,11 +7,13 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
 import mods.battlegear2.BattlemodeHookContainerClass;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
@@ -174,6 +176,32 @@ public class BattlegearUtils {
 
     public static boolean isItemBlock(Item item) {
         return item instanceof ItemBlock || item instanceof ItemDoor || item instanceof ItemSign || item instanceof ItemReed || item instanceof ItemSeedFood || item instanceof ItemRedstone || item instanceof ItemBucket || item instanceof ItemSkull;
+    }
+
+    public static boolean blockHasUse(Block block) {
+        if (block == null || block == Blocks.air) {
+            return false;
+        }
+        try {
+            String mappedName = BattlegearTranslator.getMapedMethodName("Block", "func_149727_a", "onBlockActivated");
+            Class[] classParams = new Class[]{World.class, int.class, int.class, int.class, EntityPlayer.class, int.class, float.class, float.class, float.class};
+
+            Class c = block.getClass();
+            while (!(c.equals(Block.class))) {
+                try {
+                    try {
+                        c.getDeclaredMethod(mappedName,classParams);
+                        return true;
+                    } catch (NoSuchMethodException ignored) {}
+                } catch (NoClassDefFoundError ignored) {}
+
+                c = c.getSuperclass();
+            }
+
+            return false;
+        } catch (NullPointerException e) {
+            return true;
+        }
     }
 
     @SuppressWarnings("unchecked")
