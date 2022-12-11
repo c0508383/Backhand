@@ -6,7 +6,9 @@ import java.io.IOException;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
+import mods.battlegear2.BattlemodeHookContainerClass;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,7 +28,8 @@ public class BattlegearUtils {
 
     private static String[] itemBlackListMethodNames = {
             BattlegearTranslator.getMapedMethodName("Item", "func_77648_a", "onItemUse"),
-            BattlegearTranslator.getMapedMethodName("Item", "func_77659_a", "onItemRightClick")
+            BattlegearTranslator.getMapedMethodName("Item", "func_77659_a", "onItemRightClick"),
+            BattlegearTranslator.getMapedMethodName("Item", "func_111207_a", "itemInteractionForEntity")
     };
 
     /**
@@ -34,7 +37,8 @@ public class BattlegearUtils {
      */
     private static Class[][] itemBlackListMethodParams = {
             new Class[]{ItemStack.class, EntityPlayer.class, World.class, int.class, int.class, int.class, int.class, float.class, float.class, float.class},
-            new Class[]{ItemStack.class, World.class, EntityPlayer.class}
+            new Class[]{ItemStack.class, World.class, EntityPlayer.class},
+            new Class[]{ItemStack.class, EntityPlayer.class, EntityLivingBase.class}
     };
     private static ItemStack prevNotWieldable;
     /**
@@ -59,20 +63,22 @@ public class BattlegearUtils {
 
     public static void setPlayerOffhandItem(EntityPlayer player, ItemStack stack) {
         if (!Backhand.isOffhandBlacklisted(stack)) {
-            if (hasOffhandInventory(player) && !Backhand.UseInventorySlot) {
-                ((InventoryPlayerBattle) player.inventory).setOffhandItem(stack);
-            } else {
-                player.inventory.setInventorySlotContents(Backhand.AlternateOffhandSlot, stack);
-            }
+            getOffhandEP(player).setOffhandItem(stack);
         }
     }
 
     public static ItemStack getOffhandItem(EntityPlayer player) {
-        if (hasOffhandInventory(player) && !Backhand.UseInventorySlot) {
-            return ((InventoryPlayerBattle) player.inventory).getOffhandItem();
-        } else {
-            return player.inventory.getStackInSlot(Backhand.AlternateOffhandSlot);
-        }
+        return getOffhandEP(player).getOffhandItem();
+    }
+
+    public static boolean allowOffhandUse(EntityPlayer player) {
+        ItemStack mainHandItem = player.getCurrentEquippedItem();
+        return mainHandItem == null || (!BattlegearUtils.checkForRightClickFunction(mainHandItem)
+                && !BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()) && player.getItemInUse() != mainHandItem);
+    }
+
+    public static OffhandExtendedProperty getOffhandEP(EntityPlayer player) {
+        return ((OffhandExtendedProperty)player.getExtendedProperties("OffhandStorage"));
     }
 
     /**
@@ -171,6 +177,30 @@ public class BattlegearUtils {
     }
 
     @SuppressWarnings("unchecked")
+    public static boolean hasEntityInteraction(ItemStack stack) {
+        if (stack == null) {
+            return false;
+        }
+        try {
+            Class c = stack.getItem().getClass();
+            while (!(c.equals(Item.class) || c.equals(ItemTool.class) || c.equals(ItemSword.class))) {
+                try {
+                    try {
+                        c.getDeclaredMethod(itemBlackListMethodNames[2], itemBlackListMethodParams[2]);
+                        return true;
+                    } catch (NoSuchMethodException ignored) {}
+                } catch (NoClassDefFoundError ignored) {}
+
+                c = c.getSuperclass();
+            }
+
+            return false;
+        } catch (NullPointerException e) {
+            return true;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public static boolean checkForRightClickFunction(ItemStack stack) {
         if (stack == null) {
             return false;
@@ -181,20 +211,13 @@ public class BattlegearUtils {
                 Class c = stack.getItem().getClass();
                 while (!(c.equals(Item.class) || c.equals(ItemTool.class) || c.equals(ItemSword.class))) {
                     try {
-                        try {
-                            c.getDeclaredMethod(itemBlackListMethodNames[0], itemBlackListMethodParams[0]);
-                            return true;
-                        } catch (NoSuchMethodException ignored) {
+                        for (int i = 0; i < itemBlackListMethodNames.length; i++) {
+                            try {
+                                c.getDeclaredMethod(itemBlackListMethodNames[i], itemBlackListMethodParams[i]);
+                                return true;
+                            } catch (NoSuchMethodException ignored) {}
                         }
-
-                        try {
-                            c.getDeclaredMethod(itemBlackListMethodNames[1], itemBlackListMethodParams[1]);
-                            return true;
-                        } catch (NoSuchMethodException ignored) {
-                        }
-                    } catch (NoClassDefFoundError ignored) {
-
-                    }
+                    } catch (NoClassDefFoundError ignored) {}
 
                     c = c.getSuperclass();
                 }
@@ -217,20 +240,13 @@ public class BattlegearUtils {
             Class c = stack.getItem().getClass();
             while (!(c.equals(Item.class) || c.equals(ItemTool.class) || c.equals(ItemSword.class))) {
                 try {
-                    try {
-                        c.getDeclaredMethod(itemBlackListMethodNames[0], itemBlackListMethodParams[0]);
-                        return true;
-                    } catch (NoSuchMethodException ignored) {
+                    for (int i = 0; i < itemBlackListMethodNames.length; i++) {
+                        try {
+                            c.getDeclaredMethod(itemBlackListMethodNames[i], itemBlackListMethodParams[i]);
+                            return true;
+                        } catch (NoSuchMethodException ignored) {}
                     }
-
-                    try {
-                        c.getDeclaredMethod(itemBlackListMethodNames[1], itemBlackListMethodParams[1]);
-                        return true;
-                    } catch (NoSuchMethodException ignored) {
-                    }
-                } catch (NoClassDefFoundError ignored) {
-
-                }
+                } catch (NoClassDefFoundError ignored) {}
 
                 c = c.getSuperclass();
             }

@@ -51,6 +51,11 @@ public class BattlegearConfig {
         Backhand.UseInventorySlot = config.get(category, "Use inventory slot",Backhand.UseInventorySlot, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
+        sb.append("If enabled, a hotswap will be performed every tick if the main hand has no use or is empty.\n");
+        sb.append("This hotswap allows for many more items like fishing rods to be used in the offhand, but may be unstable.");
+        Backhand.OffhandTickHotswap = config.get(category, "Offhand Tick Hotswap",Backhand.OffhandTickHotswap, sb.toString()).getBoolean();
+
+        sb = new StringBuilder();
         sb.append("These items will be unable to be swapped into the offhand.\n");
         sb.append("Formatting of an item should be: modid:itemname\n");
         sb.append("These should all be placed on separate lines between the provided \'<\' and \'>\'.");

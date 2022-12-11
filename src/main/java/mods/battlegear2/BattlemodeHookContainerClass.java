@@ -10,10 +10,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mods.battlegear2.api.PlayerEventChild;
-import mods.battlegear2.api.core.BattlegearTranslator;
-import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.IBattlePlayer;
-import mods.battlegear2.api.core.InventoryPlayerBattle;
+import mods.battlegear2.api.core.*;
 import mods.battlegear2.packet.BattlegearSyncItemPacket;
 import mods.battlegear2.packet.OffhandPlaceBlockPacket;
 import mods.battlegear2.utils.EnumBGAnimations;
@@ -32,6 +29,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.*;
 import org.apache.logging.log4j.Level;
@@ -69,6 +67,13 @@ public final class BattlemodeHookContainerClass {
                 }
             }
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onEntityConstructing(EntityEvent.EntityConstructing event) {
+        if (!(event.entity instanceof EntityPlayer && ! (isFake(event.entity))))
+            return;
+        event.entity.registerExtendedProperties("OffhandStorage",new OffhandExtendedProperty((EntityPlayer) event.entity));
     }
 
     public static MovingObjectPosition getRaytraceBlock(EntityPlayer p) {

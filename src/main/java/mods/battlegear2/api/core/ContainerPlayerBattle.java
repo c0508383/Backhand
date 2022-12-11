@@ -21,7 +21,7 @@ public class ContainerPlayerBattle extends ContainerPlayer {
                     slot.yDisplayPosition = 21 + ((slot.slotNumber/2)%2) * 18;
                 }
             }
-            this.addSlotToContainer(new OffhandSlot(p_i1819_1_, InventoryPlayerBattle.OFFHAND_ITEM_INDEX, 80, 62));
+            this.addSlotToContainer(new OffhandSlot(p_i1819_1_, -1, 80, 62));
         }
     }
 
@@ -29,6 +29,43 @@ public class ContainerPlayerBattle extends ContainerPlayer {
     {
         public OffhandSlot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_) {
             super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
+        }
+
+        public void onSlotChange(ItemStack p_75220_1_, ItemStack p_75220_2_)
+        {
+            if (p_75220_1_ != null && p_75220_2_ != null)
+            {
+                if (p_75220_1_.getItem() == p_75220_2_.getItem())
+                {
+                    int i = p_75220_2_.stackSize - p_75220_1_.stackSize;
+
+                    if (i > 0)
+                    {
+                        this.onCrafting(p_75220_1_, i);
+                    }
+                }
+            }
+        }
+
+        public ItemStack getStack()
+        {
+            return BattlegearUtils.getOffhandItem(((InventoryPlayer)this.inventory).player);
+        }
+
+        public void putStack(ItemStack p_75215_1_)
+        {
+            BattlegearUtils.setPlayerOffhandItem(((InventoryPlayer)this.inventory).player,p_75215_1_);
+            this.onSlotChanged();
+        }
+
+        public ItemStack decrStackSize(int p_75209_1_)
+        {
+            ItemStack offhandItem = BattlegearUtils.getOffhandItem(((InventoryPlayer)this.inventory).player);
+            offhandItem = offhandItem.splitStack(p_75209_1_);
+            if (offhandItem.stackSize == 0) {
+                return null;
+            }
+            return offhandItem;
         }
 
         public boolean isItemValid(ItemStack p_75214_1_)

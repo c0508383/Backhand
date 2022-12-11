@@ -11,8 +11,10 @@ import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
+import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 
@@ -32,6 +34,19 @@ public class ServerEventsHandler {
                 BattlegearUtils.swapOffhandItem(player);
                 fireworkHotSwapped = 1;
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onLivingDeath(LivingDeathEvent event) {
+        if (!(event.entityLiving instanceof EntityPlayer))
+            return;
+
+        EntityPlayer player = (EntityPlayer) event.entityLiving;
+        if (!BattlegearUtils.hasOffhandInventory(player)) {
+            ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+            player.func_146097_a(offhandItem, true, false);
+            BattlegearUtils.setPlayerOffhandItem(player,null);
         }
     }
 

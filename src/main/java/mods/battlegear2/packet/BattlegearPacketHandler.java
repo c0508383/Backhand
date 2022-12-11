@@ -27,6 +27,7 @@ public final class BattlegearPacketHandler {
         map.put(OffhandSwapPacket.packetName, new OffhandSwapPacket());
         map.put(OffhandSwapClientPacket.packetName, new OffhandSwapClientPacket());
         map.put(OffhandAttackPacket.packetName, new OffhandAttackPacket());
+        map.put(OffhandWorldHotswapPacket.packetName, new OffhandWorldHotswapPacket());
     }
     
     public void register(){
@@ -62,6 +63,8 @@ public final class BattlegearPacketHandler {
     }
 
     public void sendPacketToAll(FMLProxyPacket packet){
-        channels.get(packet.channel()).sendToAll(packet);
+        try {
+            channels.get(packet.channel()).sendToAll(packet);
+        } catch (NullPointerException ignored) {}
     }
 }

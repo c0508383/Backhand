@@ -9,29 +9,38 @@ import invtweaks.InvTweaksContainerSectionManager;
 import invtweaks.api.container.ContainerSection;
 import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.ContainerPlayerBattle;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.play.INetHandlerPlayClient;
+import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.server.S23PacketBlockChange;
+import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.IIcon;
@@ -46,9 +55,7 @@ import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import xonin.backhand.Backhand;
-import xonin.backhand.CommonProxy;
 import xonin.backhand.client.ClientEventHandler;
-import xonin.backhand.client.ClientProxy;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 import java.lang.invoke.MethodHandle;
@@ -453,95 +460,90 @@ public class MysteriumPatchesFixesO {
         m.tryHarvestBlock(p_73082_1_, p_73082_2_, p_73082_3_);
     }
 
-	@Fix(returnSetting=EnumReturnSetting.ON_TRUE)
-	public static boolean onPlayerStoppedUsing(ItemBow bow, ItemStack p_77615_1_, World p_77615_2_, EntityPlayer p_77615_3_, int p_77615_4_)
+    public static boolean ignoreSetSlot = false;
+
+    @Fix(returnSetting=EnumReturnSetting.ALWAYS)
+    public static void handleSetSlot(NetHandlerPlayClient netClient, S2FPacketSetSlot p_147266_1_){
+        EntityClientPlayerMP player = netClient.gameController.thePlayer;
+
+        if (p_147266_1_.func_149175_c() == -1)
+        {
+            player.inventory.setItemStack(p_147266_1_.func_149174_e());
+        }
+        else if (!ignoreSetSlot)
+        {
+            boolean flag = false;
+
+            if (netClient.gameController.currentScreen instanceof GuiContainerCreative)
+            {
+                GuiContainerCreative guicontainercreative = (GuiContainerCreative)netClient.gameController.currentScreen;
+                flag = guicontainercreative.func_147056_g() != CreativeTabs.tabInventory.getTabIndex();
+            }
+
+            if (p_147266_1_.func_149175_c() == 0 && p_147266_1_.func_149173_d() >= 36 && p_147266_1_.func_149173_d() < 45)
+            {
+                ItemStack itemstack = player.inventoryContainer.getSlot(p_147266_1_.func_149173_d()).getStack();
+
+                if (p_147266_1_.func_149174_e() != null && (itemstack == null || itemstack.stackSize < p_147266_1_.func_149174_e().stackSize))
+                {
+                    p_147266_1_.func_149174_e().animationsToGo = 5;
+                }
+
+                player.inventoryContainer.putStackInSlot(p_147266_1_.func_149173_d(), p_147266_1_.func_149174_e());
+            }
+            else if (p_147266_1_.func_149175_c() == player.openContainer.windowId && (p_147266_1_.func_149175_c() != 0 || !flag))
+            {
+                player.openContainer.putStackInSlot(p_147266_1_.func_149173_d(), p_147266_1_.func_149174_e());
+            }
+        }
+    }
+
+    @Fix(returnSetting=EnumReturnSetting.ALWAYS)
+    public static void processUseEntity(NetHandlerPlayServer netServer, C02PacketUseEntity p_147340_1_)
     {
-		if (!(BattlegearUtils.getOffhandItem(p_77615_3_) != null && p_77615_3_.inventory.getCurrentItem() != null && BattlegearUtils.getOffhandItem(p_77615_3_).getItem() == Items.bow && p_77615_3_.inventory.getCurrentItem().getItem() == Items.bow)) {
-        	return false;
+        WorldServer worldserver = netServer.serverController.worldServerForDimension(netServer.playerEntity.dimension);
+        Entity entity = p_147340_1_.func_149564_a(worldserver);
+        netServer.playerEntity.func_143004_u();
+
+        boolean swapOffhand = BattlegearUtils.allowOffhandUse(netServer.playerEntity);
+
+        if (swapOffhand) {
+            BattlegearUtils.swapOffhandItem(netServer.playerEntity);
         }
 
-        int j = bow.getMaxItemUseDuration(p_77615_1_) - p_77615_4_;
-
-        ArrowLooseEvent event = new ArrowLooseEvent(p_77615_3_, p_77615_1_, j);
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled())
+        if (entity != null)
         {
-            return true;
-        }
-        j = event.charge;
+            boolean flag = netServer.playerEntity.canEntityBeSeen(entity);
+            double d0 = 36.0D;
 
-        boolean flag = p_77615_3_.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, p_77615_1_) > 0;
-
-        if (flag || p_77615_3_.inventory.hasItem(Items.arrow))
-        {
-            float f = j / 20.0F;
-            f = (f * f + f * 2.0F) / 3.0F;
-
-            if (f < 0.1D)
+            if (!flag)
             {
-                return true;
+                d0 = 9.0D;
             }
 
-            if (f > 1.0F)
+            if (netServer.playerEntity.getDistanceSqToEntity(entity) < d0)
             {
-                f = 1.0F;
-            }
+                if (p_147340_1_.func_149565_c() == C02PacketUseEntity.Action.INTERACT)
+                {
+                    netServer.playerEntity.interactWith(entity);
+                }
+                else if (p_147340_1_.func_149565_c() == C02PacketUseEntity.Action.ATTACK)
+                {
+                    if (entity instanceof EntityItem || entity instanceof EntityXPOrb || entity instanceof EntityArrow || entity == netServer.playerEntity)
+                    {
+                        netServer.kickPlayerFromServer("Attempting to attack an invalid entity");
+                        netServer.serverController.logWarning("Player " + netServer.playerEntity.getCommandSenderName() + " tried to attack an invalid entity");
+                        return;
+                    }
 
-            EntityArrow entityarrow = new EntityArrow(p_77615_2_, p_77615_3_, f * 2.0F);
-
-            if (flag)
-            {
-                entityarrow.canBePickedUp = 2;
-            }
-            else
-            {
-                p_77615_3_.inventory.consumeInventoryItem(Items.arrow);
-            }
-
-            boolean hasEnough = p_77615_3_.inventory.hasItem(Items.arrow) || flag;
-
-            if (!hasEnough) {
-            	p_77615_3_.inventory.addItemStackToInventory(new ItemStack(Items.arrow, 1));
-            	return true;
-            } else {
-            	if (!flag) p_77615_3_.inventory.consumeInventoryItem(Items.arrow);
-            }
-
-            if (f == 1.0F)
-            {
-                entityarrow.setIsCritical(true);
-            }
-
-            int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, p_77615_1_);
-
-            if (k > 0)
-            {
-                entityarrow.setDamage(entityarrow.getDamage() + k * 0.5D + 0.5D);
-            }
-
-            int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, p_77615_1_);
-
-            if (l > 0)
-            {
-                entityarrow.setKnockbackStrength(l);
-            }
-
-            if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, p_77615_1_) > 0)
-            {
-                entityarrow.setFire(100);
-            }
-
-            p_77615_1_.damageItem(1, p_77615_3_);
-            p_77615_2_.playSoundAtEntity(p_77615_3_, "random.bow", 1.0F, 1.0F / (p_77615_2_.rand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
-
-            if (!p_77615_2_.isRemote)
-            {
-                p_77615_2_.spawnEntityInWorld(entityarrow);
-
+                    netServer.playerEntity.attackTargetEntityWithCurrentItem(entity);
+                }
             }
         }
 
-        return BattlegearUtils.getOffhandItem(p_77615_3_) != null && p_77615_3_.inventory.getCurrentItem() != null && BattlegearUtils.getOffhandItem(p_77615_3_).getItem() instanceof ItemBow && p_77615_3_.inventory.getCurrentItem().getItem() instanceof ItemBow;
+        if (swapOffhand) {
+            BattlegearUtils.swapOffhandItem(netServer.playerEntity);
+        }
     }
 
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
@@ -562,27 +564,6 @@ public class MysteriumPatchesFixesO {
     public static ItemStack getCurrentItem(InventoryPlayer inv)
     {
         return inv.currentItem < 9 && inv.currentItem >= 0 ? inv.mainInventory[inv.currentItem] : inv.currentItem == InventoryPlayerBattle.OFFHAND_HOTBAR_SLOT ? BattlegearUtils.getOffhandItem(inv.player) : null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Fix(returnSetting=EnumReturnSetting.NEVER)
-    public static void func_147112_ai(Minecraft mc)
-    {
-        if (mc.objectMouseOver != null)
-        {
-            boolean flag = mc.thePlayer.capabilities.isCreativeMode && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle;
-            if (flag)
-            {
-                int j;
-
-                if (!net.minecraftforge.common.ForgeHooks.onPickBlock(mc.objectMouseOver, mc.thePlayer, mc.theWorld)) return;
-                // We delete this code wholly instead of commenting it out, to make sure we detect changes in it between MC versions
-
-                j = mc.thePlayer.inventoryContainer.inventorySlots.size() - 10 + mc.thePlayer.inventory.currentItem;
-                mc.playerController.sendSlotPacket(mc.thePlayer.inventory.getStackInSlot(mc.thePlayer.inventory.currentItem), j);
-                mc.objectMouseOver = null;
-            }
-        }
     }
 
     private static final MethodHandle fieldGetSection;
