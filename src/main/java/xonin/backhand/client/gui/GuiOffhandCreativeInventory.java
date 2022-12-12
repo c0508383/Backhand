@@ -1,7 +1,10 @@
 package xonin.backhand.client.gui;
 
 import mods.battlegear2.api.core.BattlegearUtils;
+import mods.battlegear2.api.core.ContainerPlayerBattle;
+import mods.battlegear2.packet.OffhandContainerPacket;
 import mods.battlegear2.packet.OffhandToServerPacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,9 +14,11 @@ import net.minecraft.inventory.Slot;
 import java.util.ArrayList;
 
 public class GuiOffhandCreativeInventory extends GuiContainerCreative {
+    final ContainerPlayerBattle inputContainer;
 
-    public GuiOffhandCreativeInventory(EntityPlayer p_i1088_1_) {
-        super(p_i1088_1_);
+    public GuiOffhandCreativeInventory(EntityPlayer player) {
+        super(player);
+        this.inputContainer = (ContainerPlayerBattle) player.inventoryContainer;
     }
 
     protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_)
@@ -46,7 +51,11 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
 
         if (p_147050_1_ == CreativeTabs.tabInventory)
         {
-            Container container = this.mc.thePlayer.inventoryContainer;
+            Minecraft.getMinecraft().thePlayer.sendQueue.addToSendQueue(
+                    new OffhandContainerPacket(Minecraft.getMinecraft().thePlayer,false).generatePacket()
+            );
+
+            Container container = this.inputContainer;
 
             if (this.field_147063_B == null)
             {

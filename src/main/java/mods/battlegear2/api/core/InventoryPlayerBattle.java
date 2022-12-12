@@ -54,10 +54,10 @@ public class InventoryPlayerBattle extends InventoryPlayer {
             return false;
 
         if (!Backhand.isOffhandBlacklisted(itemStack)) {
-            this.markDirty();
             if (this.getOffhandItem() == null && getFirstEmptyStack() == -1) {
                 this.setOffhandItem(ItemStack.copyItemStack(itemStack));
                 itemStack.stackSize = 0;
+                BattlegearUtils.getOffhandEP(player).offhandItemChanged = true;
                 return true;
             }
 
@@ -70,10 +70,12 @@ public class InventoryPlayerBattle extends InventoryPlayer {
                 if (this.getOffhandItem().stackSize + itemStack.stackSize > this.getOffhandItem().getMaxStackSize()) {
                     itemStack.stackSize -= this.getOffhandItem().stackSize;
                     this.getOffhandItem().stackSize = this.getOffhandItem().getMaxStackSize();
+                    BattlegearUtils.getOffhandEP(player).offhandItemChanged = true;
                     return super.addItemStackToInventory(itemStack);
                 } else {
                     this.getOffhandItem().stackSize += itemStack.stackSize;
                     itemStack.stackSize = 0;
+                    BattlegearUtils.getOffhandEP(player).offhandItemChanged = true;
                     return true;
                 }
             }

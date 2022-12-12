@@ -18,12 +18,16 @@ public class OffhandExtendedProperty implements IExtendedEntityProperties {
 
     @Override
     public void saveNBTData(NBTTagCompound compound) {
-        compound.setTag("OffhandItemStack", offhandItem.writeToNBT(new NBTTagCompound()));
+        if (offhandItem != null) {
+            compound.setTag("OffhandItemStack", offhandItem.writeToNBT(new NBTTagCompound()));
+        }
     }
 
     @Override
     public void loadNBTData(NBTTagCompound compound) {
-        this.setOffhandItem(ItemStack.loadItemStackFromNBT(compound.getCompoundTag("OffhandItemStack")));
+        if (compound.hasKey("OffhandItemStack")) {
+            this.setOffhandItem(ItemStack.loadItemStackFromNBT(compound.getCompoundTag("OffhandItemStack")));
+        }
     }
 
     @Override

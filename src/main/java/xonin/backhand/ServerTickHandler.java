@@ -106,7 +106,7 @@ public class ServerTickHandler {
         }
 
         if (ServerEventsHandler.arrowHotSwapped) {
-            if (offhand.getItem() != Items.arrow) {
+            if (offhand != null && offhand.getItem() != Items.arrow) {
                 BattlegearUtils.swapOffhandItem(player);
             }
             ServerEventsHandler.arrowHotSwapped = false;

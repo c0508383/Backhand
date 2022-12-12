@@ -4,8 +4,11 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.ContainerPlayerBattle;
+import mods.battlegear2.packet.OffhandContainerPacket;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBiped;
@@ -17,6 +20,7 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.*;
+import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import xonin.backhand.Backhand;
@@ -31,13 +35,28 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void openGUI(GuiOpenEvent event) {
+        if (MysteriumPatchesFixesO.disableGUIOpen) {
+            event.setCanceled(true);
+            return;
+        }
+
         Minecraft mc = Minecraft.getMinecraft();
-        if (event.gui != null && mc.thePlayer != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayerBattle && Backhand.ExtraInventorySlot && !Backhand.UseInventorySlot) {
-            if (event.gui.getClass() == GuiInventory.class) {
-                event.gui = new GuiOffhandInventory(mc.thePlayer);
+        EntityClientPlayerMP player = mc.thePlayer;
+        if (player != null) {
+            if (event.gui != null && Backhand.ExtraInventorySlot && !Backhand.UseInventorySlot) {
+                if (event.gui.getClass() == GuiInventory.class || event.gui instanceof GuiContainerCreative && Backhand.CreativeInventoryOffhand) {
+                    player.inventoryContainer = new ContainerPlayerBattle(player.inventory, !player.worldObj.isRemote, player);
+                    event.gui = event.gui.getClass() == GuiInventory.class ? new GuiOffhandInventory(player) : new GuiOffhandCreativeInventory(player);
+                    player.sendQueue.addToSendQueue(new OffhandContainerPacket(player, false).generatePacket());
+                    return;
+                }
             }
-            if (event.gui instanceof GuiContainerCreative && Backhand.CreativeInventoryOffhand) {
-                event.gui = new GuiOffhandCreativeInventory(mc.thePlayer);
+            GuiScreen oldScreen = Minecraft.getMinecraft().currentScreen;
+            if (oldScreen != null && (oldScreen.getClass() == GuiOffhandInventory.class || oldScreen.getClass() == GuiOffhandCreativeInventory.class)) {
+                player.sendQueue.addToSendQueue(
+                        new OffhandContainerPacket(player, true).generatePacket()
+                );
+                MysteriumPatchesFixesO.disableGUIOpen = true;
             }
         }
     }

@@ -25,6 +25,14 @@ public class ContainerPlayerBattle extends ContainerPlayer {
         }
     }
 
+    public ItemStack slotClick(int slot, int p_75144_2_, int p_75144_3_, EntityPlayer player)
+    {
+        if (!(player.inventoryContainer instanceof ContainerPlayerBattle) && slot == 45) {
+            return null;
+        }
+        return super.slotClick(slot, p_75144_2_, p_75144_3_, player);
+    }
+
     public static class OffhandSlot extends Slot
     {
         public OffhandSlot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_) {
