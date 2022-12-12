@@ -11,6 +11,7 @@ import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
+import mods.battlegear2.client.BattlegearClientTickHandler;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -537,6 +538,16 @@ public class MysteriumPatchesFixesO {
         if (swapOffhand) {
             BattlegearUtils.swapOffhandItem(netServer.playerEntity);
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Fix(insertOnExit=true, returnSetting=EnumReturnSetting.ALWAYS)
+    public static boolean interactWithEntitySendPacket(PlayerControllerMP controllerMP, EntityPlayer p_78768_1_, Entity p_78768_2_, @ReturnedValue boolean interacted)
+    {
+        if (interacted) {
+            BattlegearClientTickHandler.attackDelay = 5;
+        }
+        return interacted;
     }
 
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
