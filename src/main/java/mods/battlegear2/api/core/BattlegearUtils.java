@@ -76,7 +76,7 @@ public class BattlegearUtils {
     public static boolean allowOffhandUse(EntityPlayer player) {
         ItemStack mainHandItem = player.getCurrentEquippedItem();
         return mainHandItem == null || (!BattlegearUtils.checkForRightClickFunction(mainHandItem)
-                && !BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()) && player.getItemInUse() != mainHandItem);
+                && !BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()));
     }
 
     public static OffhandExtendedProperty getOffhandEP(EntityPlayer player) {

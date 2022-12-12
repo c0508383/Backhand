@@ -117,7 +117,9 @@ public final class BattlegearClientTickHandler {
 
         if (mouseOver != null && mouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
         {
-            if (BattlegearUtils.blockHasUse(player.worldObj.getBlock(mouseOver.blockX, mouseOver.blockY,mouseOver.blockZ))) {
+            if (BattlegearUtils.blockHasUse(player.worldObj.getBlock(mouseOver.blockX, mouseOver.blockY,mouseOver.blockZ))
+                && !BattlegearUtils.getOffhandItem(player).getItem().doesSneakBypassUse(player.worldObj, mouseOver.blockX, mouseOver.blockY,mouseOver.blockZ, player)
+                && !(offhandItem.getItem() instanceof ItemBlock)) {
                 ticksBeforeUse = 4;
                 return false;
             }
