@@ -30,13 +30,16 @@ import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.*;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
+import net.minecraft.network.play.client.C0EPacketClickWindow;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
+import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.IIcon;
@@ -54,6 +57,7 @@ import xonin.backhand.client.renderer.RenderOffhandPlayer;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 public class MysteriumPatchesFixesO {
     /**Dirty hack to prevent random resetting of block removal (why does this even happen?!) when breaking blocks with the offhand.*/
@@ -462,7 +466,7 @@ public class MysteriumPatchesFixesO {
 
         if (p_147266_1_.func_149175_c() == -1)
         {
-            player.inventory.setItemStack(p_147266_1_.func_149174_e());
+            player.inventory.setItemStack(p_147266_1_.func_149174_e() == null || p_147266_1_.func_149174_e().stackSize == 0 ? null : p_147266_1_.func_149174_e());
         }
         else if (!ignoreSetSlot)
         {
@@ -478,16 +482,16 @@ public class MysteriumPatchesFixesO {
             {
                 ItemStack itemstack = player.inventoryContainer.getSlot(p_147266_1_.func_149173_d()).getStack();
 
-                if (p_147266_1_.func_149174_e() != null && (itemstack == null || itemstack.stackSize < p_147266_1_.func_149174_e().stackSize))
+                if (p_147266_1_.func_149174_e() != null && p_147266_1_.func_149174_e().stackSize != 0 && (itemstack == null || itemstack.stackSize < p_147266_1_.func_149174_e().stackSize))
                 {
                     p_147266_1_.func_149174_e().animationsToGo = 5;
                 }
 
-                player.inventoryContainer.putStackInSlot(p_147266_1_.func_149173_d(), p_147266_1_.func_149174_e());
+                player.inventoryContainer.putStackInSlot(p_147266_1_.func_149173_d(), p_147266_1_.func_149174_e() == null || p_147266_1_.func_149174_e().stackSize == 0 ? null : p_147266_1_.func_149174_e());
             }
             else if (p_147266_1_.func_149175_c() == player.openContainer.windowId && (p_147266_1_.func_149175_c() != 0 || !flag))
             {
-                player.openContainer.putStackInSlot(p_147266_1_.func_149173_d(), p_147266_1_.func_149174_e());
+                player.openContainer.putStackInSlot(p_147266_1_.func_149173_d(), p_147266_1_.func_149174_e() == null || p_147266_1_.func_149174_e().stackSize == 0 ? null : p_147266_1_.func_149174_e());
             }
         }
     }
@@ -563,6 +567,40 @@ public class MysteriumPatchesFixesO {
             System.out.println(server.playerEntity.getCommandSenderName() + " tried to set an invalid carried item " + p_147355_1_.func_149614_c());
         }
     }
+
+    /*@Fix(returnSetting=EnumReturnSetting.ALWAYS)
+    public static void processClickWindow(NetHandlerPlayServer server, C0EPacketClickWindow p_147351_1_)
+    {
+        server.playerEntity.func_143004_u();
+
+        if (server.playerEntity.openContainer.windowId == p_147351_1_.func_149548_c() && server.playerEntity.openContainer.isPlayerNotUsingContainer(server.playerEntity))
+        {
+            ItemStack itemstack = server.playerEntity.openContainer.slotClick(p_147351_1_.func_149544_d(), p_147351_1_.func_149543_e(), p_147351_1_.func_149542_h(), server.playerEntity);
+
+            if (ItemStack.areItemStacksEqual(p_147351_1_.func_149546_g(), itemstack))
+            {
+                server.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(p_147351_1_.func_149548_c(), p_147351_1_.func_149547_f(), true));
+                server.playerEntity.isChangingQuantityOnly = true;
+                server.playerEntity.openContainer.detectAndSendChanges();
+                server.playerEntity.updateHeldItem();
+                server.playerEntity.isChangingQuantityOnly = false;
+            }
+            else
+            {
+                server.field_147372_n.addKey(server.playerEntity.openContainer.windowId, Short.valueOf(p_147351_1_.func_149547_f()));
+                server.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(p_147351_1_.func_149548_c(), p_147351_1_.func_149547_f(), false));
+                server.playerEntity.openContainer.setPlayerIsPresent(server.playerEntity, false);
+                ArrayList arraylist = new ArrayList();
+
+                for (int i = 0; i < server.playerEntity.openContainer.inventorySlots.size(); ++i)
+                {
+                    arraylist.add(((Slot)server.playerEntity.openContainer.inventorySlots.get(i)).getStack());
+                }
+
+                server.playerEntity.sendContainerAndContentsToPlayer(server.playerEntity.openContainer, arraylist);
+            }
+        }
+    }*/
 
     @Fix(insertOnExit=true,returnSetting=EnumReturnSetting.ON_NOT_NULL)
     public static ItemStack getCurrentItem(InventoryPlayer inv)

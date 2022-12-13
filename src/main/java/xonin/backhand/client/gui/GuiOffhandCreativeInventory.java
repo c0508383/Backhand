@@ -34,9 +34,11 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
     @Override
     public void onGuiClosed() {
         super.onGuiClosed();
-        this.mc.thePlayer.sendQueue.addToSendQueue(
-                new OffhandToServerPacket(BattlegearUtils.getOffhandItem(this.mc.thePlayer), this.mc.thePlayer).generatePacket()
-        );
+        if (Minecraft.getMinecraft().thePlayer != null) {
+            Minecraft.getMinecraft().thePlayer.sendQueue.addToSendQueue(
+                    new OffhandToServerPacket(BattlegearUtils.getOffhandItem(Minecraft.getMinecraft().thePlayer), this.mc.thePlayer).generatePacket()
+            );
+        }
     }
 
     public void setCurrentCreativeTab(CreativeTabs p_147050_1_)
