@@ -12,6 +12,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import mods.battlegear2.api.PlayerEventChild;
 import mods.battlegear2.api.core.*;
 import mods.battlegear2.packet.BattlegearSyncItemPacket;
+import mods.battlegear2.packet.OffhandConfigSyncPacket;
 import mods.battlegear2.packet.OffhandPlaceBlockPacket;
 import mods.battlegear2.utils.EnumBGAnimations;
 import net.minecraft.block.Block;
@@ -45,11 +46,7 @@ public final class BattlemodeHookContainerClass {
     private boolean isFake(Entity entity){
         return entity instanceof FakePlayer;
     }
-    /**
-     * Crash the game if our inventory has been replaced by something else, or the coremod failed
-     * Also synchronize battle inventory
-     * @param event that spawned the player
-     */
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onEntityJoin(EntityJoinWorldEvent event){
         if (event.entity instanceof EntityPlayer && !(isFake(event.entity))) {
@@ -59,6 +56,7 @@ public final class BattlemodeHookContainerClass {
                     FMLLog.log("Backhand", Level.INFO, "Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
                 }
             }
+            Backhand.packetHandler.sendPacketToAll(new OffhandConfigSyncPacket().generatePacket());
             ItemStack offhandItem = BattlegearUtils.getOffhandItem((EntityPlayer) event.entity);
             if (Backhand.isOffhandBlacklisted(offhandItem)) {
                 BattlegearUtils.setPlayerOffhandItem((EntityPlayer) event.entity,null);

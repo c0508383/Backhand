@@ -65,6 +65,7 @@ public class MysteriumPatchesFixesO {
     /**If we have hotswapped the breaking item with the one in offhand and should hotswap it back when called next*/
     public static boolean hotSwapped = false;
     public static boolean disableGUIOpen = false;
+    public static boolean receivedConfigs = false;
 
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
 	public static boolean isPlayer(EntityPlayer p) {

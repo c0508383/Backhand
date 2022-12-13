@@ -30,6 +30,7 @@ public final class BattlegearPacketHandler {
         map.put(OffhandAttackPacket.packetName, new OffhandAttackPacket());
         map.put(OffhandWorldHotswapPacket.packetName, new OffhandWorldHotswapPacket());
         map.put(OffhandContainerPacket.packetName, new OffhandContainerPacket());
+        map.put(OffhandConfigSyncPacket.packetName, new OffhandConfigSyncPacket());
     }
     
     public void register(){

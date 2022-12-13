@@ -40,6 +40,10 @@ public class ClientEventHandler {
             return;
         }
 
+        if (!MysteriumPatchesFixesO.receivedConfigs) {
+            return;
+        }
+
         Minecraft mc = Minecraft.getMinecraft();
         EntityClientPlayerMP player = mc.thePlayer;
         if (player != null) {
