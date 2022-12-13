@@ -38,7 +38,7 @@ public class ServerTickHandler {
                 ItemStack offhand = BattlegearUtils.getOffhandItem(player) == null ? null : BattlegearUtils.getOffhandItem(player).copy();
 
                 if (event.phase == TickEvent.Phase.START && !player.isUsingItem()) {
-                    if (!BattlegearUtils.checkForRightClickFunction(mainhand)) {
+                    if (!BattlegearUtils.checkForRightClickFunction(mainhand) && offhand != null) {
                         if (!tickStartItems.containsKey(player.getUniqueID())) {
                             Backhand.packetHandler.sendPacketToPlayer(
                                     new OffhandWorldHotswapPacket(true).generatePacket(), (EntityPlayerMP) player
