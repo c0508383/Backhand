@@ -66,6 +66,9 @@ public class BattlegearUtils {
     public static void setPlayerOffhandItem(EntityPlayer player, ItemStack stack) {
         if (!Backhand.isOffhandBlacklisted(stack)) {
             if (Backhand.UseInventorySlot) {
+                if (!ItemStack.areItemStacksEqual(stack,player.inventory.getStackInSlot(Backhand.AlternateOffhandSlot))) {
+                    player.inventory.inventoryChanged = true;
+                }
                 player.inventory.setInventorySlotContents(Backhand.AlternateOffhandSlot, stack);
             } else {
                 getOffhandEP(player).setOffhandItem(stack);

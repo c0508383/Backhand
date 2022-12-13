@@ -96,11 +96,16 @@ public class ServerTickHandler {
             prevStackInSlot = offhand;
         }
 
-        if (BattlegearUtils.getOffhandEP(player).offhandItemChanged) {
+        if (BattlegearUtils.getOffhandEP(player).offhandItemChanged || player.inventory.inventoryChanged) {
             if (!tickStartItems.containsKey(player.getUniqueID())) {
                 Backhand.packetHandler.sendPacketToAll(new BattlegearSyncItemPacket(player).generatePacket());
             }
-            BattlegearUtils.getOffhandEP(player).offhandItemChanged = false;
+            if (BattlegearUtils.getOffhandEP(player).offhandItemChanged) {
+                BattlegearUtils.getOffhandEP(player).offhandItemChanged = false;
+            }
+            if (player.inventory.inventoryChanged) {
+                player.inventory.inventoryChanged = false;
+            }
         }
 
         if (ServerEventsHandler.arrowHotSwapped) {
