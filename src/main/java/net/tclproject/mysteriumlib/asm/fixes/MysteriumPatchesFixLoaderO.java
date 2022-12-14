@@ -12,8 +12,7 @@ public class MysteriumPatchesFixLoaderO extends CustomLoadingPlugin {
 		new PlayerControllerMPTransformer(),
 		new ItemInWorldTransformer(),
 		new EntityAIControlledByPlayerTransformer(),
-		new EntityOtherPlayerMPTransformer(),
-		new NetClientHandlerTransformer()
+		new EntityOtherPlayerMPTransformer()
     };
 	
     // Turns on MysteriumASM Lib. You can do this in only one of your Fix Loaders.

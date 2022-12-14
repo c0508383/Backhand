@@ -3,6 +3,7 @@ package mods.battlegear2.packet;
 import java.util.Hashtable;
 import java.util.Map;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
@@ -27,6 +28,9 @@ public final class BattlegearPacketHandler {
         map.put(OffhandSwapPacket.packetName, new OffhandSwapPacket());
         map.put(OffhandSwapClientPacket.packetName, new OffhandSwapClientPacket());
         map.put(OffhandAttackPacket.packetName, new OffhandAttackPacket());
+        map.put(OffhandWorldHotswapPacket.packetName, new OffhandWorldHotswapPacket());
+        map.put(OffhandContainerPacket.packetName, new OffhandContainerPacket());
+        map.put(OffhandConfigSyncPacket.packetName, new OffhandConfigSyncPacket());
     }
     
     public void register(){
@@ -49,7 +53,9 @@ public final class BattlegearPacketHandler {
     }
 
     public void sendPacketToPlayer(FMLProxyPacket packet, EntityPlayerMP player){
-        channels.get(packet.channel()).sendTo(packet, player);
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+            channels.get(packet.channel()).sendTo(packet, player);
+        }
     }
 
     public void sendPacketToServer(FMLProxyPacket packet){
@@ -58,10 +64,14 @@ public final class BattlegearPacketHandler {
     }
 
     public void sendPacketAround(Entity entity, double range, FMLProxyPacket packet){
-        channels.get(packet.channel()).sendToAllAround(packet, new NetworkRegistry.TargetPoint(entity.dimension, entity.posX, entity.posY, entity.posZ, range));
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+            channels.get(packet.channel()).sendToAllAround(packet, new NetworkRegistry.TargetPoint(entity.dimension, entity.posX, entity.posY, entity.posZ, range));
+        }
     }
 
     public void sendPacketToAll(FMLProxyPacket packet){
-        channels.get(packet.channel()).sendToAll(packet);
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+            channels.get(packet.channel()).sendToAll(packet);
+        }
     }
 }

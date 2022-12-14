@@ -1,20 +1,12 @@
 package xonin.backhand.client.gui;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.config.DummyConfigElement;
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.IConfigElement;
 import mods.battlegear2.client.gui.controls.GuiToggleButton;
 import mods.battlegear2.utils.BattlegearConfig;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
-import net.minecraftforge.client.gui.ForgeGuiFactory;
 import xonin.backhand.Backhand;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BackhandConfigGui extends GuiScreen {
     private final GuiScreen parent;
@@ -27,7 +19,12 @@ public class BackhandConfigGui extends GuiScreen {
     @Override
     public void initGui() {
         this.buttonList.add(new GuiButton(1, this.width / 2 - 75, this.height - 38, I18n.format("gui.done")));
-        this.buttonList.add(new GuiToggleButton(10, this.width / 2 - 75, this.height / 2, I18n.format("backhandconfig.offhandRest")+":"+ Backhand.RenderEmptyOffhandAtRest, this.fontRendererObj));
+        this.buttonList.add(new GuiToggleButton(10, this.width / 2 - 75, this.height / 2 - 12, I18n.format("backhandconfig.offhandRest") + ":" + Backhand.RenderEmptyOffhandAtRest, this.fontRendererObj));
+        this.buttonList.add(new GuiToggleButton(11, this.width / 2 - 75, this.height / 2 + 12, I18n.format("backhandconfig.creativeOffhand") + ":" + Backhand.CreativeInventoryOffhand, this.fontRendererObj));
+
+        for (Object obj : this.buttonList) {
+            ((GuiButton)obj).xPosition = this.width/2 - ((GuiButton)obj).getButtonWidth()/2;
+        }
     }
 
     @Override
@@ -38,6 +35,9 @@ public class BackhandConfigGui extends GuiScreen {
             }
             if (button.id == 10) {
                 Backhand.RenderEmptyOffhandAtRest = !Backhand.RenderEmptyOffhandAtRest;
+            }
+            if (button.id == 11) {
+                Backhand.CreativeInventoryOffhand = !Backhand.CreativeInventoryOffhand;
             }
             if(button instanceof GuiToggleButton){
                 ((GuiToggleButton) button).toggleDisplayString();

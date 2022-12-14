@@ -1,80 +1,132 @@
 package xonin.backhand;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.relauncher.Side;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.InventoryPlayerBattle;
+import mods.battlegear2.packet.BattlegearSyncItemPacket;
+import mods.battlegear2.packet.OffhandWorldHotswapPacket;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+
+import java.util.*;
 
 public class ServerTickHandler {
 
     public ItemStack prevStackInSlot;
     public int blacklistDelay = -1;
 
+    public static HashMap<UUID,List<ItemStack>> tickStartItems = new HashMap<>();
+
+    @SubscribeEvent
+    @SuppressWarnings("unchecked")
+    public void onUpdateWorld(TickEvent.WorldTickEvent event) {
+        if (FMLCommonHandler.instance().getEffectiveSide() != Side.SERVER) {
+            return;
+        }
+
+        if (Backhand.OffhandTickHotswap) {
+            List<EntityPlayer> players = event.world.playerEntities;
+            for (EntityPlayer player : players) {
+                ItemStack mainhand = player.getCurrentEquippedItem() == null ? null : player.getCurrentEquippedItem().copy();
+                ItemStack offhand = BattlegearUtils.getOffhandItem(player) == null ? null : BattlegearUtils.getOffhandItem(player).copy();
+
+                if (event.phase == TickEvent.Phase.START && !player.isUsingItem()) {
+                    if (!BattlegearUtils.checkForRightClickFunction(mainhand) && offhand != null) {
+                        if (!tickStartItems.containsKey(player.getUniqueID())) {
+                            Backhand.packetHandler.sendPacketToPlayer(
+                                    new OffhandWorldHotswapPacket(true).generatePacket(), (EntityPlayerMP) player
+                            );
+                        }
+                        tickStartItems.put(player.getUniqueID(), Arrays.asList(mainhand, offhand));
+                        player.setCurrentItemOrArmor(0, tickStartItems.get(player.getUniqueID()).get(1));
+                    }
+                } else if (tickStartItems.containsKey(player.getUniqueID())) {
+                    player.setCurrentItemOrArmor(0, tickStartItems.get(player.getUniqueID()).get(0));
+                    BattlegearUtils.setPlayerOffhandItem(player, tickStartItems.get(player.getUniqueID()).get(1));
+                    tickStartItems.remove(player.getUniqueID());
+                    Backhand.packetHandler.sendPacketToPlayer(
+                            new OffhandWorldHotswapPacket(false).generatePacket(), (EntityPlayerMP) player
+                    );
+                }
+            }
+        }
+    }
+
     @SubscribeEvent(
             priority = EventPriority.HIGHEST
     )
     public void onUpdatePlayer(TickEvent.PlayerTickEvent event)
     {
-        ItemStack offhandItem = BattlegearUtils.getOffhandItem(event.player);
+        EntityPlayer player = event.player;
+        ItemStack offhand = BattlegearUtils.getOffhandItem(player);
 
-        if (BattlegearUtils.hasOffhandInventory(event.player) && !Backhand.UseInventorySlot) {
-            int slot = InventoryPlayerBattle.OFFHAND_ITEM_INDEX;
-            if (offhandItem != event.player.inventory.getStackInSlot(slot)) {
-                if (event.player.inventory.getStackInSlot(slot) == null || event.player.inventory.getStackInSlot(slot).stackSize == 0) {
-                    BattlegearUtils.setPlayerOffhandItem(event.player, null);
-                    event.player.inventory.setInventorySlotContents(slot, null);
-                } else {
-                    BattlegearUtils.setPlayerOffhandItem(event.player, BattlegearUtils.getOffhandItem(event.player));
-                }
-                event.player.inventory.markDirty();
-            }
-        } else if (event.phase == TickEvent.Phase.END) {
+        if (event.phase == TickEvent.Phase.END) {
             if (blacklistDelay > 0) {
                 blacklistDelay--;
             }
-            if (Backhand.isOffhandBlacklisted(offhandItem)) {
-                if (!ItemStack.areItemStacksEqual(offhandItem,prevStackInSlot)) {
+            if (Backhand.isOffhandBlacklisted(offhand)) {
+                if (!ItemStack.areItemStacksEqual(offhand,prevStackInSlot)) {
                     blacklistDelay = 10;
-                    event.player.inventoryContainer.detectAndSendChanges();
-                }
-                if (blacklistDelay == 0) {
-                    BattlegearUtils.setPlayerOffhandItem(event.player,null);
+                } else if (blacklistDelay == 0) {
+                    BattlegearUtils.setPlayerOffhandItem(player,null);
 
                     boolean foundSlot = false;
-                    for (int i = 0; i < event.player.inventory.getSizeInventory() - 4; i++) {
+                    for (int i = 0; i < player.inventory.getSizeInventory() - 4; i++) {
                         if (i == Backhand.AlternateOffhandSlot)
                             continue;
-                        if (event.player.inventory.getStackInSlot(i) == null) {
-                            event.player.inventory.setInventorySlotContents(i,offhandItem);
+                        if (player.inventory.getStackInSlot(i) == null) {
+                            player.inventory.setInventorySlotContents(i,offhand);
                             foundSlot = true;
                             break;
                         }
                     }
                     if (!foundSlot) {
-                        event.player.entityDropItem(offhandItem,0);
+                        player.entityDropItem(offhand,0);
                     }
-                    event.player.inventoryContainer.detectAndSendChanges();
+                    player.inventoryContainer.detectAndSendChanges();
                 }
             }
-            prevStackInSlot = offhandItem;
+            prevStackInSlot = offhand;
+        }
+
+        if (BattlegearUtils.getOffhandEP(player).offhandItemChanged || player.inventory.inventoryChanged) {
+            if (!tickStartItems.containsKey(player.getUniqueID())) {
+                Backhand.packetHandler.sendPacketToAll(new BattlegearSyncItemPacket(player).generatePacket());
+            }
+            if (BattlegearUtils.getOffhandEP(player).offhandItemChanged) {
+                BattlegearUtils.getOffhandEP(player).offhandItemChanged = false;
+            }
+            if (player.inventory.inventoryChanged) {
+                player.inventory.inventoryChanged = false;
+            }
         }
 
         if (ServerEventsHandler.arrowHotSwapped) {
-            final ItemStack oldItem = event.player.getCurrentEquippedItem();
-            if (offhandItem.getItem() != Items.arrow) {
-                BattlegearUtils.setPlayerCurrentItem(event.player, offhandItem);
-                BattlegearUtils.setPlayerOffhandItem(event.player, oldItem);
+            if (offhand != null && offhand.getItem() != Items.arrow) {
+                BattlegearUtils.swapOffhandItem(player);
             }
             ServerEventsHandler.arrowHotSwapped = false;
         }
         if (ServerEventsHandler.totemHotSwapped) {
-            final ItemStack oldItem = event.player.getCurrentEquippedItem();
-            BattlegearUtils.setPlayerCurrentItem(event.player, offhandItem);
-            BattlegearUtils.setPlayerOffhandItem(event.player, oldItem);
+            BattlegearUtils.swapOffhandItem(player);
             ServerEventsHandler.totemHotSwapped = false;
+        }
+
+        if (ServerEventsHandler.fireworkHotSwapped > 0) {
+            ServerEventsHandler.fireworkHotSwapped--;
+        } else if (ServerEventsHandler.fireworkHotSwapped == 0) {
+            BattlegearUtils.swapOffhandItem(player);
+            ServerEventsHandler.fireworkHotSwapped--;
+            MinecraftForge.EVENT_BUS.post(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR,
+                    (int)player.posX, (int)player.posY, (int)player.posZ, -1, player.worldObj));
+            BattlegearUtils.swapOffhandItem(player);
         }
     }
 }

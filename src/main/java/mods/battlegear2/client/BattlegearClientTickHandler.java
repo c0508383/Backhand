@@ -38,11 +38,9 @@ import xonin.backhand.client.ClientTickHandler;
 
 public final class BattlegearClientTickHandler {
     public final Minecraft mc = Minecraft.getMinecraft();
-
-    public float partialTick;
-    public int previousBattlemode = 0;
     public static float ticksBeforeUse = 0;
-    public static final BattlegearClientTickHandler INSTANCE = new BattlegearClientTickHandler();
+    public static boolean prevRightClickHeld = false;
+    public static int attackDelay = 0;
 
     public BattlegearClientTickHandler() {
     }
@@ -61,18 +59,31 @@ public final class BattlegearClientTickHandler {
 
     @SideOnly(Side.CLIENT)
     public void tickStart(EntityPlayer player) {
+        ItemStack mainhand = player.getCurrentEquippedItem();
         ItemStack offhand = BattlegearUtils.getOffhandItem(player);
+        boolean mainhandUse = BattlegearUtils.checkForRightClickFunction(mainhand);
+        boolean offhandUse = BattlegearUtils.checkForRightClickFunction(offhand);
+        if (attackDelay > 0) {
+            attackDelay--;
+        }
+
+        boolean usedItem = false;
         if (offhand != null) {
             if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
                 if (ticksBeforeUse == 0) {
-                    tryCheckUseItem(offhand, player);
+                    usedItem = tryCheckUseItem(offhand, player);
                 }
             } else {
                 ticksBeforeUse = 0;
             }
         }
-        if (mc.gameSettings.keyBindUseItem.getIsKeyPressed()) {
-            tryAttackEntity(player);
+        if (mc.gameSettings.keyBindUseItem.getIsKeyPressed() && attackDelay == 0 && !usedItem) {
+            if (!prevRightClickHeld && player.getItemInUse() == null && !mainhandUse && !offhandUse) {
+                tryAttackEntity(player);
+            }
+            prevRightClickHeld = true;
+        } else {
+            prevRightClickHeld = false;
         }
         if (player.getItemInUse() == null) {
             CommonProxy.offhandItemUsed = null;
@@ -90,29 +101,41 @@ public final class BattlegearClientTickHandler {
     }
 
     @SideOnly(Side.CLIENT)
-    public void tryCheckUseItem(ItemStack offhandItem, EntityPlayer player){
+    public boolean tryCheckUseItem(ItemStack offhandItem, EntityPlayer player){
+        MovingObjectPosition mouseOver = mc.objectMouseOver;
+
         if (offhandItem.getItem() instanceof ItemBow && !Backhand.UseOffhandBow) {
-            return;
+            return false;
         }
 
         ItemStack mainHandItem = player.getCurrentEquippedItem();
-        if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem) || offhandItem == null)) {
-            return;
+        if (mainHandItem != null && (BattlegearUtils.checkForRightClickFunction(mainHandItem)
+                    || BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()) || player.getItemInUse() == mainHandItem)) {
+            ticksBeforeUse = 10;
+            return false;
         }
 
-        MovingObjectPosition mop = BattlemodeHookContainerClass.getRaytraceBlock(player);
-        if (mop != null && BattlemodeHookContainerClass.canBlockBeInteractedWith(player.worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
-            return;
+        if (mouseOver != null && mouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+        {
+            if (BattlegearUtils.blockHasUse(player.worldObj.getBlock(mouseOver.blockX, mouseOver.blockY,mouseOver.blockZ))
+                && !BattlegearUtils.getOffhandItem(player).getItem().doesSneakBypassUse(player.worldObj, mouseOver.blockX, mouseOver.blockY,mouseOver.blockZ, player)
+                && !(offhandItem.getItem() instanceof ItemBlock)) {
+                ticksBeforeUse = 4;
+                return false;
+            }
         }
+
+        boolean interacted = false;
         if (BattlegearUtils.usagePriorAttack(offhandItem)) {
-            MovingObjectPosition mouseOver = mc.objectMouseOver;
             boolean flag = true;
             if (mouseOver != null)
             {
                 if (mouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY)
                 {
-                    if(mc.playerController.interactWithEntitySendPacket(player, mouseOver.entityHit))
+                    if(mc.playerController.interactWithEntitySendPacket(player, mouseOver.entityHit)) {
                         flag = false;
+                        interacted = true;
+                    }
                 }
 
                 if (flag)
@@ -120,7 +143,7 @@ public final class BattlegearClientTickHandler {
                     offhandItem = BattlegearUtils.getOffhandItem(player);
                     PlayerEventChild.UseOffhandItemEvent useItemEvent = new PlayerEventChild.UseOffhandItemEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, 0, 0, 0, -1, player.worldObj), offhandItem);
                     if (offhandItem != null && !MinecraftForge.EVENT_BUS.post(useItemEvent)) {
-                        BattlemodeHookContainerClass.tryUseItem(player, offhandItem, Side.CLIENT);
+                        interacted = BattlemodeHookContainerClass.tryUseItem(player, offhandItem, Side.CLIENT);
                     }
                 }
 
@@ -137,6 +160,7 @@ public final class BattlegearClientTickHandler {
                         if (player.capabilities.allowEdit || !BattlemodeHookContainerClass.isItemBlock(offhandItem.getItem())) {
                             if (!MinecraftForge.EVENT_BUS.post(useItemEvent) && onPlayerPlaceBlock(mc.playerController, player, offhandItem, j, k, l, i1, mouseOver.hitVec)) {
                                 ((IBattlePlayer) player).swingOffItem();
+                                interacted = true;
                             }
                         }
                         if (offhandItem.stackSize == 0)
@@ -148,6 +172,8 @@ public final class BattlegearClientTickHandler {
             }
             ticksBeforeUse = 4;
         }
+
+        return interacted;
     }
 
     private boolean onPlayerPlaceBlock(PlayerControllerMP controller, EntityPlayer player, ItemStack offhand, int i, int j, int k, int l, Vec3 hitVec) {
@@ -161,6 +187,18 @@ public final class BattlegearClientTickHandler {
         Minecraft mc = Minecraft.getMinecraft();
         MovingObjectPosition objectMouseOver = mc.objectMouseOver;
         Block block = mc.theWorld.getBlock(objectMouseOver.blockX, objectMouseOver.blockY, objectMouseOver.blockZ);
+
+        Block b = worldObj.getBlock(i, j, k);
+        boolean blockActivated = b.onBlockActivated(worldObj, i, j, k, player, l, f, f1, f2);
+        boolean prevSneaking = player.isSneaking();
+        player.setSneaking(true);
+        boolean blockSneakActivated = b.onBlockActivated(worldObj, i, j, k, player, l, f, f1, f2);
+        player.setSneaking(prevSneaking);
+
+        if (blockActivated && !(player.isSneaking() && blockSneakActivated)) {
+            return false;
+        }
+
         if (player.getCurrentEquippedItem() != null) {
             if ((block instanceof BlockLog && player.getCurrentEquippedItem().getItem() instanceof ItemAxe)
                     || (block instanceof BlockGrass && player.getCurrentEquippedItem().getItem() instanceof ItemSpade)) {
@@ -171,12 +209,11 @@ public final class BattlegearClientTickHandler {
         if (offhand.getItem().onItemUseFirst(offhand, player, worldObj, i, j, k, l, f, f1, f2)){
             return true;
         }
-        if (!player.isSneaking() || BattlegearUtils.getOffhandItem(player) == null || BattlegearUtils.getOffhandItem(player).getItem().doesSneakBypassUse(worldObj, i, j, k, player)){
-            Block b = worldObj.getBlock(i, j, k);
-            if (!b.isAir(worldObj, i, j, k) && b.onBlockActivated(worldObj, i, j, k, player, l, f, f1, f2)){
+        /*if (!player.isSneaking() || BattlegearUtils.getOffhandItem(player) == null || BattlegearUtils.getOffhandItem(player).getItem().doesSneakBypassUse(worldObj, i, j, k, player)){
+            if (!b.isAir(worldObj, i, j, k)){
                 flag = true;
             }
-        }
+        }*/
         if (!flag && offhand.getItem() instanceof ItemBlock){
             ItemBlock itemblock = (ItemBlock)offhand.getItem();
             if (!itemblock.func_150936_a(worldObj, i, j, k, l, player, offhand)){
@@ -227,6 +264,7 @@ public final class BattlegearClientTickHandler {
                 if (!(BattlegearUtils.usagePriorAttack(offhandItem)) && (offhandItem == null || !(offhandItem.getItem() instanceof ItemSword))) {
                     PlayerControllerMP.clickBlockCreative(mcInstance, mcInstance.playerController, i, j, k, objectMouseOver.sideHit);
                     BattlemodeHookContainerClass.sendOffSwingEventNoCheck(event.player, mainHandItem, offhandItem); // force offhand swing anyway because we broke a block
+                    mcInstance.getNetHandler().addToSendQueue(new C07PacketPlayerDigging(2, i, j, k, objectMouseOver.sideHit));
                 }
                 ClientTickHandler.delay = 20;
             }
@@ -241,6 +279,11 @@ public final class BattlegearClientTickHandler {
             else
             {
                 mcInstance.playerController.isHittingBlock = true;
+
+                if (mcInstance.playerController.currentBlockX != i || mcInstance.playerController.currentBlockY != j || mcInstance.playerController.currentblockZ != k) {
+                    mcInstance.playerController.curBlockDamageMP = 0f;
+                }
+
                 mcInstance.playerController.currentBlockX = i;
                 mcInstance.playerController.currentBlockY = j;
                 mcInstance.playerController.currentblockZ = k;

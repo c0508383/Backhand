@@ -1,7 +1,10 @@
 package xonin.backhand.client.gui;
 
 import mods.battlegear2.api.core.BattlegearUtils;
+import mods.battlegear2.api.core.ContainerPlayerBattle;
+import mods.battlegear2.packet.OffhandContainerPacket;
 import mods.battlegear2.packet.OffhandToServerPacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,15 +14,18 @@ import net.minecraft.inventory.Slot;
 import java.util.ArrayList;
 
 public class GuiOffhandCreativeInventory extends GuiContainerCreative {
+    final ContainerPlayerBattle inputContainer;
 
-    public GuiOffhandCreativeInventory(EntityPlayer p_i1088_1_) {
-        super(p_i1088_1_);
+    public GuiOffhandCreativeInventory(EntityPlayer player) {
+        super(player);
+        this.inputContainer = (ContainerPlayerBattle) player.inventoryContainer;
     }
 
     protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_)
     {
         super.drawGuiContainerBackgroundLayer(p_146976_1_,p_146976_2_,p_146976_3_);
-        if (selectedTabIndex == CreativeTabs.tabInventory.getTabIndex()) {
+        CreativeTabs creativetabs = CreativeTabs.creativeTabArray[GuiContainerCreative.selectedTabIndex];
+        if (creativetabs == CreativeTabs.tabInventory) {
             this.mc.getTextureManager().bindTexture(field_147001_a);
             this.drawTexturedModalRect(81 + guiLeft, 32 + guiTop, 7, 83, 18, 18);
         }
@@ -28,16 +34,18 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
     @Override
     public void onGuiClosed() {
         super.onGuiClosed();
-        this.mc.thePlayer.sendQueue.addToSendQueue(
-                new OffhandToServerPacket(BattlegearUtils.getOffhandItem(this.mc.thePlayer), this.mc.thePlayer).generatePacket()
-        );
+        if (Minecraft.getMinecraft().thePlayer != null) {
+            Minecraft.getMinecraft().thePlayer.sendQueue.addToSendQueue(
+                    new OffhandToServerPacket(BattlegearUtils.getOffhandItem(Minecraft.getMinecraft().thePlayer), this.mc.thePlayer).generatePacket()
+            );
+        }
     }
 
     public void setCurrentCreativeTab(CreativeTabs p_147050_1_)
     {
         if (p_147050_1_ == null) return;
-        int i = selectedTabIndex;
-        selectedTabIndex = p_147050_1_.getTabIndex();
+        int i = GuiContainerCreative.selectedTabIndex;
+        GuiContainerCreative.selectedTabIndex = p_147050_1_.getTabIndex();
         GuiContainerCreative.ContainerCreative containercreative = (GuiContainerCreative.ContainerCreative)this.inventorySlots;
         this.field_147008_s.clear();
         containercreative.itemList.clear();
@@ -45,7 +53,11 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
 
         if (p_147050_1_ == CreativeTabs.tabInventory)
         {
-            Container container = this.mc.thePlayer.inventoryContainer;
+            Minecraft.getMinecraft().thePlayer.sendQueue.addToSendQueue(
+                    new OffhandContainerPacket(Minecraft.getMinecraft().thePlayer,false).generatePacket()
+            );
+
+            Container container = this.inputContainer;
 
             if (this.field_147063_B == null)
             {

@@ -1,11 +1,8 @@
 package mods.battlegear2.utils;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import net.minecraft.item.Item;
 import net.minecraftforge.common.config.Configuration;
 import xonin.backhand.Backhand;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BattlegearConfig {
@@ -54,20 +51,17 @@ public class BattlegearConfig {
         Backhand.UseInventorySlot = config.get(category, "Use inventory slot",Backhand.UseInventorySlot, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
+        sb.append("If enabled, a hotswap will be performed every tick if the main hand has no use or is empty.\n");
+        sb.append("This hotswap allows for many more items like fishing rods to be used in the offhand, but may be unstable.");
+        Backhand.OffhandTickHotswap = config.get(category, "Offhand Tick Hotswap",Backhand.OffhandTickHotswap, sb.toString()).getBoolean();
+
+        sb = new StringBuilder();
         sb.append("These items will be unable to be swapped into the offhand.\n");
         sb.append("Formatting of an item should be: modid:itemname\n");
         sb.append("These should all be placed on separate lines between the provided \'<\' and \'>\'.");
         blacklistedItems = config.get(category, "Blacklisted items", new String[0], sb.toString()).getStringList();
         Arrays.sort(blacklistedItems);
-
-        ArrayList<Item> items = new ArrayList<>();
-        for (String s : blacklistedItems) {
-            try {
-                String[] split = s.split(":");
-                items.add(GameRegistry.findItem(split[0], split[1]));
-            } catch (Exception ignored) {}
-        }
-        Backhand.offhandBlacklist = items.toArray(new Item[0]);
+        Backhand.offhandBlacklist = blacklistedItems;
 
         /*==============================================================================================================
          * RENDERING CONFIGS
@@ -79,11 +73,17 @@ public class BattlegearConfig {
         comments[0] = sb.toString();
         Backhand.RenderEmptyOffhandAtRest = config.get(category, "Render empty offhand at rest",Backhand.RenderEmptyOffhandAtRest, comments[0]).getBoolean();
 
+        sb = new StringBuilder();
+        sb.append("If set to true, a slot for your offhand item will be available in the creative inventory GUI. False by default.");
+        comments[0] = sb.toString();
+        Backhand.CreativeInventoryOffhand = config.get(category, "Render empty offhand at rest",Backhand.CreativeInventoryOffhand, comments[0]).getBoolean();
+
         file.save();
     }
 
     public static void refreshConfig(){
         try{
+            file.get("Rendering", "Allow offhand slot in the creative mode GUI", new String[0], comments[0]).set(Backhand.CreativeInventoryOffhand);
             file.get("Rendering", "Render empty offhand at rest", new String[0], comments[0]).set(Backhand.RenderEmptyOffhandAtRest);
             file.save();
         }catch (Exception e){

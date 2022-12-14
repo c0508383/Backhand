@@ -9,7 +9,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import invtweaks.InvTweaks;
 import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.InventoryPlayerBattle;
 import mods.battlegear2.client.BattlegearClientTickHandler;
 import mods.battlegear2.packet.OffhandSwapPacket;
 import net.minecraft.client.Minecraft;
@@ -102,9 +101,9 @@ public class ClientTickHandler {
 
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (event.player.worldObj.isRemote && Backhand.proxy.getLeftClickCounter() <= 0 && mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
+        if (event.player.worldObj.isRemote && Backhand.proxy.getLeftClickCounter() <= 0 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
             if (event.player.capabilities.allowEdit) {
-                if (Backhand.proxy.isRightClickHeld()) { // if it's a block and we should try break it
+                if (Backhand.proxy.isRightClickHeld() && !(mainHandItem != null && BattlegearUtils.isItemBlock(mainHandItem.getItem()))) { // if it's a block and we should try break it
                     MovingObjectPosition mop = BattlemodeHookContainerClass.getRaytraceBlock(event.player);
                     if (offhandItem != null && BattlemodeHookContainerClass.isItemBlock(offhandItem.getItem())) {
                         if (!BattlegearUtils.usagePriorAttack(offhandItem) && mop != null) {

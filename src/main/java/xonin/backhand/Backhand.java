@@ -10,13 +10,10 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.packet.BattlegearPacketHandler;
 import mods.battlegear2.utils.BattlegearConfig;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-
-import java.io.File;
 
 @Mod(modid = "backhand", name = "Backhand", version = "$version", guiFactory = "xonin.backhand.client.gui.BackhandGuiFactory")
 public class Backhand {
@@ -36,9 +33,12 @@ public class Backhand {
     public static boolean UseOffhandArrows = true;
     public static boolean UseOffhandBow = true;
     public static boolean ExtraInventorySlot = true;
+    public static boolean OffhandTickHotswap = true;
     public static int AlternateOffhandSlot = 9;
     public static boolean UseInventorySlot = false;
-    public static Item[] offhandBlacklist;
+    public static String[] offhandBlacklist;
+
+    public static boolean CreativeInventoryOffhand = false;
     public static boolean RenderEmptyOffhandAtRest = false;
 
     public Backhand() {
@@ -76,8 +76,8 @@ public class Backhand {
         if (stack == null)
             return false;
 
-        for (Item item : offhandBlacklist) {
-            if (stack.getItem() == item) {
+        for (String itemName : offhandBlacklist) {
+            if (stack.getItem().delegate.name().equals(itemName)) {
                 return true;
             }
         }

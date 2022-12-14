@@ -68,14 +68,10 @@ public final class EntityPlayerTransformer extends TransformerBase {
                     if (insn instanceof TypeInsnNode) {
                         if (((TypeInsnNode) insn).desc.equals(inventoryClassName)) {
                             ((TypeInsnNode) insn).desc = "mods/battlegear2/api/core/InventoryPlayerBattle";
-                        } else if (((TypeInsnNode) insn).desc.equals(inventoryContainerClassName)) {
-                            ((TypeInsnNode) insn).desc = "mods/battlegear2/api/core/ContainerPlayerBattle";
                         }
                     } else if (insn instanceof MethodInsnNode) {
                         if (((MethodInsnNode) insn).owner.equals(inventoryClassName)) {
                             ((MethodInsnNode) insn).owner = "mods/battlegear2/api/core/InventoryPlayerBattle";
-                        } else if (((MethodInsnNode) insn).owner.equals(inventoryContainerClassName)) {
-                            ((MethodInsnNode) insn).owner = "mods/battlegear2/api/core/ContainerPlayerBattle";
                         }
                     }
                 }
