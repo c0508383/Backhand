@@ -47,15 +47,21 @@ public class ServerTickHandler {
                         tickStartItems.put(player.getUniqueID(), Arrays.asList(mainhand, offhand));
                         player.setCurrentItemOrArmor(0, tickStartItems.get(player.getUniqueID()).get(1));
                     }
-                } else if (tickStartItems.containsKey(player.getUniqueID())) {
-                    player.setCurrentItemOrArmor(0, tickStartItems.get(player.getUniqueID()).get(0));
-                    BattlegearUtils.setPlayerOffhandItem(player, tickStartItems.get(player.getUniqueID()).get(1));
-                    tickStartItems.remove(player.getUniqueID());
-                    Backhand.packetHandler.sendPacketToPlayer(
-                            new OffhandWorldHotswapPacket(false).generatePacket(), (EntityPlayerMP) player
-                    );
+                } else {
+                    ServerTickHandler.resetTickingHotswap(player);
                 }
             }
+        }
+    }
+
+    public static void resetTickingHotswap(EntityPlayer player) {
+        if (tickStartItems.containsKey(player.getUniqueID())) {
+            player.setCurrentItemOrArmor(0, tickStartItems.get(player.getUniqueID()).get(0));
+            BattlegearUtils.setPlayerOffhandItem(player, tickStartItems.get(player.getUniqueID()).get(1));
+            tickStartItems.remove(player.getUniqueID());
+            Backhand.packetHandler.sendPacketToPlayer(
+                    new OffhandWorldHotswapPacket(false).generatePacket(), (EntityPlayerMP) player
+            );
         }
     }
 
@@ -114,9 +120,9 @@ public class ServerTickHandler {
             }
             ServerEventsHandler.arrowHotSwapped = false;
         }
-        if (ServerEventsHandler.totemHotSwapped) {
+        if (ServerEventsHandler.regularHotSwap) {
             BattlegearUtils.swapOffhandItem(player);
-            ServerEventsHandler.totemHotSwapped = false;
+            ServerEventsHandler.regularHotSwap = false;
         }
 
         if (ServerEventsHandler.fireworkHotSwapped > 0) {

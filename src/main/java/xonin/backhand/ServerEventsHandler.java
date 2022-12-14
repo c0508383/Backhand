@@ -1,27 +1,24 @@
 package xonin.backhand;
 
-import cpw.mods.fml.common.eventhandler.Event;
-import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
 import mods.battlegear2.api.core.BattlegearUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
-import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 
 public class ServerEventsHandler {
 
     public static boolean arrowHotSwapped = false;
-    public static boolean totemHotSwapped = false;
+    public static boolean regularHotSwap = false;
     public static int fireworkHotSwapped = -1;
 
     @SubscribeEvent
@@ -66,7 +63,7 @@ public class ServerEventsHandler {
 
             if (totemItem.isInstance(offhandItem.getItem()) && (mainhandItem == null || !totemItem.isInstance(mainhandItem.getItem()))) {
                 BattlegearUtils.swapOffhandItem(player);
-                totemHotSwapped = true;
+                regularHotSwap = true;
                 MinecraftForge.EVENT_BUS.post(event);
             }
         } catch (Exception ignored) {}
@@ -114,7 +111,20 @@ public class ServerEventsHandler {
     }
 
     @SubscribeEvent
-    public void onPreArrowLoose(PlayerUseItemEvent.Stop event) {
+    public void onItemFinish(PlayerUseItemEvent.Finish event) {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+            EntityPlayer player = event.entityPlayer;
+            ServerTickHandler.resetTickingHotswap(player);
+        }
+    }
+
+    @SubscribeEvent
+    public void onItemStop(PlayerUseItemEvent.Stop event) {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+            EntityPlayer player = event.entityPlayer;
+            ServerTickHandler.resetTickingHotswap(player);
+        }
+
         if (!Backhand.UseOffhandArrows || !(event.item.getItem() instanceof ItemBow)) {
             return;
         }
