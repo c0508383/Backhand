@@ -12,6 +12,7 @@ import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import mods.battlegear2.client.BattlegearClientTickHandler;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -21,7 +22,12 @@ import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -46,10 +52,15 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import xonin.backhand.Backhand;
 import xonin.backhand.client.ClientEventHandler;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
@@ -191,11 +202,15 @@ public class MysteriumPatchesFixesO {
 
 	public static float onGround2;
     public static float firstPersonFrame;
+    public static boolean offhandFPRender;
 
     @Fix(insertOnExit = true)
     @SideOnly(Side.CLIENT)
-    public static void renderItemInFirstPerson(ItemRenderer i, float frame)
+    public static void renderItemInFirstPerson(ItemRenderer itemRenderer, float frame)
     {
+        if (offhandFPRender)
+            return;
+
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         ClientEventHandler.renderingPlayer = player;
 
@@ -215,7 +230,22 @@ public class MysteriumPatchesFixesO {
 
         MysteriumPatchesFixesO.onGround2 = 0;
         RenderOffhandPlayer.itemRenderer.updateEquippedItem();
-        ClientEventHandler.renderOffhandPlayer.renderOffhandItem(frame);
+        offhandFPRender = true;
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        GL11.glCullFace(GL11.GL_FRONT);
+        ClientEventHandler.renderOffhandPlayer.renderOffhandItem(itemRenderer,frame);
+        GL11.glCullFace(GL11.GL_BACK);
+        offhandFPRender = false;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Fix(insertOnExit=true, returnSetting=EnumReturnSetting.ALWAYS)
+    public static float getSwingProgress(EntityLivingBase entityLivingBase, float partialTicks, @ReturnedValue float returnedValue)
+    {
+        if (offhandFPRender) {
+            return ((IBattlePlayer)entityLivingBase).getOffSwingProgress(partialTicks);
+        }
+        return returnedValue;
     }
 
 	@Fix
