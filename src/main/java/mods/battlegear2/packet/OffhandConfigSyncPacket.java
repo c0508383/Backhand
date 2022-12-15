@@ -3,15 +3,20 @@ package mods.battlegear2.packet;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ContainerPlayer;
 import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import xonin.backhand.Backhand;
 
 public final class OffhandConfigSyncPacket extends AbstractMBPacket {
 
     public static final String packetName = "MB2|ConfigSync";
+    private EntityPlayer player;
 
-    public OffhandConfigSyncPacket() {
+    public OffhandConfigSyncPacket(EntityPlayer player) {
+        this.player = player;
     }
+
+    public OffhandConfigSyncPacket() {}
 
     @Override
     public void process(ByteBuf inputStream, EntityPlayer player) {
@@ -24,6 +29,7 @@ public final class OffhandConfigSyncPacket extends AbstractMBPacket {
         Backhand.OffhandTickHotswap = inputStream.readBoolean();
         Backhand.AlternateOffhandSlot = inputStream.readInt();
         Backhand.UseInventorySlot = inputStream.readBoolean();
+        MysteriumPatchesFixesO.changedContainer = inputStream.readBoolean();
         MysteriumPatchesFixesO.receivedConfigs = true;
     }
 
@@ -43,5 +49,6 @@ public final class OffhandConfigSyncPacket extends AbstractMBPacket {
         out.writeBoolean(Backhand.OffhandTickHotswap);
         out.writeInt(Backhand.AlternateOffhandSlot);
         out.writeBoolean(Backhand.UseInventorySlot);
+        out.writeBoolean(this.player.inventoryContainer.getClass() != ContainerPlayer.class);
     }
 }

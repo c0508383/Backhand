@@ -112,17 +112,19 @@ public class ServerEventsHandler {
 
     @SubscribeEvent
     public void onItemFinish(PlayerUseItemEvent.Finish event) {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-            EntityPlayer player = event.entityPlayer;
-            ServerTickHandler.resetTickingHotswap(player);
+        EntityPlayer player = event.entityPlayer;
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER && !ServerTickHandler.tickStartItems.containsKey(player.getUniqueID())) {
+            BattlegearUtils.swapOffhandItem(player);
+            regularHotSwap = true;
         }
     }
 
     @SubscribeEvent
     public void onItemStop(PlayerUseItemEvent.Stop event) {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-            EntityPlayer player = event.entityPlayer;
-            ServerTickHandler.resetTickingHotswap(player);
+        EntityPlayer player = event.entityPlayer;
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER && !ServerTickHandler.tickStartItems.containsKey(player.getUniqueID())) {
+            BattlegearUtils.swapOffhandItem(player);
+            regularHotSwap = true;
         }
 
         if (!Backhand.UseOffhandArrows || !(event.item.getItem() instanceof ItemBow)) {

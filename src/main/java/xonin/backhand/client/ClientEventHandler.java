@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -40,7 +41,7 @@ public class ClientEventHandler {
             return;
         }
 
-        if (!MysteriumPatchesFixesO.receivedConfigs) {
+        if (!MysteriumPatchesFixesO.receivedConfigs || MysteriumPatchesFixesO.changedContainer) {
             return;
         }
 

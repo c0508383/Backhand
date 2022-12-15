@@ -50,13 +50,13 @@ public final class BattlemodeHookContainerClass {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onEntityJoin(EntityJoinWorldEvent event){
         if (event.entity instanceof EntityPlayer && !(isFake(event.entity))) {
-            if (!(((EntityPlayer) event.entity).inventory instanceof InventoryPlayerBattle)) {
-                //throw new RuntimeException("Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
-                if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+            if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+                if (!(((EntityPlayer) event.entity).inventory instanceof InventoryPlayerBattle)) {
+                    //throw new RuntimeException("Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
                     FMLLog.log("Backhand", Level.INFO, "Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
                 }
+                Backhand.packetHandler.sendPacketToPlayer(new OffhandConfigSyncPacket((EntityPlayer) event.entity).generatePacket(), (EntityPlayerMP) event.entity);
             }
-            Backhand.packetHandler.sendPacketToAll(new OffhandConfigSyncPacket().generatePacket());
             ItemStack offhandItem = BattlegearUtils.getOffhandItem((EntityPlayer) event.entity);
             if (Backhand.isOffhandBlacklisted(offhandItem)) {
                 BattlegearUtils.setPlayerOffhandItem((EntityPlayer) event.entity,null);
