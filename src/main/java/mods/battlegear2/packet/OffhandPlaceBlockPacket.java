@@ -139,8 +139,7 @@ public final class OffhandPlaceBlockPacket extends AbstractMBPacket{
         }
         offhandWeapon = BattlegearUtils.getOffhandItem(player);
         if (offhandWeapon != null && BattlemodeHookContainerClass.isItemBlock(offhandWeapon.getItem())) {
-
-            if (offhandWeapon != null && offhandWeapon.stackSize <= 0) {
+            if (offhandWeapon.stackSize <= 0) {
                 BattlegearUtils.setPlayerOffhandItem(player, null);
                 offhandWeapon = null;
             }
@@ -156,10 +155,18 @@ public final class OffhandPlaceBlockPacket extends AbstractMBPacket{
     public boolean useItem(EntityPlayerMP playerMP, ItemStack itemStack, int x, int y, int z, int side, float xOffset, float yOffset, float zOffset)
     {
         World theWorld = playerMP.getEntityWorld();
-        if (itemStack != null && itemStack.getItem().onItemUseFirst(itemStack, playerMP, theWorld, x, y, z, side, xOffset, yOffset, zOffset))
+        if (itemStack != null)
         {
-            if (itemStack.stackSize <= 0) ForgeEventFactory.onPlayerDestroyItem(playerMP, itemStack);
-            return true;
+            final int meta = itemStack.getItemDamage();
+            if (itemStack.getItem().onItemUseFirst(itemStack, playerMP, theWorld, x, y, z, side, xOffset, yOffset, zOffset)) {
+                if (itemStack.stackSize <= 0) {
+                    ForgeEventFactory.onPlayerDestroyItem(playerMP, itemStack);
+                    BattlegearUtils.setPlayerOffhandItem(playerMP, null);
+                } else if (itemStack.getItemDamage() != meta) {
+                    BattlegearUtils.setPlayerOffhandItem(playerMP, BattlegearUtils.getOffhandItem(playerMP));
+                }
+                return true;
+            }
         }
 
         boolean result = false;
@@ -172,10 +179,13 @@ public final class OffhandPlaceBlockPacket extends AbstractMBPacket{
             {
                 itemStack.setItemDamage(meta);
                 itemStack.stackSize = size;
-            } else {
-//                itemStack.stackSize--;
             }
-            if (itemStack.stackSize <= 0) ForgeEventFactory.onPlayerDestroyItem(playerMP, itemStack);
+            if (itemStack.stackSize <= 0) {
+                ForgeEventFactory.onPlayerDestroyItem(playerMP, itemStack);
+                BattlegearUtils.setPlayerOffhandItem(playerMP, null);
+            } else if (itemStack.getItemDamage() != meta) {
+                BattlegearUtils.setPlayerOffhandItem(playerMP, itemStack);
+            }
         }
         return result;
     }

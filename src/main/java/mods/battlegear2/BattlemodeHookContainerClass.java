@@ -208,10 +208,11 @@ public final class BattlemodeHookContainerClass {
         ItemStack prevHeldItem = player.getCurrentEquippedItem();
 
         player.setCurrentItemOrArmor(0, itemStack);
-        ItemStack itemUsed = player.getCurrentEquippedItem();
+        ItemStack itemUsed = player.getCurrentEquippedItem().copy();
         ItemStack itemStackResult = itemStack.useItemRightClick(player.getEntityWorld(), player);
-        if (itemUsed != player.getCurrentEquippedItem()) {
-            BattlegearUtils.setPlayerOffhandItem(player, player.getCurrentEquippedItem());
+        if (!ItemStack.areItemStacksEqual(itemUsed,itemStackResult)) {
+            BattlegearUtils.setPlayerOffhandItem(player,itemStackResult);
+            BattlegearUtils.getOffhandEP(player).offhandItemChanged = true;
             if (player.getCurrentEquippedItem() == null || player.getCurrentEquippedItem().stackSize == 0) {
                 ForgeEventFactory.onPlayerDestroyItem(player, player.getCurrentEquippedItem());
             }
