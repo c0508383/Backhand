@@ -377,11 +377,11 @@ public class BattlegearUtils {
      * @param par1Entity the attacked
      */
     public static void attackTargetEntityWithCurrentOffItem(EntityPlayer player, Entity par1Entity){
-        if (!Backhand.OffhandAttack)
-            return;
-
         final ItemStack oldItem = player.getCurrentEquippedItem();
         final ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+        if (!Backhand.OffhandAttack || (offhandItem == null && !Backhand.EmptyOffhand))
+            return;
+
         BattlegearUtils.setPlayerCurrentItem(player,offhandItem);
         refreshAttributes(player.getAttributeMap(), oldItem, player.getCurrentEquippedItem());
 
