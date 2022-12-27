@@ -48,7 +48,7 @@ public class ClientEventHandler {
         Minecraft mc = Minecraft.getMinecraft();
         EntityClientPlayerMP player = mc.thePlayer;
         if (player != null) {
-            if (event.gui != null && Backhand.ExtraInventorySlot) {
+            if (event.gui != null && Backhand.ExtraInventorySlot && !Backhand.UseInventorySlot) {
                 if (event.gui.getClass() == GuiInventory.class || event.gui instanceof GuiContainerCreative && Backhand.CreativeInventoryOffhand) {
                     player.inventoryContainer = new ContainerPlayerBattle(player.inventory, !player.worldObj.isRemote, player);
                     event.gui = event.gui.getClass() == GuiInventory.class ? new GuiOffhandInventory(player) : new GuiOffhandCreativeInventory(player);

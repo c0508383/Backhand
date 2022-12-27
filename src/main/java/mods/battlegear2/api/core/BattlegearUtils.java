@@ -65,12 +65,23 @@ public class BattlegearUtils {
 
     public static void setPlayerOffhandItem(EntityPlayer player, ItemStack stack) {
         if (!Backhand.isOffhandBlacklisted(stack)) {
-            getOffhandEP(player).setOffhandItem(stack);
+            if (Backhand.UseInventorySlot) {
+                if (!ItemStack.areItemStacksEqual(stack,player.inventory.getStackInSlot(Backhand.AlternateOffhandSlot))) {
+                    player.inventory.inventoryChanged = true;
+                }
+                player.inventory.setInventorySlotContents(Backhand.AlternateOffhandSlot, stack);
+            } else {
+                getOffhandEP(player).setOffhandItem(stack);
+            }
         }
     }
 
     public static ItemStack getOffhandItem(EntityPlayer player) {
-        return getOffhandEP(player).getOffhandItem();
+        if (Backhand.UseInventorySlot) {
+            return player.inventory.getStackInSlot(Backhand.AlternateOffhandSlot);
+        } else {
+            return getOffhandEP(player).getOffhandItem();
+        }
     }
 
     public static boolean allowOffhandUse(EntityPlayer player) {

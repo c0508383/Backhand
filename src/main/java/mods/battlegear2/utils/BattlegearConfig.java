@@ -43,6 +43,14 @@ public class BattlegearConfig {
         Backhand.ExtraInventorySlot = config.get(category, "Extra Inventory Slot",Backhand.ExtraInventorySlot, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
+        sb.append("If the main offhand inventory can't be used, this slot in the main inventory will be used as the offhand instead. Slot 9 by default.");
+        Backhand.AlternateOffhandSlot = config.get(category, "Alternate Inventory Slot",Backhand.AlternateOffhandSlot, sb.toString()).getInt();
+
+        sb = new StringBuilder();
+        sb.append("If enabled, the alternate offhand slot configured above will always be used for the offhand. False by default.");
+        Backhand.UseInventorySlot = config.get(category, "Use inventory slot",Backhand.UseInventorySlot, sb.toString()).getBoolean();
+
+        sb = new StringBuilder();
         sb.append("If enabled, a hotswap will be performed every tick if the main hand has no use or is empty.\n");
         sb.append("This hotswap allows for many more items like fishing rods to be used in the offhand, but may be unstable.");
         Backhand.OffhandTickHotswap = config.get(category, "Offhand Tick Hotswap",Backhand.OffhandTickHotswap, sb.toString()).getBoolean();

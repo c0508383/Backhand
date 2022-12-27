@@ -85,6 +85,8 @@ public class ServerTickHandler {
 
                     boolean foundSlot = false;
                     for (int i = 0; i < player.inventory.getSizeInventory() - 4; i++) {
+                        if (i == Backhand.AlternateOffhandSlot)
+                            continue;
                         if (player.inventory.getStackInSlot(i) == null) {
                             player.inventory.setInventorySlotContents(i,offhand);
                             foundSlot = true;
