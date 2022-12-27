@@ -7,10 +7,23 @@ import java.util.Arrays;
 
 public class BattlegearConfig {
     private static Configuration file;
-	public static String[] blacklistedItems = new String[0];
+    public static String[] blacklistedItems = new String[0];
     private static String[] comments = new String[1];
 
-	public static void getConfig(Configuration config) {
+    public static void getConfig(Configuration config) {
+        file = config;
+
+        loadConfigFields(config);
+
+        file.getConfigFile().delete();
+        file.load();
+
+        loadConfigFields(file);
+
+        file.save();
+    }
+
+    public static void loadConfigFields(Configuration config) {
         file = config;
         StringBuilder sb;
         String category = Configuration.CATEGORY_GENERAL;
@@ -76,7 +89,7 @@ public class BattlegearConfig {
         sb = new StringBuilder();
         sb.append("If set to true, a slot for your offhand item will be available in the creative inventory GUI. False by default.");
         comments[0] = sb.toString();
-        Backhand.CreativeInventoryOffhand = config.get(category, "Render empty offhand at rest",Backhand.CreativeInventoryOffhand, comments[0]).getBoolean();
+        Backhand.CreativeInventoryOffhand = config.get(category, "Allow offhand slot in the creative mode GUI",Backhand.CreativeInventoryOffhand, comments[0]).getBoolean();
 
         file.save();
     }
