@@ -575,9 +575,10 @@ public class MysteriumPatchesFixesO {
         Entity entity = p_147340_1_.func_149564_a(worldserver);
         netServer.playerEntity.func_143004_u();
 
-        boolean swapOffhand = BattlegearUtils.allowOffhandUse(netServer.playerEntity);
-
-        if (swapOffhand) {
+        boolean swappedOffhand = BattlegearUtils.checkForRightClickFunction(BattlegearUtils.getOffhandItem(netServer.playerEntity))
+                && !BattlegearUtils.checkForRightClickFunction(netServer.playerEntity.getCurrentEquippedItem())
+                && p_147340_1_.func_149565_c() == C02PacketUseEntity.Action.INTERACT;
+        if (swappedOffhand) {
             BattlegearUtils.swapOffhandItem(netServer.playerEntity);
         }
 
@@ -603,7 +604,9 @@ public class MysteriumPatchesFixesO {
                     {
                         netServer.kickPlayerFromServer("Attempting to attack an invalid entity");
                         netServer.serverController.logWarning("Player " + netServer.playerEntity.getCommandSenderName() + " tried to attack an invalid entity");
-                        return;
+                        if (swappedOffhand) {
+                            BattlegearUtils.swapOffhandItem(netServer.playerEntity);
+                        }
                     }
 
                     netServer.playerEntity.attackTargetEntityWithCurrentItem(entity);
@@ -611,7 +614,7 @@ public class MysteriumPatchesFixesO {
             }
         }
 
-        if (swapOffhand) {
+        if (swappedOffhand) {
             BattlegearUtils.swapOffhandItem(netServer.playerEntity);
         }
     }
