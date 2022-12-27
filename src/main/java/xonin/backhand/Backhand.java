@@ -34,8 +34,6 @@ public class Backhand {
     public static boolean UseOffhandBow = true;
     public static boolean ExtraInventorySlot = true;
     public static boolean OffhandTickHotswap = true;
-    public static int AlternateOffhandSlot = 9;
-    public static boolean UseInventorySlot = false;
     public static String[] offhandBlacklist;
 
     public static boolean CreativeInventoryOffhand = false;

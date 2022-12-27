@@ -27,8 +27,6 @@ public final class OffhandConfigSyncPacket extends AbstractMBPacket {
         Backhand.UseOffhandBow = inputStream.readBoolean();
         Backhand.ExtraInventorySlot = inputStream.readBoolean();
         Backhand.OffhandTickHotswap = inputStream.readBoolean();
-        Backhand.AlternateOffhandSlot = inputStream.readInt();
-        Backhand.UseInventorySlot = inputStream.readBoolean();
         MysteriumPatchesFixesO.changedContainer = inputStream.readBoolean();
         MysteriumPatchesFixesO.receivedConfigs = true;
     }
@@ -47,8 +45,6 @@ public final class OffhandConfigSyncPacket extends AbstractMBPacket {
         out.writeBoolean(Backhand.UseOffhandBow);
         out.writeBoolean(Backhand.ExtraInventorySlot);
         out.writeBoolean(Backhand.OffhandTickHotswap);
-        out.writeInt(Backhand.AlternateOffhandSlot);
-        out.writeBoolean(Backhand.UseInventorySlot);
         out.writeBoolean(this.player.inventoryContainer.getClass() != ContainerPlayer.class);
     }
 }
