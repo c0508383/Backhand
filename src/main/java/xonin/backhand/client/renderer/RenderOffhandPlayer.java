@@ -108,6 +108,12 @@ public class RenderOffhandPlayer extends RenderPlayer {
         otherItemRenderer.equippedProgress = itemRenderer.equippedProgress;
         otherItemRenderer.prevEquippedProgress = itemRenderer.prevEquippedProgress;
 
+        EntityClientPlayerMP entityclientplayermp = mc.thePlayer;
+        float f3 = entityclientplayermp.prevRenderArmPitch + (entityclientplayermp.renderArmPitch - entityclientplayermp.prevRenderArmPitch) * frame;
+        float f4 = entityclientplayermp.prevRenderArmYaw + (entityclientplayermp.renderArmYaw - entityclientplayermp.prevRenderArmYaw) * frame;
+        GL11.glRotatef((entityclientplayermp.rotationPitch - f3) * -0.1F, 1.0F, 0.0F, 0.0F);
+        GL11.glRotatef((entityclientplayermp.rotationYaw - f4) * -0.1F, 0.0F, 1.0F, 0.0F);
+
         otherItemRenderer.renderItemInFirstPerson(frame);
 
         otherItemRenderer.itemToRender = itemToRender;
