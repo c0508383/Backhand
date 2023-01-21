@@ -6,7 +6,6 @@ import java.io.IOException;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
-import mods.battlegear2.BattlemodeHookContainerClass;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -79,12 +78,6 @@ public class BattlegearUtils {
         } else {
             return getOffhandEP(player).getOffhandItem();
         }
-    }
-
-    public static boolean allowOffhandUse(EntityPlayer player) {
-        ItemStack mainHandItem = player.getCurrentEquippedItem();
-        return mainHandItem == null || (!BattlegearUtils.checkForRightClickFunction(mainHandItem)
-                && !BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()));
     }
 
     public static OffhandExtendedProperty getOffhandEP(EntityPlayer player) {

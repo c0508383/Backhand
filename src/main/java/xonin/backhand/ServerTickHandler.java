@@ -70,6 +70,10 @@ public class ServerTickHandler {
     )
     public void onUpdatePlayer(TickEvent.PlayerTickEvent event)
     {
+        if (FMLCommonHandler.instance().getEffectiveSide() != Side.SERVER) {
+            return;
+        }
+
         EntityPlayer player = event.player;
         ItemStack offhand = BattlegearUtils.getOffhandItem(player);
 
@@ -102,16 +106,11 @@ public class ServerTickHandler {
             prevStackInSlot = offhand;
         }
 
-        if (BattlegearUtils.getOffhandEP(player).offhandItemChanged || player.inventory.inventoryChanged) {
+        if (BattlegearUtils.getOffhandEP(player).offhandItemChanged) {
             if (!tickStartItems.containsKey(player.getUniqueID())) {
                 Backhand.packetHandler.sendPacketToAll(new BattlegearSyncItemPacket(player).generatePacket());
             }
-            if (BattlegearUtils.getOffhandEP(player).offhandItemChanged) {
-                BattlegearUtils.getOffhandEP(player).offhandItemChanged = false;
-            }
-            if (player.inventory.inventoryChanged) {
-                player.inventory.inventoryChanged = false;
-            }
+            BattlegearUtils.getOffhandEP(player).offhandItemChanged = false;
         }
 
         if (ServerEventsHandler.arrowHotSwapped) {

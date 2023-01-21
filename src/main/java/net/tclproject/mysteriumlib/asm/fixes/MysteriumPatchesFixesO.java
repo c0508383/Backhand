@@ -13,7 +13,6 @@ import mods.battlegear2.api.core.ContainerPlayerBattle;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import mods.battlegear2.client.BattlegearClientTickHandler;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -23,12 +22,7 @@ import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -37,28 +31,22 @@ import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.*;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
-import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.IItemRenderer;
-import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import xonin.backhand.Backhand;
 import xonin.backhand.client.ClientEventHandler;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
@@ -66,7 +54,7 @@ import xonin.backhand.client.renderer.RenderOffhandPlayer;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 
 public class MysteriumPatchesFixesO {
     /**Dirty hack to prevent random resetting of block removal (why does this even happen?!) when breaking blocks with the offhand.*/
@@ -792,6 +780,24 @@ public class MysteriumPatchesFixesO {
             manager = null;
         }
         return manager;
+    }
+
+    @Optional.Method(modid="Optifine")
+    @SideOnly(Side.CLIENT)
+    @Fix(insertOnExit=true, returnSetting=EnumReturnSetting.ALWAYS)
+    public static int getLightLevel(Entity entity, @ReturnedValue int returned) {
+        if (entity instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) entity;
+            ItemStack offhand = BattlegearUtils.getOffhandItem(player);
+            try {
+                Method getLightLevel = Class.forName("DynamicLights").getMethod("getLightLevel",ItemStack.class);
+                int levelMain = (int) getLightLevel.invoke(null,offhand);
+                ItemStack stackHead = player.getEquipmentInSlot(4);
+                int levelHead = (int) getLightLevel.invoke(null,stackHead);
+                return Math.max(levelMain, levelHead);
+            } catch (Exception ignored) {}
+        }
+        return returned;
     }
 
     // inv tweaks compat starts here

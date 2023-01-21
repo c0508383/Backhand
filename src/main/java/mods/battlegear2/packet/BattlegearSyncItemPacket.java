@@ -38,12 +38,7 @@ public final class BattlegearSyncItemPacket extends AbstractMBPacket {
         this.user = ByteBufUtils.readUTF8String(inputStream);
         this.player = player.worldObj.getPlayerEntityByName(user);
         if(this.player!=null){
-            int slot = inputStream.readInt();
-            ItemStack currentItem = ByteBufUtils.readItemStack(inputStream);
             ItemStack offhandItem = ByteBufUtils.readItemStack(inputStream);
-            if(InventoryPlayerBattle.isValidSwitch(slot))
-                this.player.inventory.currentItem = slot;
-            BattlegearUtils.setPlayerCurrentItem(this.player, currentItem);
             BattlegearUtils.setPlayerOffhandItem(this.player, offhandItem);
             if(!player.worldObj.isRemote){//Using data sent only by client
                 try {
@@ -63,8 +58,6 @@ public final class BattlegearSyncItemPacket extends AbstractMBPacket {
 	@Override
 	public void write(ByteBuf out) {
         ByteBufUtils.writeUTF8String(out, user);
-        out.writeInt(inventory.currentItem);
-        ByteBufUtils.writeItemStack(out, inventory.getCurrentItem());
         ByteBufUtils.writeItemStack(out, BattlegearUtils.getOffhandItem(player));
         if(player.worldObj.isRemote){//client-side only thing
             ByteBufUtils.writeItemStack(out, player.getItemInUse());
