@@ -113,6 +113,12 @@ public class ServerEventsHandler {
     @SubscribeEvent
     public void onItemFinish(PlayerUseItemEvent.Finish event) {
         EntityPlayer player = event.entityPlayer;
+        ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+        ItemStack mainhandItem = player.getCurrentEquippedItem();
+        boolean mainhandUse = BattlegearUtils.checkForRightClickFunction(mainhandItem);
+        if (offhandItem == null || mainhandUse) {
+            return;
+        }
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER && !ServerTickHandler.tickStartItems.containsKey(player.getUniqueID())) {
             BattlegearUtils.swapOffhandItem(player);
             regularHotSwap = true;
@@ -122,6 +128,12 @@ public class ServerEventsHandler {
     @SubscribeEvent
     public void onItemStop(PlayerUseItemEvent.Stop event) {
         EntityPlayer player = event.entityPlayer;
+        ItemStack mainhandItem = player.getCurrentEquippedItem();
+        boolean mainhandUse = BattlegearUtils.checkForRightClickFunction(mainhandItem);
+        if (BattlegearUtils.getOffhandItem(player) == null || mainhandUse) {
+            return;
+        }
+
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER && !ServerTickHandler.tickStartItems.containsKey(player.getUniqueID())) {
             BattlegearUtils.swapOffhandItem(player);
             regularHotSwap = true;
