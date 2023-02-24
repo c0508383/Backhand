@@ -360,22 +360,39 @@ public class MysteriumPatchesFixesO {
         b.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
         b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
 
-        if (b.aimedBow)
-        {
-            f6 = 0.0F;
-            f7 = 0.0F;
-            b.bipedRightArm.rotateAngleZ = 0.0F;
-            b.bipedLeftArm.rotateAngleZ = 0.0F;
-            b.bipedRightArm.rotateAngleY = -(0.1F - f6 * 0.6F) + b.bipedHead.rotateAngleY;
-            b.bipedLeftArm.rotateAngleY = 0.1F - f6 * 0.6F + b.bipedHead.rotateAngleY + 0.4F;
-            b.bipedRightArm.rotateAngleX = -((float)Math.PI / 2F) + b.bipedHead.rotateAngleX;
-            b.bipedLeftArm.rotateAngleX = -((float)Math.PI / 2F) + b.bipedHead.rotateAngleX;
-            b.bipedRightArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
-            b.bipedLeftArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
-            b.bipedRightArm.rotateAngleZ += MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
-            b.bipedLeftArm.rotateAngleZ -= MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
-            b.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
-            b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+        if (b.aimedBow) {
+            if (p_78087_7_ instanceof EntityPlayer && p_78087_7_ == Minecraft.getMinecraft().thePlayer && BattlegearUtils.getOffhandItem((EntityPlayer) p_78087_7_) != null
+                && ((EntityClientPlayerMP) p_78087_7_).getItemInUse() == BattlegearUtils.getOffhandItem((EntityPlayer) p_78087_7_)) {
+                f6 = 0.0F;
+                f7 = 0.0F;
+                b.bipedLeftArm.rotateAngleZ = 0.0F;
+                b.bipedRightArm.rotateAngleZ = 0.0F;
+                b.bipedLeftArm.rotateAngleY = 0.1F + b.bipedHead.rotateAngleY;
+                b.bipedRightArm.rotateAngleY = -0.5F + b.bipedHead.rotateAngleY;
+                b.bipedLeftArm.rotateAngleX = -((float) Math.PI / 2F) + b.bipedHead.rotateAngleX;
+                b.bipedRightArm.rotateAngleX = -((float) Math.PI / 2F) + b.bipedHead.rotateAngleX;
+                b.bipedLeftArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
+                b.bipedRightArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
+                b.bipedLeftArm.rotateAngleZ -= MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
+                b.bipedRightArm.rotateAngleZ += MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
+                b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+                b.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+            } else {
+                f6 = 0.0F;
+                f7 = 0.0F;
+                b.bipedRightArm.rotateAngleZ = 0.0F;
+                b.bipedLeftArm.rotateAngleZ = 0.0F;
+                b.bipedRightArm.rotateAngleY = -(0.1F - f6 * 0.6F) + b.bipedHead.rotateAngleY;
+                b.bipedLeftArm.rotateAngleY = 0.1F - f6 * 0.6F + b.bipedHead.rotateAngleY + 0.4F;
+                b.bipedRightArm.rotateAngleX = -((float) Math.PI / 2F) + b.bipedHead.rotateAngleX;
+                b.bipedLeftArm.rotateAngleX = -((float) Math.PI / 2F) + b.bipedHead.rotateAngleX;
+                b.bipedRightArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
+                b.bipedLeftArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
+                b.bipedRightArm.rotateAngleZ += MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
+                b.bipedLeftArm.rotateAngleZ -= MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
+                b.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+                b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+            }
         }
     }
 
@@ -630,40 +647,6 @@ public class MysteriumPatchesFixesO {
             System.out.println(server.playerEntity.getCommandSenderName() + " tried to set an invalid carried item " + p_147355_1_.func_149614_c());
         }
     }
-
-    /*@Fix(returnSetting=EnumReturnSetting.ALWAYS)
-    public static void processClickWindow(NetHandlerPlayServer server, C0EPacketClickWindow p_147351_1_)
-    {
-        server.playerEntity.func_143004_u();
-
-        if (server.playerEntity.openContainer.windowId == p_147351_1_.func_149548_c() && server.playerEntity.openContainer.isPlayerNotUsingContainer(server.playerEntity))
-        {
-            ItemStack itemstack = server.playerEntity.openContainer.slotClick(p_147351_1_.func_149544_d(), p_147351_1_.func_149543_e(), p_147351_1_.func_149542_h(), server.playerEntity);
-
-            if (ItemStack.areItemStacksEqual(p_147351_1_.func_149546_g(), itemstack))
-            {
-                server.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(p_147351_1_.func_149548_c(), p_147351_1_.func_149547_f(), true));
-                server.playerEntity.isChangingQuantityOnly = true;
-                server.playerEntity.openContainer.detectAndSendChanges();
-                server.playerEntity.updateHeldItem();
-                server.playerEntity.isChangingQuantityOnly = false;
-            }
-            else
-            {
-                server.field_147372_n.addKey(server.playerEntity.openContainer.windowId, Short.valueOf(p_147351_1_.func_149547_f()));
-                server.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(p_147351_1_.func_149548_c(), p_147351_1_.func_149547_f(), false));
-                server.playerEntity.openContainer.setPlayerIsPresent(server.playerEntity, false);
-                ArrayList arraylist = new ArrayList();
-
-                for (int i = 0; i < server.playerEntity.openContainer.inventorySlots.size(); ++i)
-                {
-                    arraylist.add(((Slot)server.playerEntity.openContainer.inventorySlots.get(i)).getStack());
-                }
-
-                server.playerEntity.sendContainerAndContentsToPlayer(server.playerEntity.openContainer, arraylist);
-            }
-        }
-    }*/
 
     @Fix(insertOnExit=true,returnSetting=EnumReturnSetting.ON_NOT_NULL)
     public static ItemStack getCurrentItem(InventoryPlayer inv)
