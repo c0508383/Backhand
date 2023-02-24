@@ -68,18 +68,16 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void renderHotbarOverlay(RenderGameOverlayEvent event) {
-        if (event.isCancelable() || event.type != RenderGameOverlayEvent.ElementType.ALL) {
-            return;
+        if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR) {
+            Minecraft mc = Minecraft.getMinecraft();
+            renderHotbar(mc.ingameGUI, event.resolution.getScaledWidth(), event.resolution.getScaledHeight(), event.partialTicks);
         }
-
-        Minecraft mc = Minecraft.getMinecraft();
-        renderHotbar(mc.ingameGUI, event.resolution.getScaledWidth(), event.resolution.getScaledHeight(), event.partialTicks);
     }
 
     protected void renderHotbar(GuiIngame gui, int width, int height, float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack itemstack = BattlegearUtils.getOffhandItem(mc.thePlayer);
-        if (itemstack == null) {
+        if (itemstack != null) {
             return;
         }
 
