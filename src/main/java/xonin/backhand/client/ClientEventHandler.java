@@ -77,7 +77,7 @@ public class ClientEventHandler {
     protected void renderHotbar(GuiIngame gui, int width, int height, float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack itemstack = BattlegearUtils.getOffhandItem(mc.thePlayer);
-        if (itemstack != null) {
+        if (itemstack == null) {
             return;
         }
 
