@@ -104,7 +104,7 @@ public class RenderOffhandPlayer extends RenderPlayer {
         float equippedProgress = otherItemRenderer.equippedProgress;
         float prevEquippedProgress = otherItemRenderer.prevEquippedProgress;
 
-        otherItemRenderer.itemToRender = BattlegearUtils.getOffhandItem(player);
+        otherItemRenderer.itemToRender = itemRenderer.itemToRender;
         otherItemRenderer.equippedProgress = itemRenderer.equippedProgress;
         otherItemRenderer.prevEquippedProgress = itemRenderer.prevEquippedProgress;
 

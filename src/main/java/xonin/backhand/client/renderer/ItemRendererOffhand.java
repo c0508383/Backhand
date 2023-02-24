@@ -33,13 +33,11 @@ public class ItemRendererOffhand extends ItemRenderer {
 
     /** A reference to the Minecraft object. */
     private Minecraft mc;
-    private ItemStack itemToRender;
+    public ItemStack itemToRender;
     /** How far the current item has been equipped (0 disequipped and 1 fully up) */
     public float equippedProgress;
     public float prevEquippedProgress;
     private RenderBlocks renderBlocksIr = new RenderBlocks();
-    /** The index of the currently held item (0-8, or -1 if not yet updated) */
-    private int equippedItemSlot = -1;
 
     public ItemRendererOffhand(Minecraft mc) {
         super(mc);
@@ -360,27 +358,6 @@ public class ItemRendererOffhand extends ItemRenderer {
         }
     }
 
-    public void thirdPersonRenderModCompatibility(EntityPlayer player, ModelBiped modelBiped, float frame, ItemStack offhandItem) {
-        try {
-            Class<?> CNPCShield = Class.forName("noppes.npcs.items.ItemShield");
-            if (CNPCShield.isInstance(offhandItem.getItem())) {
-                if (player.getItemInUse() != offhandItem) {
-                    GL11.glTranslatef(0.36F, 0.0F, 0.0F);
-                } else {
-                    GL11.glTranslatef(0.0F, 0.07F, 0.0F);
-                }
-            }
-        } catch (Exception ignored) {}
-    }
-
-    public void applyColorFromItemStack(ItemStack itemStack, int pass){
-        int col = itemStack.getItem().getColorFromItemStack(itemStack, pass);
-        float r = (float) (col >> 16 & 255) / 255.0F;
-        float g = (float) (col >> 8 & 255) / 255.0F;
-        float b = (float) (col & 255) / 255.0F;
-        GL11.glColor4f(r, g, b, 1.0F);
-    }
-
     public void updateEquippedItem()
     {
         this.prevEquippedProgress = this.equippedProgress;
@@ -413,7 +390,6 @@ public class ItemRendererOffhand extends ItemRenderer {
         if (this.equippedProgress < 0.1F)
         {
             this.itemToRender = itemstack;
-            this.equippedItemSlot = player.inventory.currentItem;
         }
     }
 
