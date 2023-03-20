@@ -4,6 +4,10 @@ A minimalist fork of [The Offhand Mod](https://github.com/TCLProject/theoffhandm
 
 Big thanks to TCLProject, the creator of the offhand mod. Another huge thanks to nerd-boy & GotoLink as well, the authors of Mine&Blade Battlegear 2.
 
+Support me on Ko-Fi!
+
+<a href="https://ko-fi.com/louisxiv"> <img src="https://i.imgur.com/EvkTjYS.png" alt="Support Me!"  width="180" height="180"> </a>
+
 ## Setting up a Development Environment
 
 Using IntelliJ, take the following steps: 
