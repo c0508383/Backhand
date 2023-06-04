@@ -13,10 +13,13 @@ import mods.battlegear2.client.BattlegearClientTickHandler;
 import mods.battlegear2.packet.OffhandSwapPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.input.Keyboard;
 import xonin.backhand.Backhand;
+
+import java.lang.reflect.Field;
 
 public class ClientTickHandler {
     public static int delay;
@@ -25,6 +28,8 @@ public class ClientTickHandler {
 
     public static int invTweaksDelay;
     public static boolean allowSwap = true;
+
+    public static boolean jrmcInvGuiOpen = false;
 
     @SubscribeEvent
     public void onKeyInputEvent(InputEvent.KeyInputEvent event) {
@@ -41,6 +46,14 @@ public class ClientTickHandler {
                     new OffhandSwapPacket(player).generatePacket()
             );
         }
+
+        try {
+            Class<?> JRMCoreKeyHandler = Class.forName("JinRyuu.JRMCore.JRMCoreKeyHandler");
+            KeyBinding Fn = (KeyBinding) JRMCoreKeyHandler.getField("Fn").get(null);
+            if (Keyboard.isKeyDown(Fn.keyCode)) {
+                jrmcInvGuiOpen = true;
+            }
+        } catch (Exception ignored) {}
     }
 
     @Optional.Method(modid="inventorytweaks")

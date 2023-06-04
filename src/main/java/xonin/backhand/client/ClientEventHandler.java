@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -50,9 +49,12 @@ public class ClientEventHandler {
         if (player != null) {
             if (event.gui != null && Backhand.ExtraInventorySlot && !Backhand.UseInventorySlot) {
                 if (event.gui.getClass() == GuiInventory.class || event.gui instanceof GuiContainerCreative && Backhand.CreativeInventoryOffhand) {
-                    player.inventoryContainer = new ContainerPlayerBattle(player.inventory, !player.worldObj.isRemote, player);
-                    event.gui = event.gui.getClass() == GuiInventory.class ? new GuiOffhandInventory(player) : new GuiOffhandCreativeInventory(player);
-                    player.sendQueue.addToSendQueue(new OffhandContainerPacket(player, false).generatePacket());
+                    if (!ClientTickHandler.jrmcInvGuiOpen) {
+                        player.inventoryContainer = new ContainerPlayerBattle(player.inventory, !player.worldObj.isRemote, player);
+                        event.gui = event.gui.getClass() == GuiInventory.class ? new GuiOffhandInventory(player) : new GuiOffhandCreativeInventory(player);
+                        player.sendQueue.addToSendQueue(new OffhandContainerPacket(player, false).generatePacket());
+                    }
+                    ClientTickHandler.jrmcInvGuiOpen = false;
                     return;
                 }
             }
@@ -64,6 +66,7 @@ public class ClientEventHandler {
                 MysteriumPatchesFixesO.disableGUIOpen = true;
             }
         }
+        ClientTickHandler.jrmcInvGuiOpen = false;
     }
 
     @SubscribeEvent
