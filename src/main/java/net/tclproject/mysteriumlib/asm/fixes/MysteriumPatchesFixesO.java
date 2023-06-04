@@ -500,7 +500,7 @@ public class MysteriumPatchesFixesO {
     @Fix(returnSetting=EnumReturnSetting.ALWAYS, insertOnExit = true)
     public static void sendContainerAndContentsToPlayer(EntityPlayerMP player, Container p_71110_1_, List p_71110_2_)
     {
-        BattlegearUtils.getOffhandEP(player).offhandItemChanged = true;
+        BattlegearUtils.getOffhandEP(player).syncOffhand = true;
     }
 
     public static boolean ignoreSetSlot = false;

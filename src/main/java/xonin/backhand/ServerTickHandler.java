@@ -109,11 +109,11 @@ public class ServerTickHandler {
             prevStackInSlot = offhand;
         }
 
-        if (BattlegearUtils.getOffhandEP(player).offhandItemChanged) {
+        if (BattlegearUtils.getOffhandEP(player).syncOffhand) {
             if (!tickStartItems.containsKey(player.getUniqueID())) {
                 Backhand.packetHandler.sendPacketToAll(new BattlegearSyncItemPacket(player).generatePacket());
             }
-            BattlegearUtils.getOffhandEP(player).offhandItemChanged = false;
+            BattlegearUtils.getOffhandEP(player).syncOffhand = false;
         }
 
         if (ServerEventsHandler.arrowHotSwapped) {
