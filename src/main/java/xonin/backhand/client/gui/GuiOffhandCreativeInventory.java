@@ -53,10 +53,6 @@ public class GuiOffhandCreativeInventory extends GuiContainerCreative {
 
         if (p_147050_1_ == CreativeTabs.tabInventory)
         {
-            Minecraft.getMinecraft().thePlayer.sendQueue.addToSendQueue(
-                    new OffhandContainerPacket(Minecraft.getMinecraft().thePlayer,false).generatePacket()
-            );
-
             Container container = this.inputContainer;
 
             if (this.field_147063_B == null)
