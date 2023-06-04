@@ -3,14 +3,8 @@ package xonin.backhand.client;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.ContainerPlayerBattle;
-import mods.battlegear2.packet.OffhandContainerPacket;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -20,62 +14,15 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.*;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import xonin.backhand.Backhand;
-import xonin.backhand.client.gui.GuiOffhandCreativeInventory;
-import xonin.backhand.client.gui.GuiOffhandInventory;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 public class ClientEventHandler {
     public static RenderOffhandPlayer renderOffhandPlayer = new RenderOffhandPlayer();
     public static EntityPlayer renderingPlayer;
     public static boolean cancelone = false;
-
-    @SubscribeEvent
-    public void openGUI(GuiOpenEvent event) {
-        Minecraft mc = Minecraft.getMinecraft();
-        EntityClientPlayerMP player = mc.thePlayer;
-        if (player != null) {
-            if (MysteriumPatchesFixesO.disableGUIOpen) {
-                if (!(player.inventoryContainer instanceof ContainerPlayerBattle)) {
-                    //If the inventory container is not Backhand's, we don't need to worry about GUIs having mismatched containers anymore.
-                    //Set this to false in-case the packet doesn't arrive for some reason
-                    MysteriumPatchesFixesO.disableGUIOpen = false;
-                } else {
-                    //Keep sending this packet every time a GUI cannot be opened, until the inventory container changes.
-                    player.sendQueue.addToSendQueue(new OffhandContainerPacket(player, true).generatePacket());
-                    event.setCanceled(true);
-                    return;
-                }
-            }
-
-            if (!MysteriumPatchesFixesO.receivedConfigs || MysteriumPatchesFixesO.changedContainer) {
-                return;
-            }
-
-            if (event.gui != null && Backhand.ExtraInventorySlot && !Backhand.UseInventorySlot) {
-                if (event.gui.getClass() == GuiInventory.class || event.gui instanceof GuiContainerCreative && Backhand.CreativeInventoryOffhand) {
-                    if (!ClientTickHandler.jrmcInvGuiOpen) {
-                        player.inventoryContainer = new ContainerPlayerBattle(player.inventory, !player.worldObj.isRemote, player);
-                        event.gui = event.gui.getClass() == GuiInventory.class ? new GuiOffhandInventory(player) : new GuiOffhandCreativeInventory(player);
-                        player.sendQueue.addToSendQueue(new OffhandContainerPacket(player, false).generatePacket());
-                    }
-                    ClientTickHandler.jrmcInvGuiOpen = false;
-                    return;
-                }
-            }
-            GuiScreen oldScreen = Minecraft.getMinecraft().currentScreen;
-            if (oldScreen != null && (oldScreen.getClass() == GuiOffhandInventory.class || oldScreen.getClass() == GuiOffhandCreativeInventory.class)) {
-                player.sendQueue.addToSendQueue(
-                        new OffhandContainerPacket(player, true).generatePacket()
-                );
-                MysteriumPatchesFixesO.disableGUIOpen = true;
-            }
-            ClientTickHandler.jrmcInvGuiOpen = false;
-        }
-    }
 
     @SubscribeEvent
     public void renderHotbarOverlay(RenderGameOverlayEvent event) {

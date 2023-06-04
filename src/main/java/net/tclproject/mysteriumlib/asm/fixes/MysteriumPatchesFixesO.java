@@ -9,7 +9,6 @@ import invtweaks.InvTweaksContainerSectionManager;
 import invtweaks.api.container.ContainerSection;
 import mods.battlegear2.BattlemodeHookContainerClass;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.ContainerPlayerBattle;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import mods.battlegear2.client.BattlegearClientTickHandler;
@@ -65,9 +64,7 @@ public class MysteriumPatchesFixesO {
     /**If we have hotswapped the breaking item with the one in offhand and should hotswap it back when called next*/
     public static boolean hotSwapped = false;
 
-    public static boolean disableGUIOpen = false;
     public static boolean receivedConfigs = false;
-    public static boolean changedContainer = false;
 
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
 	public static boolean isPlayer(EntityPlayer p) {
@@ -537,47 +534,6 @@ public class MysteriumPatchesFixesO {
             else if (p_147266_1_.func_149175_c() == player.openContainer.windowId && (p_147266_1_.func_149175_c() != 0 || !flag))
             {
                 player.openContainer.putStackInSlot(p_147266_1_.func_149173_d(), p_147266_1_.func_149174_e() == null || p_147266_1_.func_149174_e().stackSize == 0 ? null : p_147266_1_.func_149174_e());
-            }
-        }
-    }
-
-    @Fix(returnSetting=EnumReturnSetting.ALWAYS)
-    public static void processCreativeInventoryAction(NetHandlerPlayServer netServer, C10PacketCreativeInventoryAction p_147344_1_)
-    {
-        if (netServer.playerEntity.theItemInWorldManager.isCreative())
-        {
-            boolean flag = p_147344_1_.func_149627_c() < 0;
-            ItemStack itemstack = p_147344_1_.func_149625_d();
-            int maxSlot = 36 + InventoryPlayer.getHotbarSize();
-            if (netServer.playerEntity.inventoryContainer instanceof ContainerPlayerBattle) {
-                maxSlot += 1;
-            }
-            boolean flag1 = p_147344_1_.func_149627_c() >= 1 && p_147344_1_.func_149627_c() < maxSlot;
-            boolean flag2 = itemstack == null || itemstack.getItem() != null;
-            boolean flag3 = itemstack == null || itemstack.getItemDamage() >= 0 && itemstack.stackSize <= 64 && itemstack.stackSize > 0;
-
-            if (flag1 && flag2 && flag3)
-            {
-                if (itemstack == null)
-                {
-                    netServer.playerEntity.inventoryContainer.putStackInSlot(p_147344_1_.func_149627_c(), (ItemStack)null);
-                }
-                else
-                {
-                    netServer.playerEntity.inventoryContainer.putStackInSlot(p_147344_1_.func_149627_c(), itemstack);
-                }
-
-                netServer.playerEntity.inventoryContainer.setPlayerIsPresent(netServer.playerEntity, true);
-            }
-            else if (flag && flag2 && flag3 && netServer.field_147375_m < 200)
-            {
-                netServer.field_147375_m += 20;
-                EntityItem entityitem = netServer.playerEntity.dropPlayerItemWithRandomChoice(itemstack, true);
-
-                if (entityitem != null)
-                {
-                    entityitem.setAgeToCreativeDespawnTime();
-                }
             }
         }
     }
