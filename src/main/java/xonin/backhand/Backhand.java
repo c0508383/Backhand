@@ -37,7 +37,6 @@ public class Backhand {
     public static boolean UseInventorySlot = false;
     public static String[] offhandBlacklist;
 
-    public static boolean CreativeInventoryOffhand = false;
     public static boolean RenderEmptyOffhandAtRest = false;
 
     public Backhand() {

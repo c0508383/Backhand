@@ -82,17 +82,11 @@ public class BattlegearConfig {
         comments[0] = sb.toString();
         Backhand.RenderEmptyOffhandAtRest = config.get(category, "Render empty offhand at rest",Backhand.RenderEmptyOffhandAtRest, comments[0]).getBoolean();
 
-        sb = new StringBuilder();
-        sb.append("If set to true, a slot for your offhand item will be available in the creative inventory GUI. False by default.");
-        comments[0] = sb.toString();
-        Backhand.CreativeInventoryOffhand = config.get(category, "Allow offhand slot in the creative mode GUI",Backhand.CreativeInventoryOffhand, comments[0]).getBoolean();
-
         file.save();
     }
 
     public static void refreshConfig(){
         try{
-            file.get("Rendering", "Allow offhand slot in the creative mode GUI", new String[0], comments[0]).set(Backhand.CreativeInventoryOffhand);
             file.get("Rendering", "Render empty offhand at rest", new String[0], comments[0]).set(Backhand.RenderEmptyOffhandAtRest);
             file.save();
         }catch (Exception e){
