@@ -73,11 +73,15 @@ public class ServerTickHandler {
     )
     public void onUpdatePlayer(TickEvent.PlayerTickEvent event)
     {
+        EntityPlayer player = event.player;
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.SERVER) {
+            if (ServerEventsHandler.regularHotSwap) {
+                BattlegearUtils.swapOffhandItem(player);
+                ServerEventsHandler.regularHotSwap = false;
+            }
             return;
         }
 
-        EntityPlayer player = event.player;
         ItemStack offhand = BattlegearUtils.getOffhandItem(player);
 
         if (event.phase == TickEvent.Phase.END) {
