@@ -13,6 +13,7 @@ import mods.battlegear2.client.BattlegearClientTickHandler;
 import mods.battlegear2.packet.OffhandSwapPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.input.Keyboard;

@@ -1,27 +1,26 @@
 package xonin.backhand;
 
-import cpw.mods.fml.common.eventhandler.Event;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
 import mods.battlegear2.api.core.BattlegearUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
-import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 
 public class ServerEventsHandler {
 
     public static boolean arrowHotSwapped = false;
-    public static boolean totemHotSwapped = false;
+    public static boolean regularHotSwap = false;
     public static int fireworkHotSwapped = -1;
 
     @SubscribeEvent
@@ -66,7 +65,7 @@ public class ServerEventsHandler {
 
             if (totemItem.isInstance(offhandItem.getItem()) && (mainhandItem == null || !totemItem.isInstance(mainhandItem.getItem()))) {
                 BattlegearUtils.swapOffhandItem(player);
-                totemHotSwapped = true;
+                regularHotSwap = true;
                 MinecraftForge.EVENT_BUS.post(event);
             }
         } catch (Exception ignored) {}
@@ -114,7 +113,34 @@ public class ServerEventsHandler {
     }
 
     @SubscribeEvent
-    public void onPreArrowLoose(PlayerUseItemEvent.Stop event) {
+    public void onItemFinish(PlayerUseItemEvent.Finish event) {
+        EntityPlayer player = event.entityPlayer;
+        ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+        ItemStack mainhandItem = player.getCurrentEquippedItem();
+        boolean mainhandUse = BattlegearUtils.checkForRightClickFunction(mainhandItem);
+        if (offhandItem == null || mainhandUse) {
+            return;
+        }
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER && !ServerTickHandler.tickStartItems.containsKey(player.getUniqueID())) {
+            BattlegearUtils.swapOffhandItem(player);
+            regularHotSwap = true;
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onItemStop(PlayerUseItemEvent.Stop event) {
+        EntityPlayer player = event.entityPlayer;
+        ItemStack mainhandItem = player.getCurrentEquippedItem();
+        boolean mainhandUse = BattlegearUtils.checkForRightClickFunction(mainhandItem);
+        if (BattlegearUtils.getOffhandItem(player) == null || mainhandUse) {
+            return;
+        }
+
+        if (!ServerTickHandler.tickStartItems.containsKey(player.getUniqueID()) && !regularHotSwap) {
+            BattlegearUtils.swapOffhandItem(player);
+            regularHotSwap = true;
+        }
+
         if (!Backhand.UseOffhandArrows || !(event.item.getItem() instanceof ItemBow)) {
             return;
         }

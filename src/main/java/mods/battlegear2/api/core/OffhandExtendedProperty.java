@@ -9,7 +9,7 @@ import net.minecraftforge.common.IExtendedEntityProperties;
 
 public class OffhandExtendedProperty implements IExtendedEntityProperties {
     public EntityPlayer player;
-    public boolean offhandItemChanged = true;
+    public boolean syncOffhand = true;
     private ItemStack offhandItem;
 
     public OffhandExtendedProperty(EntityPlayer player) {
@@ -40,7 +40,7 @@ public class OffhandExtendedProperty implements IExtendedEntityProperties {
 
     public void setOffhandItem(ItemStack stack) {
         if (!ItemStack.areItemStacksEqual(stack,this.offhandItem)) {
-            this.offhandItemChanged = true;
+            this.syncOffhand = true;
         }
         this.offhandItem = stack;
     }

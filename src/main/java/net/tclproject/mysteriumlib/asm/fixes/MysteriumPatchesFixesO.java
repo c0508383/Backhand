@@ -12,7 +12,6 @@ import mods.battlegear2.api.core.BattlegearUtils;
 import mods.battlegear2.api.core.IBattlePlayer;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import mods.battlegear2.client.BattlegearClientTickHandler;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -22,45 +21,33 @@ import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.*;
 import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.play.client.C02PacketUseEntity;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.network.play.client.C09PacketHeldItemChange;
-import net.minecraft.network.play.client.C0EPacketClickWindow;
+import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
-import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.IItemRenderer;
-import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.tclproject.mysteriumlib.asm.annotations.EnumReturnSetting;
 import net.tclproject.mysteriumlib.asm.annotations.Fix;
 import net.tclproject.mysteriumlib.asm.annotations.ReturnedValue;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import xonin.backhand.Backhand;
 import xonin.backhand.client.ClientEventHandler;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
@@ -68,14 +55,15 @@ import xonin.backhand.client.renderer.RenderOffhandPlayer;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.lang.reflect.Method;
+import java.util.List;
 
 public class MysteriumPatchesFixesO {
     /**Dirty hack to prevent random resetting of block removal (why does this even happen?!) when breaking blocks with the offhand.*/
     public static int countToCancel = 0;
     /**If we have hotswapped the breaking item with the one in offhand and should hotswap it back when called next*/
     public static boolean hotSwapped = false;
-    public static boolean disableGUIOpen = false;
+
     public static boolean receivedConfigs = false;
 
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
@@ -372,22 +360,39 @@ public class MysteriumPatchesFixesO {
         b.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
         b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
 
-        if (b.aimedBow)
-        {
-            f6 = 0.0F;
-            f7 = 0.0F;
-            b.bipedRightArm.rotateAngleZ = 0.0F;
-            b.bipedLeftArm.rotateAngleZ = 0.0F;
-            b.bipedRightArm.rotateAngleY = -(0.1F - f6 * 0.6F) + b.bipedHead.rotateAngleY;
-            b.bipedLeftArm.rotateAngleY = 0.1F - f6 * 0.6F + b.bipedHead.rotateAngleY + 0.4F;
-            b.bipedRightArm.rotateAngleX = -((float)Math.PI / 2F) + b.bipedHead.rotateAngleX;
-            b.bipedLeftArm.rotateAngleX = -((float)Math.PI / 2F) + b.bipedHead.rotateAngleX;
-            b.bipedRightArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
-            b.bipedLeftArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
-            b.bipedRightArm.rotateAngleZ += MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
-            b.bipedLeftArm.rotateAngleZ -= MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
-            b.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
-            b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+        if (b.aimedBow) {
+            if (p_78087_7_ instanceof EntityPlayer && p_78087_7_ == Minecraft.getMinecraft().thePlayer && BattlegearUtils.getOffhandItem((EntityPlayer) p_78087_7_) != null
+                && ((EntityClientPlayerMP) p_78087_7_).getItemInUse() == BattlegearUtils.getOffhandItem((EntityPlayer) p_78087_7_)) {
+                f6 = 0.0F;
+                f7 = 0.0F;
+                b.bipedLeftArm.rotateAngleZ = 0.0F;
+                b.bipedRightArm.rotateAngleZ = 0.0F;
+                b.bipedLeftArm.rotateAngleY = 0.1F + b.bipedHead.rotateAngleY;
+                b.bipedRightArm.rotateAngleY = -0.5F + b.bipedHead.rotateAngleY;
+                b.bipedLeftArm.rotateAngleX = -((float) Math.PI / 2F) + b.bipedHead.rotateAngleX;
+                b.bipedRightArm.rotateAngleX = -((float) Math.PI / 2F) + b.bipedHead.rotateAngleX;
+                b.bipedLeftArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
+                b.bipedRightArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
+                b.bipedLeftArm.rotateAngleZ -= MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
+                b.bipedRightArm.rotateAngleZ += MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
+                b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+                b.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+            } else {
+                f6 = 0.0F;
+                f7 = 0.0F;
+                b.bipedRightArm.rotateAngleZ = 0.0F;
+                b.bipedLeftArm.rotateAngleZ = 0.0F;
+                b.bipedRightArm.rotateAngleY = -(0.1F - f6 * 0.6F) + b.bipedHead.rotateAngleY;
+                b.bipedLeftArm.rotateAngleY = 0.1F - f6 * 0.6F + b.bipedHead.rotateAngleY + 0.4F;
+                b.bipedRightArm.rotateAngleX = -((float) Math.PI / 2F) + b.bipedHead.rotateAngleX;
+                b.bipedLeftArm.rotateAngleX = -((float) Math.PI / 2F) + b.bipedHead.rotateAngleX;
+                b.bipedRightArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
+                b.bipedLeftArm.rotateAngleX -= f6 * 1.2F - f7 * 0.4F;
+                b.bipedRightArm.rotateAngleZ += MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
+                b.bipedLeftArm.rotateAngleZ -= MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
+                b.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+                b.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
+            }
         }
     }
 
@@ -489,6 +494,12 @@ public class MysteriumPatchesFixesO {
         m.tryHarvestBlock(p_73082_1_, p_73082_2_, p_73082_3_);
     }
 
+    @Fix(returnSetting=EnumReturnSetting.ALWAYS, insertOnExit = true)
+    public static void sendContainerAndContentsToPlayer(EntityPlayerMP player, Container p_71110_1_, List p_71110_2_)
+    {
+        BattlegearUtils.getOffhandEP(player).syncOffhand = true;
+    }
+
     public static boolean ignoreSetSlot = false;
 
     @Fix(returnSetting=EnumReturnSetting.ALWAYS)
@@ -534,9 +545,10 @@ public class MysteriumPatchesFixesO {
         Entity entity = p_147340_1_.func_149564_a(worldserver);
         netServer.playerEntity.func_143004_u();
 
-        boolean swapOffhand = BattlegearUtils.allowOffhandUse(netServer.playerEntity);
-
-        if (swapOffhand) {
+        boolean swappedOffhand = BattlegearUtils.checkForRightClickFunction(BattlegearUtils.getOffhandItem(netServer.playerEntity))
+                && !BattlegearUtils.checkForRightClickFunction(netServer.playerEntity.getCurrentEquippedItem())
+                && p_147340_1_.func_149565_c() == C02PacketUseEntity.Action.INTERACT;
+        if (swappedOffhand) {
             BattlegearUtils.swapOffhandItem(netServer.playerEntity);
         }
 
@@ -562,7 +574,9 @@ public class MysteriumPatchesFixesO {
                     {
                         netServer.kickPlayerFromServer("Attempting to attack an invalid entity");
                         netServer.serverController.logWarning("Player " + netServer.playerEntity.getCommandSenderName() + " tried to attack an invalid entity");
-                        return;
+                        if (swappedOffhand) {
+                            BattlegearUtils.swapOffhandItem(netServer.playerEntity);
+                        }
                     }
 
                     netServer.playerEntity.attackTargetEntityWithCurrentItem(entity);
@@ -570,7 +584,7 @@ public class MysteriumPatchesFixesO {
             }
         }
 
-        if (swapOffhand) {
+        if (swappedOffhand) {
             BattlegearUtils.swapOffhandItem(netServer.playerEntity);
         }
     }
@@ -598,40 +612,6 @@ public class MysteriumPatchesFixesO {
             System.out.println(server.playerEntity.getCommandSenderName() + " tried to set an invalid carried item " + p_147355_1_.func_149614_c());
         }
     }
-
-    /*@Fix(returnSetting=EnumReturnSetting.ALWAYS)
-    public static void processClickWindow(NetHandlerPlayServer server, C0EPacketClickWindow p_147351_1_)
-    {
-        server.playerEntity.func_143004_u();
-
-        if (server.playerEntity.openContainer.windowId == p_147351_1_.func_149548_c() && server.playerEntity.openContainer.isPlayerNotUsingContainer(server.playerEntity))
-        {
-            ItemStack itemstack = server.playerEntity.openContainer.slotClick(p_147351_1_.func_149544_d(), p_147351_1_.func_149543_e(), p_147351_1_.func_149542_h(), server.playerEntity);
-
-            if (ItemStack.areItemStacksEqual(p_147351_1_.func_149546_g(), itemstack))
-            {
-                server.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(p_147351_1_.func_149548_c(), p_147351_1_.func_149547_f(), true));
-                server.playerEntity.isChangingQuantityOnly = true;
-                server.playerEntity.openContainer.detectAndSendChanges();
-                server.playerEntity.updateHeldItem();
-                server.playerEntity.isChangingQuantityOnly = false;
-            }
-            else
-            {
-                server.field_147372_n.addKey(server.playerEntity.openContainer.windowId, Short.valueOf(p_147351_1_.func_149547_f()));
-                server.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(p_147351_1_.func_149548_c(), p_147351_1_.func_149547_f(), false));
-                server.playerEntity.openContainer.setPlayerIsPresent(server.playerEntity, false);
-                ArrayList arraylist = new ArrayList();
-
-                for (int i = 0; i < server.playerEntity.openContainer.inventorySlots.size(); ++i)
-                {
-                    arraylist.add(((Slot)server.playerEntity.openContainer.inventorySlots.get(i)).getStack());
-                }
-
-                server.playerEntity.sendContainerAndContentsToPlayer(server.playerEntity.openContainer, arraylist);
-            }
-        }
-    }*/
 
     @Fix(insertOnExit=true,returnSetting=EnumReturnSetting.ON_NOT_NULL)
     public static ItemStack getCurrentItem(InventoryPlayer inv)
@@ -748,6 +728,24 @@ public class MysteriumPatchesFixesO {
             manager = null;
         }
         return manager;
+    }
+
+    @Optional.Method(modid="Optifine")
+    @SideOnly(Side.CLIENT)
+    @Fix(insertOnExit=true, returnSetting=EnumReturnSetting.ALWAYS)
+    public static int getLightLevel(Entity entity, @ReturnedValue int returned) {
+        if (entity instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) entity;
+            ItemStack offhand = BattlegearUtils.getOffhandItem(player);
+            try {
+                Method getLightLevel = Class.forName("DynamicLights").getMethod("getLightLevel",ItemStack.class);
+                int levelMain = (int) getLightLevel.invoke(null,offhand);
+                ItemStack stackHead = player.getEquipmentInSlot(4);
+                int levelHead = (int) getLightLevel.invoke(null,stackHead);
+                return Math.max(levelMain, levelHead);
+            } catch (Exception ignored) {}
+        }
+        return returned;
     }
 
     // inv tweaks compat starts here

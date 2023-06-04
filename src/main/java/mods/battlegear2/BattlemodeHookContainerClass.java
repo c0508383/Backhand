@@ -50,13 +50,13 @@ public final class BattlemodeHookContainerClass {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onEntityJoin(EntityJoinWorldEvent event){
         if (event.entity instanceof EntityPlayer && !(isFake(event.entity))) {
-            if (!(((EntityPlayer) event.entity).inventory instanceof InventoryPlayerBattle)) {
-                //throw new RuntimeException("Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
-                if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+            if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+                if (!(((EntityPlayer) event.entity).inventory instanceof InventoryPlayerBattle)) {
+                    //throw new RuntimeException("Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
                     FMLLog.log("Backhand", Level.INFO, "Player inventory has been replaced with " + ((EntityPlayer) event.entity).inventory.getClass());
                 }
+                Backhand.packetHandler.sendPacketToPlayer(new OffhandConfigSyncPacket((EntityPlayer) event.entity).generatePacket(), (EntityPlayerMP) event.entity);
             }
-            Backhand.packetHandler.sendPacketToAll(new OffhandConfigSyncPacket().generatePacket());
             ItemStack offhandItem = BattlegearUtils.getOffhandItem((EntityPlayer) event.entity);
             if (Backhand.isOffhandBlacklisted(offhandItem)) {
                 BattlegearUtils.setPlayerOffhandItem((EntityPlayer) event.entity,null);
@@ -208,10 +208,11 @@ public final class BattlemodeHookContainerClass {
         ItemStack prevHeldItem = player.getCurrentEquippedItem();
 
         player.setCurrentItemOrArmor(0, itemStack);
-        ItemStack itemUsed = player.getCurrentEquippedItem();
+        ItemStack itemUsed = player.getCurrentEquippedItem().copy();
         ItemStack itemStackResult = itemStack.useItemRightClick(player.getEntityWorld(), player);
-        if (itemUsed != player.getCurrentEquippedItem()) {
-            BattlegearUtils.setPlayerOffhandItem(player, player.getCurrentEquippedItem());
+        if (!ItemStack.areItemStacksEqual(itemUsed,itemStackResult)) {
+            BattlegearUtils.setPlayerOffhandItem(player,itemStackResult);
+            BattlegearUtils.getOffhandEP(player).syncOffhand = true;
             if (player.getCurrentEquippedItem() == null || player.getCurrentEquippedItem().stackSize == 0) {
                 ForgeEventFactory.onPlayerDestroyItem(player, player.getCurrentEquippedItem());
             }

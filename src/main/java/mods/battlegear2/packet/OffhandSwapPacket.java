@@ -42,7 +42,7 @@ public class OffhandSwapPacket extends AbstractMBPacket {
 
             BattlegearUtils.setPlayerOffhandItem(this.player,this.player.getCurrentEquippedItem());
             BattlegearUtils.setPlayerCurrentItem(this.player,offhandItem);
-            Backhand.packetHandler.sendPacketToPlayer(new OffhandSwapClientPacket().generatePacket(), (EntityPlayerMP) player);
+            Backhand.packetHandler.sendPacketToPlayer(new OffhandSwapClientPacket(this.player).generatePacket(), (EntityPlayerMP) player);
         }
     }
 }

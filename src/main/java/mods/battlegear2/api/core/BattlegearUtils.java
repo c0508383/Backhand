@@ -6,7 +6,6 @@ import java.io.IOException;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
-import mods.battlegear2.BattlemodeHookContainerClass;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -66,9 +65,6 @@ public class BattlegearUtils {
     public static void setPlayerOffhandItem(EntityPlayer player, ItemStack stack) {
         if (!Backhand.isOffhandBlacklisted(stack)) {
             if (Backhand.UseInventorySlot) {
-                if (!ItemStack.areItemStacksEqual(stack,player.inventory.getStackInSlot(Backhand.AlternateOffhandSlot))) {
-                    player.inventory.inventoryChanged = true;
-                }
                 player.inventory.setInventorySlotContents(Backhand.AlternateOffhandSlot, stack);
             } else {
                 getOffhandEP(player).setOffhandItem(stack);
@@ -82,12 +78,6 @@ public class BattlegearUtils {
         } else {
             return getOffhandEP(player).getOffhandItem();
         }
-    }
-
-    public static boolean allowOffhandUse(EntityPlayer player) {
-        ItemStack mainHandItem = player.getCurrentEquippedItem();
-        return mainHandItem == null || (!BattlegearUtils.checkForRightClickFunction(mainHandItem)
-                && !BattlemodeHookContainerClass.isItemBlock(mainHandItem.getItem()));
     }
 
     public static OffhandExtendedProperty getOffhandEP(EntityPlayer player) {
@@ -377,11 +367,11 @@ public class BattlegearUtils {
      * @param par1Entity the attacked
      */
     public static void attackTargetEntityWithCurrentOffItem(EntityPlayer player, Entity par1Entity){
-        if (!Backhand.OffhandAttack)
-            return;
-
         final ItemStack oldItem = player.getCurrentEquippedItem();
         final ItemStack offhandItem = BattlegearUtils.getOffhandItem(player);
+        if (!Backhand.OffhandAttack || (offhandItem == null && !Backhand.EmptyOffhand))
+            return;
+
         BattlegearUtils.setPlayerCurrentItem(player,offhandItem);
         refreshAttributes(player.getAttributeMap(), oldItem, player.getCurrentEquippedItem());
 

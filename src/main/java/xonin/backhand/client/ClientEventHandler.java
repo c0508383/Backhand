@@ -3,14 +3,8 @@ package xonin.backhand.client;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import mods.battlegear2.api.core.BattlegearUtils;
-import mods.battlegear2.api.core.ContainerPlayerBattle;
-import mods.battlegear2.packet.OffhandContainerPacket;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -20,12 +14,9 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.*;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesO;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import xonin.backhand.Backhand;
-import xonin.backhand.client.gui.GuiOffhandCreativeInventory;
-import xonin.backhand.client.gui.GuiOffhandInventory;
 import xonin.backhand.client.renderer.RenderOffhandPlayer;
 
 public class ClientEventHandler {
@@ -34,45 +25,11 @@ public class ClientEventHandler {
     public static boolean cancelone = false;
 
     @SubscribeEvent
-    public void openGUI(GuiOpenEvent event) {
-        if (MysteriumPatchesFixesO.disableGUIOpen) {
-            event.setCanceled(true);
-            return;
-        }
-
-        if (!MysteriumPatchesFixesO.receivedConfigs) {
-            return;
-        }
-
-        Minecraft mc = Minecraft.getMinecraft();
-        EntityClientPlayerMP player = mc.thePlayer;
-        if (player != null) {
-            if (event.gui != null && Backhand.ExtraInventorySlot && !Backhand.UseInventorySlot) {
-                if (event.gui.getClass() == GuiInventory.class || event.gui instanceof GuiContainerCreative && Backhand.CreativeInventoryOffhand) {
-                    player.inventoryContainer = new ContainerPlayerBattle(player.inventory, !player.worldObj.isRemote, player);
-                    event.gui = event.gui.getClass() == GuiInventory.class ? new GuiOffhandInventory(player) : new GuiOffhandCreativeInventory(player);
-                    player.sendQueue.addToSendQueue(new OffhandContainerPacket(player, false).generatePacket());
-                    return;
-                }
-            }
-            GuiScreen oldScreen = Minecraft.getMinecraft().currentScreen;
-            if (oldScreen != null && (oldScreen.getClass() == GuiOffhandInventory.class || oldScreen.getClass() == GuiOffhandCreativeInventory.class)) {
-                player.sendQueue.addToSendQueue(
-                        new OffhandContainerPacket(player, true).generatePacket()
-                );
-                MysteriumPatchesFixesO.disableGUIOpen = true;
-            }
-        }
-    }
-
-    @SubscribeEvent
     public void renderHotbarOverlay(RenderGameOverlayEvent event) {
-        if (event.isCancelable() || event.type != RenderGameOverlayEvent.ElementType.ALL) {
-            return;
+        if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR) {
+            Minecraft mc = Minecraft.getMinecraft();
+            renderHotbar(mc.ingameGUI, event.resolution.getScaledWidth(), event.resolution.getScaledHeight(), event.partialTicks);
         }
-
-        Minecraft mc = Minecraft.getMinecraft();
-        renderHotbar(mc.ingameGUI, event.resolution.getScaledWidth(), event.resolution.getScaledHeight(), event.partialTicks);
     }
 
     protected void renderHotbar(GuiIngame gui, int width, int height, float partialTicks) {

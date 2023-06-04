@@ -7,10 +7,23 @@ import java.util.Arrays;
 
 public class BattlegearConfig {
     private static Configuration file;
-	public static String[] blacklistedItems = new String[0];
+    public static String[] blacklistedItems = new String[0];
     private static String[] comments = new String[1];
 
-	public static void getConfig(Configuration config) {
+    public static void getConfig(Configuration config) {
+        file = config;
+
+        loadConfigFields(config);
+
+        file.getConfigFile().delete();
+        file.load();
+
+        loadConfigFields(file);
+
+        file.save();
+    }
+
+    public static void loadConfigFields(Configuration config) {
         file = config;
         StringBuilder sb;
         String category = Configuration.CATEGORY_GENERAL;
@@ -37,10 +50,6 @@ public class BattlegearConfig {
         sb = new StringBuilder();
         sb.append("If enabled, bows can be used in the offhand. True in vanilla.");
         Backhand.UseOffhandBow = config.get(category, "Use offhand bow",Backhand.UseOffhandBow, sb.toString()).getBoolean();
-
-        sb = new StringBuilder();
-        sb.append("If enabled, an extra offhand slot will be available in the survival inventory screen.");
-        Backhand.ExtraInventorySlot = config.get(category, "Extra Inventory Slot",Backhand.ExtraInventorySlot, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
         sb.append("If the main offhand inventory can't be used, this slot in the main inventory will be used as the offhand instead. Slot 9 by default.");
@@ -76,7 +85,7 @@ public class BattlegearConfig {
         sb = new StringBuilder();
         sb.append("If set to true, a slot for your offhand item will be available in the creative inventory GUI. False by default.");
         comments[0] = sb.toString();
-        Backhand.CreativeInventoryOffhand = config.get(category, "Render empty offhand at rest",Backhand.CreativeInventoryOffhand, comments[0]).getBoolean();
+        Backhand.CreativeInventoryOffhand = config.get(category, "Allow offhand slot in the creative mode GUI",Backhand.CreativeInventoryOffhand, comments[0]).getBoolean();
 
         file.save();
     }

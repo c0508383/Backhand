@@ -36,9 +36,12 @@ public class ServerTickHandler {
             for (EntityPlayer player : players) {
                 ItemStack mainhand = player.getCurrentEquippedItem() == null ? null : player.getCurrentEquippedItem().copy();
                 ItemStack offhand = BattlegearUtils.getOffhandItem(player) == null ? null : BattlegearUtils.getOffhandItem(player).copy();
+                if (offhand == null) {
+                    continue;
+                }
 
                 if (event.phase == TickEvent.Phase.START && !player.isUsingItem()) {
-                    if (!BattlegearUtils.checkForRightClickFunction(mainhand) && offhand != null) {
+                    if (!BattlegearUtils.checkForRightClickFunction(mainhand)) {
                         if (!tickStartItems.containsKey(player.getUniqueID())) {
                             Backhand.packetHandler.sendPacketToPlayer(
                                     new OffhandWorldHotswapPacket(true).generatePacket(), (EntityPlayerMP) player
@@ -47,15 +50,21 @@ public class ServerTickHandler {
                         tickStartItems.put(player.getUniqueID(), Arrays.asList(mainhand, offhand));
                         player.setCurrentItemOrArmor(0, tickStartItems.get(player.getUniqueID()).get(1));
                     }
-                } else if (tickStartItems.containsKey(player.getUniqueID())) {
-                    player.setCurrentItemOrArmor(0, tickStartItems.get(player.getUniqueID()).get(0));
-                    BattlegearUtils.setPlayerOffhandItem(player, tickStartItems.get(player.getUniqueID()).get(1));
-                    tickStartItems.remove(player.getUniqueID());
-                    Backhand.packetHandler.sendPacketToPlayer(
-                            new OffhandWorldHotswapPacket(false).generatePacket(), (EntityPlayerMP) player
-                    );
+                } else {
+                    ServerTickHandler.resetTickingHotswap(player);
                 }
             }
+        }
+    }
+
+    public static void resetTickingHotswap(EntityPlayer player) {
+        if (tickStartItems.containsKey(player.getUniqueID())) {
+            player.setCurrentItemOrArmor(0, tickStartItems.get(player.getUniqueID()).get(0));
+            BattlegearUtils.setPlayerOffhandItem(player, tickStartItems.get(player.getUniqueID()).get(1));
+            tickStartItems.remove(player.getUniqueID());
+            Backhand.packetHandler.sendPacketToPlayer(
+                    new OffhandWorldHotswapPacket(false).generatePacket(), (EntityPlayerMP) player
+            );
         }
     }
 
@@ -65,6 +74,14 @@ public class ServerTickHandler {
     public void onUpdatePlayer(TickEvent.PlayerTickEvent event)
     {
         EntityPlayer player = event.player;
+        if (FMLCommonHandler.instance().getEffectiveSide() != Side.SERVER) {
+            if (ServerEventsHandler.regularHotSwap) {
+                BattlegearUtils.swapOffhandItem(player);
+                ServerEventsHandler.regularHotSwap = false;
+            }
+            return;
+        }
+
         ItemStack offhand = BattlegearUtils.getOffhandItem(player);
 
         if (event.phase == TickEvent.Phase.END) {
@@ -96,16 +113,11 @@ public class ServerTickHandler {
             prevStackInSlot = offhand;
         }
 
-        if (BattlegearUtils.getOffhandEP(player).offhandItemChanged || player.inventory.inventoryChanged) {
+        if (BattlegearUtils.getOffhandEP(player).syncOffhand) {
             if (!tickStartItems.containsKey(player.getUniqueID())) {
                 Backhand.packetHandler.sendPacketToAll(new BattlegearSyncItemPacket(player).generatePacket());
             }
-            if (BattlegearUtils.getOffhandEP(player).offhandItemChanged) {
-                BattlegearUtils.getOffhandEP(player).offhandItemChanged = false;
-            }
-            if (player.inventory.inventoryChanged) {
-                player.inventory.inventoryChanged = false;
-            }
+            BattlegearUtils.getOffhandEP(player).syncOffhand = false;
         }
 
         if (ServerEventsHandler.arrowHotSwapped) {
@@ -114,9 +126,9 @@ public class ServerTickHandler {
             }
             ServerEventsHandler.arrowHotSwapped = false;
         }
-        if (ServerEventsHandler.totemHotSwapped) {
+        if (ServerEventsHandler.regularHotSwap) {
             BattlegearUtils.swapOffhandItem(player);
-            ServerEventsHandler.totemHotSwapped = false;
+            ServerEventsHandler.regularHotSwap = false;
         }
 
         if (ServerEventsHandler.fireworkHotSwapped > 0) {
