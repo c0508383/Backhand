@@ -50,14 +50,17 @@ public class OffhandContainerPacket extends AbstractMBPacket {
                 if (player instanceof EntityPlayerMP) {
                     ((EntityPlayerMP) player).addSelfToInternalCraftingInventory();
                 }
-            } else if (this.player.inventoryContainer instanceof ContainerPlayerBattle) {
-                this.player.inventoryContainer = new ContainerPlayer(this.player.inventory, !this.player.worldObj.isRemote, this.player);
-                this.player.openContainer = this.player.inventoryContainer;
+            } else {
+                if (this.player.inventoryContainer instanceof ContainerPlayerBattle) {
+                    this.player.inventoryContainer = new ContainerPlayer(this.player.inventory, !this.player.worldObj.isRemote, this.player);
+                    this.player.openContainer = this.player.inventoryContainer;
 
-                if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-                    ((EntityPlayerMP) player).addSelfToInternalCraftingInventory();
-                    Backhand.packetHandler.sendPacketToPlayer(new OffhandContainerPacket(player, true).generatePacket(), (EntityPlayerMP) player);
-                } else {
+                    if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+                        ((EntityPlayerMP) player).addSelfToInternalCraftingInventory();
+                        Backhand.packetHandler.sendPacketToPlayer(new OffhandContainerPacket(player, true).generatePacket(), (EntityPlayerMP) player);
+                    }
+                }
+                if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
                     MysteriumPatchesFixesO.disableGUIOpen = false;
                 }
             }

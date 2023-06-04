@@ -35,18 +35,26 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void openGUI(GuiOpenEvent event) {
-        if (MysteriumPatchesFixesO.disableGUIOpen) {
-            event.setCanceled(true);
-            return;
-        }
-
-        if (!MysteriumPatchesFixesO.receivedConfigs || MysteriumPatchesFixesO.changedContainer) {
-            return;
-        }
-
         Minecraft mc = Minecraft.getMinecraft();
         EntityClientPlayerMP player = mc.thePlayer;
         if (player != null) {
+            if (MysteriumPatchesFixesO.disableGUIOpen) {
+                if (!(player.inventoryContainer instanceof ContainerPlayerBattle)) {
+                    //If the inventory container is not Backhand's, we don't need to worry about GUIs having mismatched containers anymore.
+                    //Set this to false in-case the packet doesn't arrive for some reason
+                    MysteriumPatchesFixesO.disableGUIOpen = false;
+                } else {
+                    //Keep sending this packet every time a GUI cannot be opened, until the inventory container changes.
+                    player.sendQueue.addToSendQueue(new OffhandContainerPacket(player, true).generatePacket());
+                    event.setCanceled(true);
+                    return;
+                }
+            }
+
+            if (!MysteriumPatchesFixesO.receivedConfigs || MysteriumPatchesFixesO.changedContainer) {
+                return;
+            }
+
             if (event.gui != null && Backhand.ExtraInventorySlot && !Backhand.UseInventorySlot) {
                 if (event.gui.getClass() == GuiInventory.class || event.gui instanceof GuiContainerCreative && Backhand.CreativeInventoryOffhand) {
                     if (!ClientTickHandler.jrmcInvGuiOpen) {
@@ -65,8 +73,8 @@ public class ClientEventHandler {
                 );
                 MysteriumPatchesFixesO.disableGUIOpen = true;
             }
+            ClientTickHandler.jrmcInvGuiOpen = false;
         }
-        ClientTickHandler.jrmcInvGuiOpen = false;
     }
 
     @SubscribeEvent
