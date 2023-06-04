@@ -52,10 +52,6 @@ public class BattlegearConfig {
         Backhand.UseOffhandBow = config.get(category, "Use offhand bow",Backhand.UseOffhandBow, sb.toString()).getBoolean();
 
         sb = new StringBuilder();
-        sb.append("If enabled, an extra offhand slot will be available in the survival inventory screen.");
-        Backhand.ExtraInventorySlot = config.get(category, "Extra Inventory Slot",Backhand.ExtraInventorySlot, sb.toString()).getBoolean();
-
-        sb = new StringBuilder();
         sb.append("If the main offhand inventory can't be used, this slot in the main inventory will be used as the offhand instead. Slot 9 by default.");
         Backhand.AlternateOffhandSlot = config.get(category, "Alternate Inventory Slot",Backhand.AlternateOffhandSlot, sb.toString()).getInt();
 

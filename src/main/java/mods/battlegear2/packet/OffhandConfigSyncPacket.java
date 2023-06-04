@@ -25,7 +25,6 @@ public final class OffhandConfigSyncPacket extends AbstractMBPacket {
         Backhand.OffhandBreakBlocks = inputStream.readBoolean();
         Backhand.UseOffhandArrows = inputStream.readBoolean();
         Backhand.UseOffhandBow = inputStream.readBoolean();
-        Backhand.ExtraInventorySlot = inputStream.readBoolean();
         Backhand.OffhandTickHotswap = inputStream.readBoolean();
         Backhand.AlternateOffhandSlot = inputStream.readInt();
         Backhand.UseInventorySlot = inputStream.readBoolean();
@@ -44,7 +43,6 @@ public final class OffhandConfigSyncPacket extends AbstractMBPacket {
         out.writeBoolean(Backhand.OffhandBreakBlocks);
         out.writeBoolean(Backhand.UseOffhandArrows);
         out.writeBoolean(Backhand.UseOffhandBow);
-        out.writeBoolean(Backhand.ExtraInventorySlot);
         out.writeBoolean(Backhand.OffhandTickHotswap);
         out.writeInt(Backhand.AlternateOffhandSlot);
         out.writeBoolean(Backhand.UseInventorySlot);
