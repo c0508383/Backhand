@@ -29,8 +29,10 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.*;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.play.client.*;
@@ -55,6 +57,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class MysteriumPatchesFixesO {
     /**Dirty hack to prevent random resetting of block removal (why does this even happen?!) when breaking blocks with the offhand.*/
@@ -492,6 +495,12 @@ public class MysteriumPatchesFixesO {
     {
         m.theWorld.destroyBlockInWorldPartially(m.thisPlayerMP.getEntityId(), p_73082_1_, p_73082_2_, p_73082_3_, -1);
         m.tryHarvestBlock(p_73082_1_, p_73082_2_, p_73082_3_);
+    }
+
+    @Fix(returnSetting=EnumReturnSetting.ALWAYS, insertOnExit = true)
+    public static void sendContainerAndContentsToPlayer(EntityPlayerMP player, Container p_71110_1_, List p_71110_2_)
+    {
+        BattlegearUtils.getOffhandEP(player).offhandItemChanged = true;
     }
 
     public static boolean ignoreSetSlot = false;
